@@ -1,0 +1,26 @@
+
+.wrap {
+    position: absolute;
+    width: 200px;
+    border: 1px solid red;
+    /* height: 100%; */
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding: 5px;
+}
+
+.wrap > div {
+    width: 100%; height: 5px; background: #ddd;
+    
+}
+
+.wrap .bar {
+    background: black;
+    width: 100%;
+    display: inline-block;
+    transition: all .3s;
+   transform: scaleX(19%);
+   transform-origin: 0 0;;
+   height: 100%;;
+}

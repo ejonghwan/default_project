@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { v4 } from 'uuid';
 import mime from 'mime-types'; //file type 지정
+import cors from 'cors'
 
 
 
@@ -38,6 +39,7 @@ const upload = multer({
 const app = express();
 const PORT = 5000;
 
+// app.use(cors())
 app.use('/uploads', express.static('uploads')) //http://localhost:5000/uploads/ae791f20-ca35-4e95-919b-655d94791127.jpeg 이거 접근됨...이거 없음 접근안됨
 
 
@@ -50,6 +52,10 @@ app.post('/upload', upload.single("image"), (req, res) => {
     res.json(req.file);
 })
 
+
+app.get('/test', (req, res) => {
+    res.json('hehe')
+})
   
 
 
