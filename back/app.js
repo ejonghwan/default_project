@@ -3,6 +3,9 @@ import multer from 'multer';
 import { v4 } from 'uuid';
 import mime from 'mime-types'; //file type 지정
 import cors from 'cors'
+import mongoose from 'mongoose';
+import dotenv from 'dotenv'
+import ImageModel from './models/images.js'
 
 
 
@@ -20,6 +23,7 @@ destionation: 어디에 저장할지
 filename: 어떤 이름으로 저장할지
 */
 
+
 const upload = multer({ 
     storage, 
     fileFilter: (req, file, cb) => {
@@ -36,27 +40,60 @@ const upload = multer({
 })
 
 
+
+
+
 const app = express();
 const PORT = 5000;
 
-// app.use(cors())
 app.use('/uploads', express.static('uploads')) //http://localhost:5000/uploads/ae791f20-ca35-4e95-919b-655d94791127.jpeg 이거 접근됨...이거 없음 접근안됨
+app.use(cors())
+app.use(express.json())
+dotenv.config()
 
 
 
-app.post('/upload', upload.single("image"), (req, res) => { 
-    //post로 이미지를 보낼때 이미 req에 저장이 되어있음. upload(미들웨어)를 이용해서 저장된 이미지 가져옴 
-    // postman  body -> form-data -> key에 위에 미들웨어와 동일한 키값 image넣음
-    
-    console.log(req.file)
-    res.json(req.file);
+
+
+mongoose.connect(process.env.MONGO_URI, {}).then(() => {
+    try {
+        console.log('mongodb connect')
+
+        app.post('/images', upload.single("image"), async (req, res) => { 
+            //post로 이미지를 보낼때 이미 req에 저장이 되어있음. upload(미들웨어)를 이용해서 저장된 이미지 가져옴 
+            // postman  body -> form-data -> key에 위에 미들웨어와 동일한 키값 image넣음
+            
+            const image = await new ImageModel({
+                key: req.file.filename, 
+                originalFileName: req.file.originalname,
+            })
+            image.save();
+
+            console.log(req.file)
+            res.json(req.file);
+        })
+
+
+        app.get('/images', async (req, res) => {
+            try {
+                const images = await ImageModel.find()
+                res.status(201).json(images)
+            } catch(err) {
+                console.error(err)
+            }
+        })
+
+
+        app.get('/test', (req, res) => {
+            res.json('hehe')
+        })
+        
+
+
+        app.listen(PORT, () => console.log('express server listening port ' + PORT))
+
+    } catch(err) {
+        console.error(err)
+    }
 })
 
-
-app.get('/test', (req, res) => {
-    res.json('hehe')
-})
-  
-
-
-app.listen(PORT, () => console.log('express server listening port ' + PORT))

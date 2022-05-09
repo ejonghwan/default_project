@@ -34,7 +34,7 @@ const ImageUploadForm = () => {
         formData.append('image', file) //form data에 배열로 담김
       
         try {
-            const res = await axios.post('/upload', formData, {
+            const res = await axios.post('http://localhost:5000/images', formData, {
                 headers: {"Content-Type":"multipart/form-data"},
                 onUploadProgress: ProgressEvent => {
                     console.log(ProgressEvent)
