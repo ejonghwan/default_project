@@ -6,31 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import ImageUploadForm from './components/ImageUploadForm.js'
 import Context_test from './components/Context_test.js'
+import Test from './components/Test.js'
 
 
-import { reducer, intialState } from './reducers/index.js'
-export const TestContext = createContext(null);
-
+import { ImageProvider } from './context/ImageContext.js'
 
 
 const App = () => {
-
-  const [test, setTest] = useState('')
-
-  const getData = async () => {
-      const res = await axios.get('http://localhost:5000/test') 
-      const data = res.data
-      return data;
-  }
-
-
-  useEffect(() => {
-    getData().then((a)=> {
-      // console.log(a)
-      setTest(a)
-    } )
-    // console.log(data)
-  }, [])
 
   const ele = useRef(null)
 
@@ -39,12 +21,8 @@ const App = () => {
   }
 
 
-  const [ state, dispatch ] = useReducer(reducer, intialState);
-  console.log(state)
-  // const { test } = state;
-
   return (
-    <TestContext.Provider value={{ dispatch, test }}>
+    
         <div className="App">
           <header className="App-header">
             <ToastContainer />
@@ -53,11 +31,14 @@ const App = () => {
             <button onClick={handleClick}>click</button>
           </header>
           <main>
-            <ImageUploadForm />
-            <Context_test />
+            <ImageProvider>
+              <ImageUploadForm />
+              <Context_test />
+              <Test />
+            </ImageProvider>
           </main>
         </div>
-    </TestContext.Provider>
+    
   );
 }
 

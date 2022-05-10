@@ -77,16 +77,13 @@ mongoose.connect(process.env.MONGO_URI, {}).then(() => {
         app.get('/images', async (req, res) => {
             try {
                 const images = await ImageModel.find()
+                console.log(images)
                 res.status(201).json(images)
             } catch(err) {
                 console.error(err)
             }
         })
 
-
-        app.get('/test', (req, res) => {
-            res.json('hehe')
-        })
         
 
 

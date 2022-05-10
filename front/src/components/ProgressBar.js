@@ -6,8 +6,8 @@ const ProgressBar = props => {
     const barRef = useRef(null)
 
     const handlePersent = e => {
-        console.log(barRef.current)
-        console.log(props.persent)
+        // console.log(barRef.current)
+        // console.log(props.persent)
         barRef.current.style.transform = `scaleX(${props.persent}%)`
     }
 
