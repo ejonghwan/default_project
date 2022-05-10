@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer, useContext } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
 
 import './ImageUploadForm.css'
 import ProgressBar from './ProgressBar.js'
+
+import { ImageContext } from '../context/ImageContext.js'
+
+
 
 const ImageUploadForm = () => {
     const defaultFileName = '이미지 삽입'
@@ -13,6 +17,8 @@ const ImageUploadForm = () => {
     const [persent, setPersent] = useState(0) 
     const [imageUrl, setImageUrl] = useState(null);
     
+    
+    const { state, dispatch } = useContext(ImageContext)
 
 
     const handleInputChange = e => {
@@ -32,12 +38,12 @@ const ImageUploadForm = () => {
         e.preventDefault();
         const formData = new FormData();
         formData.append('image', file) //form data에 배열로 담김
-      
+        if(!formData) return;
         try {
-            const res = await axios.post('/upload', formData, {
+            const res = await axios.post('http://localhost:5000/images', formData, {
                 headers: {"Content-Type":"multipart/form-data"},
                 onUploadProgress: ProgressEvent => {
-                    console.log(ProgressEvent)
+                    // console.log(ProgressEvent)
                     setPersent( Math.round(100 * ProgressEvent.loaded / ProgressEvent.total) )
                     setTimeout(() => {
                         setPersent(0)
@@ -45,12 +51,22 @@ const ImageUploadForm = () => {
                     }, 3000)
                 }
             })
-            console.log({ res })
+
+            await dispatch({ type: "TEST_REQUEST", data: 'hoho'})
+            await dispatch({ type: "IMAGE_UPLOAD_REQUEST", data: res.data })
+
+
             toast.success('t')
         } catch (err) {
             toast.error(err.message)
             console.error(err)
         }
+    }
+
+
+    const testClick = e => {
+        console.log(111)
+        dispatch({ type: "IMAGE_UPLOAD_REQUEST", data: 'hoho'})
     }
 
     // useEffect(() => {
