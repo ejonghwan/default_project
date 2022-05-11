@@ -15,7 +15,7 @@ const Context_test = (props) => {
 
     const getData = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/images')
+            const res = await axios.get('http://localhost:5000/api/images')
             const data = await res.data;
     
             console.log('getData:', data)
