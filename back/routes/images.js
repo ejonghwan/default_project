@@ -56,7 +56,7 @@ router.post('/', upload.single("image"), async (req, res) => {
     })
     image.save();
 
-    console.log(req.file)
+    // console.log(req.file)
     res.json(req.file);
 })
 
@@ -67,7 +67,7 @@ router.post('/', upload.single("image"), async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const images = await ImageModel.find()
-        console.log(images)
+        // console.log(images)
         res.status(201).json(images)
     } catch(err) {
         console.error(err)
