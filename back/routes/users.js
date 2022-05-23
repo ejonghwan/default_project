@@ -4,14 +4,11 @@ import jwt from 'jsonwebtoken'
 import { auth } from '../middleware/auth.js' 
 
 
-
-
 // model 
 import User from '../models/users.js'
 
 
 const router = express.Router();
-
 
 
 //@ path    GET /api/users/
@@ -29,7 +26,6 @@ router.get('/', async (req, res) => {
     }
 
 })
-
 
 
 //@ path    POST /api/users/
@@ -61,8 +57,6 @@ router.post('/', async (req, res) => {
         console.error(err)
     }
 })
-
-
 
 
 
