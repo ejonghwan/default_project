@@ -16,13 +16,11 @@ const router = express.Router();
 //@ access  public
 router.get('/', async (req, res) => {
     try {
-
         const user = await User.find()
-
         res.status(201).json({ user })
-        
     } catch(err) {
         console.error(err)
+        res.status(400).json({ error: err.message })
     }
 
 })
@@ -34,9 +32,12 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const { id, password, email, name } = req.body;
-        
-        const user = await new User({ id, password, email, name })
+        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        if(!password || typeof password !== 'string') return res.status(400).json({ err: 'is not password' }) 
+        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
+        if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
+        const user = await new User({ id, password, email, name })
 
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, (err, hash) => {
@@ -55,8 +56,10 @@ router.post('/', async (req, res) => {
         
     } catch(err) {
         console.error(err)
+        res.status(400).json({ err: err.message }) 
     }
 })
+
 
 
 
@@ -66,17 +69,17 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { _id, id, password } = req.body
-        if(!id) return res.status(400).json({ err: '' })
-        // 검증 코드 아직 작성 안함 
+
+        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        if(!_id || typeof _id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        if(!password || typeof password !== 'string') return res.status(400).json({ err: 'is not password' }) 
 
         const user = await User.findOne({ id: id }) 
         if(!user) return res.status(400).json({ err: "is not find user" })
-        // console.log(user.password)
+       
         
-
-
         const match = await bcrypt.compare(password, user.password);
-        if(!match) return res.status(400).json({ err: "비밀번호 불일치" })
+        if(!match) return res.status(400).json({ err: "password is not matched" })
         if(match) {
             jwt.sign({ _id: _id }, process.env.JWT_KEY, { expiresIn: "2 days" }, (err, token) => {
                 if(err) throw new Error(err)
@@ -93,6 +96,17 @@ router.post('/login', async (req, res) => {
 
     } catch(err) {
         console.error(err)
+        res.status(400).json({ err: err.message }) 
+    }
+})
+
+
+router.post('/profile/edit', auth, async (req, res) => {
+    try {
+        const {  } = req.body;
+    } catch(err) {
+        console.error(err)
+        res.status(400).json({ err: err.message })
     }
 })
 
