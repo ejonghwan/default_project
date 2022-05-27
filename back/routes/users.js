@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
     try {
         const { id, password, email, name } = req.body;
         if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!password || typeof password !== 'string') return res.status(400).json({ err: 'is not password' }) 
+        if(!password ) return res.status(400).json({ err: 'is not password' }) 
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
@@ -53,6 +53,9 @@ router.post('/', async (req, res) => {
             })
         })
 
+        /* res data 
+            {"user":{"id":"hoho123","email":"hoho123@naver.com","name":"hohoman","password":"$2b$10$tNvb0bavhmmegJwUxR.7COshNoGPXQwjOiHunhoQoCXFau9Z8n5Au","_id":"6290902af8a34b046421598d","createdAt":"2022-05-27T08:47:38.437Z","updatedAt":"2022-05-27T08:47:38.437Z","__v":0}}
+        */
         
     } catch(err) {
         console.error(err)
@@ -71,8 +74,8 @@ router.post('/login', async (req, res) => {
         const { _id, id, password } = req.body
 
         if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!_id || typeof _id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!password || typeof password !== 'string') return res.status(400).json({ err: 'is not password' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+        if(!password) return res.status(400).json({ err: 'is not password' }) 
 
         const user = await User.findOne({ id: id }) 
         if(!user) return res.status(400).json({ err: "is not find user" })
@@ -103,7 +106,30 @@ router.post('/login', async (req, res) => {
 
 router.post('/profile/edit', auth, async (req, res) => {
     try {
-        const {  } = req.body;
+
+        const { id, _id, password, checkedPassword, name } = req.body;
+        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+        if(!password) return res.status(400).json({ err: 'is not password' }) 
+        if(!checkedPassword) return res.status(400).json({ err: 'is not checked password' }) 
+        if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
+
+
+        const userPassword = await User.findById(_id, 'password')
+        const matched = await bcrypt.compare(password, userPassword)
+
+        if(!matched) return res.status(400).json({ err: '' })
+        if(!_id) return res.status(400).json({ err: 'is not user' })
+        if(password !== checkedPassword) return res.status(400).json({ err: 'not password matched ' })
+
+        if(password, checkedPassword) {
+            
+        }
+
+
+
+
+
     } catch(err) {
         console.error(err)
         res.status(400).json({ err: err.message })
