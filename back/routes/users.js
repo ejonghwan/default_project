@@ -142,7 +142,6 @@ router.post('/profile/edit', auth, async (req, res) => {
 router.post('/test', auth, async (req, res) => {
     try {
         const findUser = await User.findOne({ _id: req.user._id })
-
         res.status(200).json({ findUser })
         
         console.log('last line test api: ', req.user._id)
