@@ -1,22 +1,28 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom'
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { ImageProvider } from './context/ImageContext.js'
+import './assets/reset.css'
+import './assets/global.css'
 
-import Home from './pages/Home.js'
+import { ImageProvider } from './context/ImageContext.js'
+import RoutesPage from './pages/index.js'
+
+
 
 const App = () => {
 
   return (
     
         <div className="App"> 
-          
+          <BrowserRouter>
             <ToastContainer />
             <ImageProvider>
-              <Home />
+              <RoutesPage />
             </ImageProvider>
+          </BrowserRouter>
           
         </div>
     

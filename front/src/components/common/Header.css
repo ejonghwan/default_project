@@ -1,0 +1,4 @@
+/* header {background-color: #161b22;} */
+header {background-color: var(--header-bg-color); color: var(--text-color1); padding: 20px;}
+header ul {display: flex;}
+header ul > li {flex: 0 0 auto; margin-right: 5px;; }
