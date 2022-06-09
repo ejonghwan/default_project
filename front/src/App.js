@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import './assets/reset.css'
-import './assets/global.css'
+import './assets/css/reset.css'
+import './assets/css/global.css'
 
 import { ImageProvider } from './context/ImageContext.js'
 import RoutesPage from './pages/index.js'

@@ -3,7 +3,9 @@ import React from 'react';
 const Main = ({children}) => {
     return (
         <main id="contents">
-            {children}
+            <div className='wrap'>
+                {children}
+            </div>
         </main>
     );
 };

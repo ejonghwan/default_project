@@ -1,0 +1,5 @@
+h1 {margin-bottom: 20px; font-size: 18px; font-weight: bold;}
+h2 {font-size: 16px; font-weight: bold;}
+h3 {}
+.conts + .conts {margin-top: 40px;}
+.conts > article + article {margin-top: 20px;}

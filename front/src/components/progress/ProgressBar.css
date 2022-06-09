@@ -1,4 +1,3 @@
-
 .wrap {
     position: absolute;
     width: 200px;
@@ -10,9 +9,11 @@
     padding: 5px;
 }
 
-.wrap > div {
-    width: 100%; height: 5px; background: #ddd;
-    
+.wrap>div {
+    width: 100%;
+    height: 5px;
+    background: #ddd;
+
 }
 
 .wrap .bar {
@@ -20,7 +21,9 @@
     width: 100%;
     display: inline-block;
     transition: all .3s;
-   transform: scaleX(19%);
-   transform-origin: 0 0;;
-   height: 100%;;
+    transform: scaleX(19%);
+    transform-origin: 0 0;
+    ;
+    height: 100%;
+    ;
 }
