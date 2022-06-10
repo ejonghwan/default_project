@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, Fragment } from 'react';
+import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
 
 //module
 import { useInput } from '../common/hooks/index.js'
@@ -9,32 +9,40 @@ import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
 
 
+// context
+import { UserContext } from '../../context/UserContext.js'
+
 
 const LoginForm = () => {
 
     const [userId, handleUserId] = useInput('')
     const [userPassword, handlePassword] = useInput('')
 
+    const {state, dispatch} = useContext(UserContext)
 
     const handleSubmit = useCallback(async e => {
         try {
             axiosModule({
                 method: "get",
                 URI: "/api/users/login",
-                data: { _id, id: userId, password: userPassword },
+                data: { id: userId, password: userPassword },
                 config: {
-                    headers: {
-                        'x-access-token': localStorage.getItem('token')
-                    },
-                    accept: {
-                        
-                    }
+                    // headers: {
+                    //     'X-Access-Token': localStorage.getItem('token')
+                    // },
+                    
                 }
             })
         } catch(err) {
-            console.err(err)
+            console.error(err)
         }
     }, [])
+
+
+    useEffect(() => {
+        console.log(state, dispatch)
+        dispatch({ type: "USER_TEST", data: userId  })
+    }, [userId])
 
 
     return (
@@ -49,6 +57,7 @@ const LoginForm = () => {
                         placeholder="id" 
                         classN="input_text_t1" 
                         name="userId" 
+                        
                         value={userId} 
                         evt="onChange" 
                         onChange={handleUserId} 

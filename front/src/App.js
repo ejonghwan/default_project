@@ -8,6 +8,7 @@ import './assets/css/reset.css'
 import './assets/css/global.css'
 
 import { ImageProvider } from './context/ImageContext.js'
+import { UserProvider } from './context/UserContext.js'
 import RoutesPage from './pages/index.js'
 
 
@@ -19,9 +20,11 @@ const App = () => {
         <div className="App"> 
           <BrowserRouter>
             <ToastContainer />
-            <ImageProvider>
-              <RoutesPage />
-            </ImageProvider>
+              <UserProvider>
+                <ImageProvider>
+                  <RoutesPage />
+                </ImageProvider>
+              </UserProvider>
           </BrowserRouter>
           
         </div>

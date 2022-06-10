@@ -7,7 +7,7 @@ import { useInput } from '../components/common/hooks/index.js'
 // components
 import Input from '../components/common/form/Input.js'
 import Label from '../components/common/form/Label.js'
-
+import LoginForm from '../components/user/LoginForm.js'
 
 const Signup = () => {
 
@@ -29,39 +29,38 @@ const Signup = () => {
         setTerms(e.target.checked)
     }, [setTerms])
 
-    useEffect(() => {
-        userPassword === userPasswordCheck ? setPasswordChecked(true) : setPasswordChecked(false);
-        if(userId && userPassword && userEmail && userName && passwordChecked && terms) setSubmitActive(true);
-    }, [userId, userEmail, userName, passwordChecked, terms, userPassword, userPasswordCheck])
-
-
-
+  
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            // if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms) return;
-            console.log('????????????????????')
+            if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms) return;
 
             const res = await axiosModule({
                 method: "post",
                 URI: "/api/users",
                 data: { id: userId, password: userPassword, email: userEmail, name: userName, },
-                config: {
-                    headers: {
-                        hoho: 'hohoho1'
-                    }
-                }
+                
             })
 
-            const data = await res.user
+            // 비밀번호 강화 로직 아직안함
 
-            console.log(data)
+            const user = await res.user;
+            console.log(user)
 
-            // console.log(res)
+
+
+
         } catch(err) {
-            console.err(err)
+            console.error(err)
         }
-    }, [])
+    }, [userId, userPassword, userEmail, userName, passwordChecked, terms])
+
+
+    useEffect(() => {
+        userPassword === userPasswordCheck ? setPasswordChecked(true) : setPasswordChecked(false);
+        if(userId && userPassword && userEmail && userName && passwordChecked && terms) setSubmitActive(true);
+    }, [userId, userEmail, userName, passwordChecked, terms, userPassword, userPasswordCheck])
+
 
 
 
@@ -155,6 +154,9 @@ const Signup = () => {
                 </div>
                 <button type="submit" className={submitActive ? 'checked' : 'none'} >회원가입</button>
             </form>
+
+            test
+            <LoginForm />
         </div>
     );
 };

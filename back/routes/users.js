@@ -71,22 +71,23 @@ router.post('/', async (req, res) => {
 //@ access  public
 router.post('/login', async (req, res) => {
     try {
-        const { _id, id, password } = req.body
+        const { id, password } = req.body;
 
         if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
         if(!password) return res.status(400).json({ err: 'is not password' }) 
 
         const user = await User.findOne({ id: id }) 
         if(!user) return res.status(400).json({ err: "is not find user" })
        
+        // console.log(user)
         
         const match = await bcrypt.compare(password, user.password);
         if(!match) return res.status(400).json({ err: "password is not matched" })
         if(match) {
-            jwt.sign({ _id: _id }, process.env.JWT_KEY, { expiresIn: "2 days" }, (err, token) => {
+            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2 days" }, (err, token) => {
                 if(err) throw new Error(err)
-                // console.log('token???: ', token)
+                console.log('token???: ', token)
                 res.status(201).json({
                     token,
                     _id: user._id, 
@@ -96,6 +97,7 @@ router.post('/login', async (req, res) => {
                 });
             });
         };
+
 
     } catch(err) {
         console.error(err)
