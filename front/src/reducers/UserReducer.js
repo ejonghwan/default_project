@@ -1,12 +1,17 @@
 export const UserIntialState = {
-    test: ''
+    error: '',
+    user: {},
 }
 
 const UserReducer = (state = UserIntialState, action) => {
     switch(action.type) {
-           case "USER_TEST": return {
+           case "USER_LOGIN_SUCCESS": return {
                ...state,
-               test: action.data
+               user: action.data
+           }
+           case "USER_LOGIN_FAILUE" : return {
+                ...state,
+                error: action.data
            }
 
            default: return { state }

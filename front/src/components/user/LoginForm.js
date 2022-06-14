@@ -17,13 +17,14 @@ const LoginForm = () => {
 
     const [userId, handleUserId] = useInput('')
     const [userPassword, handlePassword] = useInput('')
-
     const {state, dispatch} = useContext(UserContext)
 
+
     const handleSubmit = useCallback(async e => {
+        e.preventDefault();
         try {
-            axiosModule({
-                method: "get",
+            const user = await axiosModule({
+                method: "post",
                 URI: "/api/users/login",
                 data: { id: userId, password: userPassword },
                 config: {
@@ -33,15 +34,23 @@ const LoginForm = () => {
                     
                 }
             })
+
+            dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data  })
+
+            
+
         } catch(err) {
             console.error(err)
+            dispatch({ type: "USER_LOGIN_FAILUE", data: err  })
         }
+
     }, [])
 
 
     useEffect(() => {
-        console.log(state, dispatch)
-        dispatch({ type: "USER_TEST", data: userId  })
+        // console.log(state, dispatch)
+        // dispatch({ type: "USER_TEST", data: userId  })
+        console.log(userId)
     }, [userId])
 
 
@@ -78,6 +87,7 @@ const LoginForm = () => {
                     />
                     <button>view password</button>
                 </div>
+                <button type="submit">로그인</button>
             </form>
         </Fragment>
     );
