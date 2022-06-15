@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
+import axios from 'axios'
 
 //module
 import { useInput } from '../common/hooks/index.js'
@@ -23,6 +24,9 @@ const LoginForm = () => {
     const handleSubmit = useCallback(async e => {
         e.preventDefault();
         try {
+            console.log('1111111111111 ??????????')
+            await dispatch({ type: "LOADING", data: `로그인중`  })
+            console.log('222222222222 ??????????')
             const user = await axiosModule({
                 method: "post",
                 URI: "/api/users/login",
@@ -31,27 +35,28 @@ const LoginForm = () => {
                     // headers: {
                     //     'X-Access-Token': localStorage.getItem('token')
                     // },
-                    
                 }
             })
-
-            dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data  })
-
+           
+            await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
+            
             
 
         } catch(err) {
             console.error(err)
-            dispatch({ type: "USER_LOGIN_FAILUE", data: err  })
+            dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
         }
 
-    }, [])
+    }, [userId, userPassword])
 
 
     useEffect(() => {
         // console.log(state, dispatch)
         // dispatch({ type: "USER_TEST", data: userId  })
-        console.log(userId)
-    }, [userId])
+        // console.log(userId)
+        localStorage.setItem('X-Access-Token', state.user.token)
+
+    }, [userId, state])
 
 
     return (

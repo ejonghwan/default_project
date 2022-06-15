@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom'
 import './Header.css'
 
+
+//context 
+import {UserContext} from '../../context/UserContext.js'
+
+
 const Header = () => {
+
+    const { state, dispatch } = useContext(UserContext)
+    
+
+    const handleLogout = () => {
+        dispatch({ type: "USER_LOGOUT" })
+    }
+
     return (
         <header id='header'>
             <nav>
@@ -14,6 +27,8 @@ const Header = () => {
                     <li><Link to="/style">style</Link></li>
                 </ul>
             </nav>
+            <span>name: {state.user.name} </span>
+            <button onClick={handleLogout}>logout</button>
         </header>
     );
 };

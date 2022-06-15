@@ -73,7 +73,9 @@ router.post('/login', async (req, res) => {
     try {
         const { id, password } = req.body;
 
-        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        console.log('asdsadasdasd', id, password, req.body)
+
+        if(!id ) return res.status(400).json({ err: 'is not id' }) 
         // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
         if(!password) return res.status(400).json({ err: 'is not password' }) 
 
