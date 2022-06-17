@@ -37,14 +37,36 @@ router.post('/', async (req, res) => {
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
-        const user = await new User({ id, password, email, name })
+
+        // jwt access token create
+        let accessToken = await jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, token) => {
+            if(err) throw new Error(err)
+            console.log('인증토큰: ', token)
+            accessToken = token
+        });
+
+         // jwt refresh token create
+         let refreshToken = await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "365 days" }, (err, token) => {
+            if(err) throw new Error(err)
+            console.log('리프레시토큰: ', token)
+            refreshToken = token
+        });
+
+
+    
+        console.log({'acc': accessToken, "re": refreshToken})
+
+        // 여기까지 보다가 끔 (리프레시 토큰 안나옴 )
+        const user = await new User({ id, password, email, name, token: refreshToken})
 
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, (err, hash) => {
                 if(err) throw new Error(err);
                 // console.log('hash: ', hash)
-                user.password = hash
-               
+                user.password = hash;
+                user.token = refreshToken;
+                
+
                 user.save().then(user => {
                     console.log('then user:', user)
                     res.status(201).json({ user })  
@@ -52,6 +74,9 @@ router.post('/', async (req, res) => {
                 
             })
         })
+
+        
+
 
         /* res data 
             {"user":{"id":"hoho123","email":"hoho123@naver.com","name":"hohoman","password":"$2b$10$tNvb0bavhmmegJwUxR.7COshNoGPXQwjOiHunhoQoCXFau9Z8n5Au","_id":"6290902af8a34b046421598d","createdAt":"2022-05-27T08:47:38.437Z","updatedAt":"2022-05-27T08:47:38.437Z","__v":0}}
