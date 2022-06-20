@@ -38,40 +38,48 @@ router.post('/', async (req, res) => {
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
 
-        // jwt access token create
-        const accessToken = await jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, token) => {
-            if(err) throw new Error(err)
-            console.log('인증토큰: ', token)
-            return token
-        });
 
-         // jwt refresh token create
-         const refreshToken = await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "365 days" }, (err, token) => {
-            if(err) throw new Error(err)
-            console.log('리프레시토큰: ', token)
-            return token
-        });
+        // 여기까지 보다가 끔 -> 해결함 (리프레시는 해시화해서 쿠키로 보내고 디비저장, 인증토큰은 바디로ㅓ보냄)
+        const user = await new User({ id, password, email, name, token: null})
 
+        console.log('user', user)
 
-    
-        // await console.log('중간', {'acc': accessToken, "re": refreshToken})
-
-        // 여기까지 보다가 끔 (리프레시 토큰 안나옴 )
-        const user = await new User({ id, password, email, name})
-
-        await bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(user.password, salt, (err, hash) => {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, async (err, hash) => {
                 if(err) throw new Error(err);
                 // console.log('hash: ', hash)
-                user.password = hash;
-                user.token = refreshToken;
-                
-                console.log('user token: ', user.token)
-                //  console.log('마지막', {'acc': accessToken, "re": refreshToken})
 
+                // jwt refresh token create
+                await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "365 days" }, (err, token) => {
+                    if(err) throw new Error(err)
+                    user.token = token
+                });
+        
+                // hash
+                user.password = hash;
+                user.token = hash;
+
+                
+                
                 user.save().then(user => {
-                    console.log('then user:', user)
-                    res.status(201).json({ user })  
+                    // console.log('then user:', user)
+
+                    // jwt access token create
+                    jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, token) => {
+                        if(err) throw new Error(err)
+                        res.cookie('hohoho', user.token, { expires: new Date(Date.now() + 900000), httpOnly: true });
+                        console.log('???????', user.token)
+                        res.status(201).json({ 
+                            token,
+                            _id: user._id, 
+                            id: user.id,
+                            email: user.email,
+                            name: user.name, 
+                        }) 
+
+                    });
+                     
+
                 })
                 
             })
