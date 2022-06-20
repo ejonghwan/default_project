@@ -39,33 +39,35 @@ router.post('/', async (req, res) => {
 
 
         // jwt access token create
-        let accessToken = await jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, token) => {
+        const accessToken = await jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, token) => {
             if(err) throw new Error(err)
             console.log('인증토큰: ', token)
-            accessToken = token
+            return token
         });
 
          // jwt refresh token create
-         let refreshToken = await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "365 days" }, (err, token) => {
+         const refreshToken = await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "365 days" }, (err, token) => {
             if(err) throw new Error(err)
             console.log('리프레시토큰: ', token)
-            refreshToken = token
+            return token
         });
 
 
     
-        console.log({'acc': accessToken, "re": refreshToken})
+        // await console.log('중간', {'acc': accessToken, "re": refreshToken})
 
         // 여기까지 보다가 끔 (리프레시 토큰 안나옴 )
-        const user = await new User({ id, password, email, name, token: refreshToken})
+        const user = await new User({ id, password, email, name})
 
-        bcrypt.genSalt(10, (err, salt) => {
+        await bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, (err, hash) => {
                 if(err) throw new Error(err);
                 // console.log('hash: ', hash)
                 user.password = hash;
                 user.token = refreshToken;
                 
+                console.log('user token: ', user.token)
+                //  console.log('마지막', {'acc': accessToken, "re": refreshToken})
 
                 user.save().then(user => {
                     console.log('then user:', user)
