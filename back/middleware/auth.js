@@ -5,13 +5,16 @@ import User from '../models/users.js'
 export const auth = async (req, res, next) => {
     try {
         
-        const token = req.header('x-access-token')
+        const token = req.header('X-access-token')
         const match = jwt.verify(token, process.env.JWT_KEY)
          //{ _id: '627c7b6cad3ac52d28a40418', iat: 1652419267 }
 
 
         if(!token) return res.status(400).json({ err: 'is not token' })
-        if(!match) return res.status(400).json({ err: 'is not user' })
+        if(!match) {
+            
+        }
+
         if(match) {
             // console.log('auth in', match)
             req.user = match;

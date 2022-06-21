@@ -10,6 +10,23 @@ import User from '../models/users.js'
 
 const router = express.Router();
 
+//@ path    GET /api/users/load
+//@ doc     로드 유저
+//@ access  public
+router.get('/load', auth, async (req, res) => {
+    console.log('headers', req.headers)
+    console.log('users', req.user)
+
+    try {
+        const user = await User.findOne({ id: req.user.id })
+        res.status(201).json(user)
+    } catch(err) {
+
+    }
+
+})
+
+
 
 //@ path    GET /api/users/
 //@ doc     올 유저 

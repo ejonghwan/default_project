@@ -32,11 +32,12 @@ const LoginForm = () => {
                 URI: "/api/users/login",
                 data: { id: userId, password: userPassword },
                 config: {
-                    
-                    // headers: {
-                    //     'X-Access-Token': localStorage.getItem('token')
-                    // },
-                }
+                    headers: {
+                        'X-access-token': localStorage.getItem('token'),
+                        // 'encryption':
+                    },
+                },
+               
             })
            
             await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
@@ -56,6 +57,8 @@ const LoginForm = () => {
         // dispatch({ type: "USER_TEST", data: userId  })
         // console.log(userId)
         localStorage.setItem('X-Access-Token', state.user.token)
+
+       
 
     }, [userId, state])
 

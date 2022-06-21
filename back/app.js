@@ -21,7 +21,10 @@ const PORT = 5000;
 
 //http://localhost:5000/uploads/ae791f20-ca35-4e95-919b-655d94791127.jpeg 이거 접근됨...이거 없음 접근안됨
 app.use('/uploads', express.static('uploads')) 
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:3001",
+    credentials: true
+}))
 app.use(express.json())
 dotenv.config()
 
