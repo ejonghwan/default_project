@@ -16,9 +16,12 @@ import RoutesPage from './pages/index.js'
 
 const App = () => {
 
+  // 여기까지함. 만약 acc token이 에러 뜬다면 쿠키 가져와서 X-refresh-token을 header 로 보내면 됨
+  // const refreshCookie = getCookie('refresh')
+  // console.log('cookie', refreshCookie)
   // axios.get('http://localhost:5000/api/users/load', {
   //   headers: {
-
+  //     // 'X-refresh-token': getCookie('refresh')
   //   }
   // })
 
