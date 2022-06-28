@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
-import { accAuth, refAuth } from '../middleware/auth.js' 
+import { auth } from '../middleware/auth.js' 
 
 
 // model 
@@ -13,24 +13,30 @@ const router = express.Router();
 //@ path    GET /api/users/load
 //@ doc     로드 유저
 //@ access  public
-router.get('/load', refAuth, accAuth, async (req, res) => {
+router.get('/load', auth, async (req, res) => {
+    console.log('load??????')
     try {
-        const user = await User.findOne({ id: req.user.id })
-        
+        const user = req.user;
+        await jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "1s" }, (err, accToken) => {
+            console.log('여기실행왜안됨?')
+            res.status(201).json({
+                accToken,
+                _id: user._id,
+                id: user.id,
+                email: user.email,
+                name: user.name, 
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+            })
+        })
+
         console.log('headers', req.headers)
          console.log('users', req.user)
 
-        res.status(201).json({
-            accToken,
-            _id: user._id,
-            id: user.id,
-            email: user.email,
-            name: user.name, 
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-        })
+      
     } catch(err) {
-
+        console.error(err)
+        res.status(400).json({ error: err.message })
     }
 
 })
@@ -159,7 +165,7 @@ router.post('/', async (req, res) => {
 
 
 
-router.post('/profile/edit', refAuth, accAuth, async (req, res) => {
+router.post('/profile/edit', auth, async (req, res) => {
     try {
 
         const { id, _id, password, checkedPassword, name } = req.body;

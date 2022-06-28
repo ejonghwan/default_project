@@ -31,7 +31,7 @@ const LoginForm = () => {
                 data: { id: userId, password: userPassword },
                 config: {
                     headers: {
-                        'X-access-token': localStorage.getItem('token'),
+                        // 'X-access-token': localStorage.getItem('token'),
                         // 'encryption':
                     },
                 },
@@ -39,7 +39,8 @@ const LoginForm = () => {
             })
            
             await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
-            
+            await localStorage.setItem('X-access-token', user.data.accToken) 
+            await localStorage.setItem('hoho',123) 
             
 
         } catch(err) {
@@ -47,18 +48,18 @@ const LoginForm = () => {
             dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
         }
 
-    }, [userId, userPassword])
+    }, [userId, userPassword, state])
 
 
     useEffect(() => {
         // console.log(state, dispatch)
         // dispatch({ type: "USER_TEST", data: userId  })
         // console.log(userId)
-        localStorage.setItem('X-Access-Token', state.user.token)
-
+        
+       
        
 
-    }, [userId, state])
+    }, [handleSubmit])
 
 
     return (
