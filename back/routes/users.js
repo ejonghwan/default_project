@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
-import { auth } from '../middleware/auth.js' 
+import { accAuth, refAuth } from '../middleware/auth.js' 
 
 
 // model 
@@ -13,13 +13,22 @@ const router = express.Router();
 //@ path    GET /api/users/load
 //@ doc     로드 유저
 //@ access  public
-router.get('/load', auth, async (req, res) => {
-    console.log('headers', req.headers)
-    console.log('users', req.user)
-
+router.get('/load', refAuth, accAuth, async (req, res) => {
     try {
         const user = await User.findOne({ id: req.user.id })
-        res.status(201).json(user)
+        
+        console.log('headers', req.headers)
+         console.log('users', req.user)
+
+        res.status(201).json({
+            accToken,
+            _id: user._id,
+            id: user.id,
+            email: user.email,
+            name: user.name, 
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        })
     } catch(err) {
 
     }
@@ -43,6 +52,49 @@ router.get('/', async (req, res) => {
 })
 
 
+//@ path    POST /api/users/login
+//@ doc     로그인 
+//@ access  public
+router.post('/login', async (req, res) => {
+    try {
+        const { id, password } = req.body;
+
+        if(!id ) return res.status(400).json({ err: 'is not id' }) 
+        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+        if(!password) return res.status(400).json({ err: 'is not password' }) 
+
+        const user = await User.findOne({ id: id }) 
+        if(!user) return res.status(400).json({ err: "is not find user" })
+        
+        const match = await bcrypt.compare(password, user.password);
+        if(!match) return res.status(400).json({ err: "password is not matched" })
+        if(match) {
+            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "1s" }, (err, accToken) => {
+                if(err) throw new Error(err)
+
+                // res
+                res.cookie('X-refresh-token', user.token, { expires: new Date(Date.now() + 900000), httpOnly: true });
+                res.status(201).json({
+                    accToken,
+                    _id: user._id,
+                    id: user.id,
+                    email: user.email,
+                    name: user.name, 
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                });
+            });
+        };
+
+
+    } catch(err) {
+        console.error(err)
+        res.status(400).json({ err: err.message }) 
+    }
+})
+
+
+
 //@ path    POST /api/users/
 //@ doc     회원가입 
 //@ access  public
@@ -54,56 +106,44 @@ router.post('/', async (req, res) => {
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
-
-
-        // 여기까지 보다가 끔 -> 해결함 (리프레시는 해시화해서 쿠키로 보내고 디비저장, 인증토큰은 바디로ㅓ보냄)
         const user = await new User({ id, password, email, name, token: null})
-
-        console.log('user', user)
 
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(user.password, salt, async (err, hash) => {
                 if(err) throw new Error(err);
-                // console.log('hash: ', hash)
 
                 // jwt refresh token create
-                await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "365 days" }, (err, token) => {
+                await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "1y" }, (err, token) => {
                     if(err) throw new Error(err)
                     user.token = token
                 });
-        
+
+                // console.log('refresh', user.token)
+
                 // hash
                 user.password = hash;
                 user.token = hash;
 
-                
-                
                 user.save().then(user => {
-                    // console.log('then user:', user)
-
                     // jwt access token create
-                    jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, token) => {
+                    jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
                         if(err) throw new Error(err)
-                        res.cookie('hohoho', user.token, { expires: new Date(Date.now() + 900000), httpOnly: true });
-                        console.log('???????', user.token)
+                        console.log('???????', user)
                         res.status(201).json({ 
-                            token,
-                            _id: user._id, 
+                            accToken,
+                            _id: user._id,
                             id: user.id,
                             email: user.email,
                             name: user.name, 
+                            createdAt: user.createdAt,
+                            updatedAt: user.updatedAt,
                         }) 
-
                     });
-                     
-
                 })
                 
+
             })
         })
-
-        
-
 
         /* res data 
             {"user":{"id":"hoho123","email":"hoho123@naver.com","name":"hohoman","password":"$2b$10$tNvb0bavhmmegJwUxR.7COshNoGPXQwjOiHunhoQoCXFau9Z8n5Au","_id":"6290902af8a34b046421598d","createdAt":"2022-05-27T08:47:38.437Z","updatedAt":"2022-05-27T08:47:38.437Z","__v":0}}
@@ -118,49 +158,8 @@ router.post('/', async (req, res) => {
 
 
 
-//@ path    POST /api/users/login
-//@ doc     로그인 
-//@ access  public
-router.post('/login', async (req, res) => {
-    try {
-        const { id, password } = req.body;
 
-        console.log('asdsadasdasd', id, password, req.body)
-
-        if(!id ) return res.status(400).json({ err: 'is not id' }) 
-        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
-        if(!password) return res.status(400).json({ err: 'is not password' }) 
-
-        const user = await User.findOne({ id: id }) 
-        if(!user) return res.status(400).json({ err: "is not find user" })
-       
-        // console.log(user)
-        
-        const match = await bcrypt.compare(password, user.password);
-        if(!match) return res.status(400).json({ err: "password is not matched" })
-        if(match) {
-            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2 days" }, (err, token) => {
-                if(err) throw new Error(err)
-                console.log('token???: ', token)
-                res.status(201).json({
-                    token,
-                    _id: user._id, 
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                });
-            });
-        };
-
-
-    } catch(err) {
-        console.error(err)
-        res.status(400).json({ err: err.message }) 
-    }
-})
-
-
-router.post('/profile/edit', auth, async (req, res) => {
+router.post('/profile/edit', refAuth, accAuth, async (req, res) => {
     try {
 
         const { id, _id, password, checkedPassword, name } = req.body;
@@ -195,7 +194,7 @@ router.post('/profile/edit', auth, async (req, res) => {
 
 
 // jwt auth test
-router.post('/test', auth, async (req, res) => {
+router.post('/test', async (req, res) => {
     try {
         const findUser = await User.findOne({ _id: req.user._id })
         res.status(200).json({ findUser })

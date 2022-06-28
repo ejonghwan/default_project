@@ -24,9 +24,7 @@ const LoginForm = () => {
     const handleSubmit = useCallback(async e => {
         e.preventDefault();
         try {
-            console.log('1111111111111 ??????????')
             await dispatch({ type: "LOADING", data: `로그인중`  })
-            console.log('222222222222 ??????????')
             const user = await axiosModule({
                 method: "post",
                 URI: "/api/users/login",
