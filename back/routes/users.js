@@ -16,24 +16,9 @@ const router = express.Router();
 router.get('/load', auth, async (req, res) => {
     console.log('load??????')
     try {
-        const user = req.user;
-        await jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "1s" }, (err, accToken) => {
-            console.log('여기실행왜안됨?')
-            res.status(201).json({
-                accToken,
-                _id: user._id,
-                id: user.id,
-                email: user.email,
-                name: user.name, 
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
-            })
-        })
+        res.status(201).json(req.user)
+        // console.log('users', req.user)
 
-        console.log('headers', req.headers)
-         console.log('users', req.user)
-
-      
     } catch(err) {
         console.error(err)
         res.status(400).json({ error: err.message })
@@ -46,7 +31,7 @@ router.get('/load', auth, async (req, res) => {
 //@ path    GET /api/users/
 //@ doc     올 유저 
 //@ access  public
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const user = await User.find()
         res.status(201).json({ user })
@@ -72,23 +57,34 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ id: id }) 
         if(!user) return res.status(400).json({ err: "is not find user" })
         
+
         const match = await bcrypt.compare(password, user.password);
         if(!match) return res.status(400).json({ err: "password is not matched" })
         if(match) {
-            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "1s" }, (err, accToken) => {
+            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
                 if(err) throw new Error(err)
 
-                // res
-                res.cookie('X-refresh-token', user.token, { expires: new Date(Date.now() + 900000), httpOnly: true });
-                res.status(201).json({
-                    accToken,
-                    _id: user._id,
-                    id: user.id,
-                    email: user.email,
-                    name: user.name, 
-                    createdAt: user.createdAt,
-                    updatedAt: user.updatedAt,
-                });
+                
+                // token hash
+                bcrypt.genSalt(10, async (err, salt) => {
+                    bcrypt.hash(user.token, salt, (err, hash) => {
+
+                        // res
+                        res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
+                        res.cookie('hoho', '????')
+                        res.status(201).json({
+                            accToken,
+                            _id: user._id,
+                            id: user.id,
+                            email: user.email,
+                            name: user.name, 
+                            createdAt: user.createdAt,
+                            updatedAt: user.updatedAt,
+                        });
+                    })
+                })
+                
+
             });
         };
 
@@ -114,39 +110,45 @@ router.post('/', async (req, res) => {
 
         const user = await new User({ id, password, email, name, token: null})
 
-        bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(user.password, salt, async (err, hash) => {
-                if(err) throw new Error(err);
+        await bcrypt.genSalt(10, async (err, salt) => {
 
-                // jwt refresh token create
-                await jwt.sign({ id: name }, process.env.JWT_KEY, { expiresIn: "1y" }, (err, token) => {
-                    if(err) throw new Error(err)
+            // password hash
+            await bcrypt.hash(user.password, salt, async (err, hash) => {
+                if(err) throw new Error(err);
+                user.password = hash;
+
+                 // refresh token hash
+                jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "1y" }, (err, token) => {
                     user.token = token
+
+                    bcrypt.hash(token, salt, async (err, hash) => {
+                        if(err) throw new Error(err);
+
+                        // save user
+                        user.save().then(user => {
+                            // jwt access token create
+                            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
+                                if(err) throw new Error(err)
+                                console.log('???????', user)
+                                res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
+                                res.status(201).json({ 
+                                    accToken,
+                                    _id: user._id,
+                                    id: user.id,
+                                    email: user.email,
+                                    name: user.name, 
+                                    createdAt: user.createdAt,
+                                    updatedAt: user.updatedAt,
+                                }) 
+                            });
+                        })
+
+
+                    })
                 });
 
-                // console.log('refresh', user.token)
 
-                // hash
-                user.password = hash;
-                user.token = hash;
 
-                user.save().then(user => {
-                    // jwt access token create
-                    jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
-                        if(err) throw new Error(err)
-                        console.log('???????', user)
-                        res.status(201).json({ 
-                            accToken,
-                            _id: user._id,
-                            id: user.id,
-                            email: user.email,
-                            name: user.name, 
-                            createdAt: user.createdAt,
-                            updatedAt: user.updatedAt,
-                        }) 
-                    });
-                })
-                
 
             })
         })

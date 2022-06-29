@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+
 import Layout from '../components/common/Layout.js'
 
 import Home from './home.js'
@@ -12,6 +13,8 @@ import StyleGuide from './guide/styleGuide.js'
 
 
 const RoutesPage = () => {
+
+    
     return (
         <Fragment>
             <Layout>

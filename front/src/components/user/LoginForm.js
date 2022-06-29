@@ -40,7 +40,6 @@ const LoginForm = () => {
            
             await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
             await localStorage.setItem('X-access-token', user.data.accToken) 
-            await localStorage.setItem('hoho',123) 
             
 
         } catch(err) {

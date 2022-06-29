@@ -14,6 +14,7 @@ const Header = () => {
 
     const handleLogout = () => {
         dispatch({ type: "USER_LOGOUT" })
+        localStorage.removeItem('X-access-token')
     }
 
     return (

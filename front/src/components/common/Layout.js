@@ -5,6 +5,7 @@ import Footer from './Footer.js'
 
 
 const Layout = ({ children }) => {
+
     return (
         <div id="main_wrap">
             <Header />
