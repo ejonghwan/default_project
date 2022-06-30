@@ -72,6 +72,7 @@ router.post('/login', async (req, res) => {
                         // res
                         res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
                         res.cookie('hoho', '????')
+                        console.log('cookie?')
                         res.status(201).json({
                             accToken,
                             _id: user._id,
@@ -201,13 +202,16 @@ router.post('/profile/edit', auth, async (req, res) => {
 
 
 
-// jwt auth test
-router.post('/test', async (req, res) => {
+// jwt auth api users test
+router.get('/test', async (req, res) => {
     try {
-        const findUser = await User.findOne({ _id: req.user._id })
-        res.status(200).json({ findUser })
-        
-        console.log('last line test api: ', req.user._id)
+        // const findUser = await User.findOne({ _id: req.user._id })
+        // res.status(200).json({ findUser })
+
+        res.cookie('hoho', '123', {httpOnly: true})
+        res.json({a: 1})
+
+        // console.log('last line test api: ', req.user._id)
     } catch(err) {
         console.error(err)
     }

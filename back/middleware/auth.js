@@ -14,6 +14,7 @@ export const auth = async (req, res, next) => {
          
         // decode가 있으면 acc로 인증 
         if(match) { 
+            console.log('acc 토큰으로 인증함')
             const user = await User.findOne({ id: match.id })
             req.user = {
                 accToken,
