@@ -61,19 +61,19 @@ router.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if(!match) return res.status(400).json({ err: "password is not matched" })
         if(match) {
-            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
+            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2s" }, (err, accToken) => {
                 if(err) throw new Error(err)
 
                 
                 // token hash
                 bcrypt.genSalt(10, async (err, salt) => {
-                    bcrypt.hash(user.token, salt, (err, hash) => {
+                    bcrypt.hash(user.token, salt, async (err, hash) => {
 
                         // res
-                        res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
-                        res.cookie('hoho', '????')
+                        await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
+                        await res.cookie('hoho', '????')
                         console.log('cookie?')
-                        res.status(201).json({
+                        await res.status(201).json({
                             accToken,
                             _id: user._id,
                             id: user.id,
@@ -128,10 +128,11 @@ router.post('/', async (req, res) => {
                         // save user
                         user.save().then(user => {
                             // jwt access token create
-                            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
+                            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2s" }, (err, accToken) => {
                                 if(err) throw new Error(err)
                                 console.log('???????', user)
-                                res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
+                                res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
+                                res.cookie('test123', 'hoho123',{ expires: new Date(Date.now() + 9000000), httpOnly: true })
                                 res.status(201).json({ 
                                     accToken,
                                     _id: user._id,
@@ -208,7 +209,10 @@ router.get('/test', async (req, res) => {
         // const findUser = await User.findOne({ _id: req.user._id })
         // res.status(200).json({ findUser })
 
-        res.cookie('hoho', '123', {httpOnly: true})
+
+        console.log('cookies: ', req.cookies["X-refresh-token"])
+        res.cookie('hoho', '123', {maxAge: 10000})
+        // res.redirect('/');
         res.json({a: 1})
 
         // console.log('last line test api: ', req.user._id)

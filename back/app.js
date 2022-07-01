@@ -41,6 +41,8 @@ mongoose.connect(process.env.MONGO_URI, {}).then(() => {
         app.use('/api/users', usersRoutes)
         app.listen(PORT, () => console.log('express server listening port ' + PORT))
 
+        
+
     } catch(err) {
         console.error(err)
     }
