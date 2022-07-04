@@ -43,17 +43,10 @@ const Signup = () => {
                 
             // })
 
-            // ???????쿠키 안보이는데 브라우저 쿠키에 들어가긴함;;; 뭐지
              const res = await axios.post("http://localhost:5000/api/users", {
                 id: userId, password: userPassword, email: userEmail, name: userName
-             }, {withCredentials: true,}).then(data => {
-                console.log('data', data)
-                console.log('ct', data.headers['content-type'])
-                console.log('coo', data.headers['set-cookie'])
-            })
-            const cookie = await res["headers"]["set-cookie"]
-          console.log('asdasd', cookie)
-            
+             }, {withCredentials: true,})
+             
 
             // 비밀번호 강화 로직 아직안함
 

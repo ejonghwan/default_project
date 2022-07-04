@@ -3,21 +3,31 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import { auth } from '../middleware/auth.js' 
 
-
 // model 
 import User from '../models/users.js'
 
-
 const router = express.Router();
+
+
 
 //@ path    GET /api/users/load
 //@ doc     로드 유저
 //@ access  public
 router.get('/load', auth, async (req, res) => {
     try {
-
-        // console.log('넘어온 토큰값:', req.user.accToken)
-        res.status(201).json(req.user)
+        if(req.reftoken) {
+            console.log('모두 만료돼서 디비 토큰 다시 저장하고 acc 다시 발급')
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(req.reftoken, salt, async(err, hash) => {
+                    // res
+                    await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
+                    await res.status(201).json(req.user)
+                })
+            })
+        } else {
+            console.log('디비 토큰 만료안돼서 이거넘김')
+            res.status(201).json(req.user)
+        }
 
     } catch(err) {
         console.error(err)
@@ -61,18 +71,15 @@ router.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if(!match) return res.status(400).json({ err: "password is not matched" })
         if(match) {
-            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2s" }, (err, accToken) => {
+            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
                 if(err) throw new Error(err)
 
-                
                 // token hash
                 bcrypt.genSalt(10, async (err, salt) => {
                     bcrypt.hash(user.token, salt, async (err, hash) => {
 
                         // res
                         await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
-                        await res.cookie('hoho', '????')
-                        console.log('cookie?')
                         await res.status(201).json({
                             accToken,
                             _id: user._id,
@@ -101,10 +108,7 @@ router.post('/login', async (req, res) => {
 //@ doc     로그아웃
 //@ access  public
 router.get('/logout', auth, (req, res) => {
-    
-    res.clearCookie('X-refresh-token')
-    // cookie path 설정시 
-    //  res.clearCookie(key, {path:'/path'})
+    res.status(201).clearCookie('X-refresh-token').json({message: "로그아웃 되었습니다"})
 })
 
 
@@ -122,6 +126,7 @@ router.post('/', async (req, res) => {
 
         const user = await new User({ id, password, email, name, token: null})
 
+
         await bcrypt.genSalt(10, async (err, salt) => {
 
             // password hash
@@ -129,39 +134,21 @@ router.post('/', async (req, res) => {
                 if(err) throw new Error(err);
                 user.password = hash;
 
-                 // refresh token hash
-                jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "1y" }, (err, token) => {
-                    user.token = token
-
-                    bcrypt.hash(token, salt, async (err, hash) => {
-                        if(err) throw new Error(err);
-
-                        // save user
-                        user.save().then(user => {
-                            // jwt access token create
-                            jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2s" }, (err, accToken) => {
-                                if(err) throw new Error(err)
-                                console.log('???????', user)
-                                res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
-                                res.cookie('test123', 'hoho123',{ expires: new Date(Date.now() + 9000000), httpOnly: true })
-                                res.status(201).json({ 
-                                    accToken,
-                                    _id: user._id,
-                                    id: user.id,
-                                    email: user.email,
-                                    name: user.name, 
-                                    createdAt: user.createdAt,
-                                    updatedAt: user.updatedAt,
-                                }) 
-                            });
-                        })
-
-
+                jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" }, (err, reftoken) => {
+                    user.token = reftoken
+                    // save user
+                    user.save().then(user => {
+                        res.status(201).json({ 
+                           
+                            _id: user._id,
+                            id: user.id,
+                            email: user.email,
+                            name: user.name, 
+                            createdAt: user.createdAt,
+                            updatedAt: user.updatedAt,
+                        }) 
                     })
                 });
-
-
-
 
             })
         })
@@ -221,7 +208,7 @@ router.get('/test', async (req, res) => {
         // res.status(200).json({ findUser })
 
 
-        console.log('cookies: ', req.cookies["X-refresh-token"])
+        // console.log('cookies: ', req.cookies["X-refresh-token"])
         res.cookie('hoho', '123', {maxAge: 10000})
         // res.redirect('/');
         res.json({a: 1})
