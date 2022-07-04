@@ -14,10 +14,10 @@ const router = express.Router();
 //@ doc     로드 유저
 //@ access  public
 router.get('/load', auth, async (req, res) => {
-    console.log('load??????')
     try {
+
+        // console.log('넘어온 토큰값:', req.user.accToken)
         res.status(201).json(req.user)
-        // console.log('users', req.user)
 
     } catch(err) {
         console.error(err)
@@ -94,6 +94,17 @@ router.post('/login', async (req, res) => {
         console.error(err)
         res.status(400).json({ err: err.message }) 
     }
+})
+
+
+//@ path    GET /api/users/logout
+//@ doc     로그아웃
+//@ access  public
+router.get('/logout', auth, (req, res) => {
+    
+    res.clearCookie('X-refresh-token')
+    // cookie path 설정시 
+    //  res.clearCookie(key, {path:'/path'})
 })
 
 

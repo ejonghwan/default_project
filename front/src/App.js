@@ -25,20 +25,25 @@ const App = () => {
   const load = async () => {
     const accToken = localStorage.getItem('X-access-token')
 
+    // 새로고침하면 state 에 유저없어서 에러ㅏ 
+
     if(!accToken) {return false}
-    // const user = await axios.get(`http://localhost:5000/api/users/load?${state.user._id}`, {
-    //   headers: {
-    //     'X-access-token': accToken,
-    //   }
-    // })
-    const user = await axios.get(`http://localhost:5000/api/users/load?_id=62be98414cbcfbe7fb1ec6ed`, {
+    const user = await axios.get(`http://localhost:5000/api/users/load?${state.user._id}`, {
       headers: {
         'X-access-token': accToken,
-      }
+      },
+      withCredentials: true,
     })
+
+    console.log('123', user)
+    localStorage.setItem('X-access-token', user.data.accToken)
+
     dispatch({type: "USER_LOAD_SUCCESS", data: user.data})
 
   }
+
+
+
 
 
   async function test() {

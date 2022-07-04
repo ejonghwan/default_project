@@ -5,6 +5,7 @@ import './Header.css'
 
 //context 
 import {UserContext} from '../../context/UserContext.js'
+import axios from 'axios';
 
 
 const Header = () => {
@@ -51,9 +52,19 @@ const Header = () => {
 
 
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        
+        const accToken = localStorage.getItem('X-access-token')
+        if(!accToken) {return false}
+        const user = await axios.get(`http://localhost:5000/api/users/logout?${state.user._id}`, {
+          headers: {
+            'X-access-token': accToken,
+          },
+          withCredentials: true,
+        })
+
         dispatch({ type: "USER_LOGOUT" })
-        deleteCookie("X-refresh-token")
+        // deleteCookie("X-refresh-token")
         localStorage.removeItem('X-access-token')
     }
 
