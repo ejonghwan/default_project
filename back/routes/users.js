@@ -59,6 +59,7 @@ router.get('/', auth, async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { id, password } = req.body;
+       
 
         if(!id ) return res.status(400).json({ err: 'is not id' }) 
         // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
@@ -119,15 +120,15 @@ router.get('/logout', auth, (req, res) => {
 //@ access  public
 router.post('/', async (req, res) => {
     try {
-        const { id, password, email, name, qeustion, result } = req.body;
+        const { id, password, email, name, qeustion } = req.body;
         if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
         if(!password ) return res.status(400).json({ err: 'is not password' }) 
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
-        const user = await new User({ id, password, email, name, token: null, qeustion, result})
+        const user = await new User(req.body, { token: null })
 
-        console.log('si', user, qeustion, result)
+        console.log('si', user, req.body)
 
         await bcrypt.genSalt(10, async (err, salt) => {
 

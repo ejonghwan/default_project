@@ -25,7 +25,7 @@ const LoginForm = () => {
         try {
             e.preventDefault();
             await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
-            const user = await loginUser(userId, userPassword)
+            const user = await loginUser({ id: userId, password: userPassword })
             dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
 
         } catch(err) {

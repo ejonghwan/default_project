@@ -30,7 +30,7 @@ const Signup = () => {
     const [passwordChecked, setPasswordChecked] = useState(false) 
     const [userEmail, handleUserEmail] = useInput('') 
     const [userName, handleUserName] = useInput('') 
-    const [qeustion, setQeustion] = useState(null)
+    const [qeustionType, setQeustionType] = useState(null)
     const [result, handleResult] = useInput('') 
     const [terms, setTerms] = useState(false) ;
     const [submitActive, setSubmitActive] = useState(false);
@@ -48,8 +48,8 @@ const Signup = () => {
 
 
     const handleQeustion = useCallback(e => {
-        setQeustion(e.target.value)
-    }, [setQeustion])
+        setQeustionType(e.target.value)
+    }, [qeustionType, setQeustionType])
 
 
   
@@ -57,36 +57,36 @@ const Signup = () => {
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms && !qeustion && !result) return;
+            if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms && !qeustionType && !result) return;
 
             await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
+           
             const user = await signupUser({
                 id: userId, 
                 password: userPassword, 
                 email: userEmail, 
                 name: userName,
-                qeustion,
-                result,
+                qeustion: { qeustionType, result },
+       
             });
             dispatch({ type: "USER_SIGNUP_SUCCESS" })
             
             // 비밀번호 강화 로직 아직안함
-
-            console.log(user)
 
 
         } catch(err) {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
             console.error(err)
         }
-    }, [userId, userPassword, userEmail, userName, passwordChecked, terms, qeustion, result])
+    }, [userId, userPassword, userEmail, userName, passwordChecked, terms, qeustionType, result])
 
 
 
     useEffect(() => {
         userPassword === userPasswordCheck ? setPasswordChecked(true) : setPasswordChecked(false);
-        if(userId && userPassword && userEmail && userName && passwordChecked && terms && qeustion && result) setSubmitActive(true);
-    }, [userId, userEmail, userName, passwordChecked, terms, userPassword, userPasswordCheck, qeustion, result])
+        if(userId && userPassword && userEmail && userName && passwordChecked && terms && qeustionType && result) setSubmitActive(true);
+
+    }, [userId, userEmail, userName, passwordChecked, terms, userPassword, userPasswordCheck, qeustionType, result])
 
 
 

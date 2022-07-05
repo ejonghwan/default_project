@@ -7,8 +7,10 @@ const UserSchema = mongoose.Schema({
     name: { type: String, require: true, },
     password: { type: String, require: true, },
     token: { type: String, unique: true, require: true, },
-    qeustion: { type: Number, unique: true, require: true, },
-    result: { type: String, unique: true, require: true, },
+    qeustion: { 
+        qeustionType: { type: Number, unique: true, require: true },
+        result: { type: String, unique: true, require: true, },
+     },
 }, {
     timestamps: true,
 })

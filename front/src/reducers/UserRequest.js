@@ -7,13 +7,14 @@ const host = 'http://localhost:5000'
 // 회원가입 유저
 export const signupUser = async data => {
     try {
-        const { id, password, email, name, qeustion, result } = data;
+        // const { id, password, email, name, qeustion } = data;
+        // console.log('saga', data)
         const config = {
             headers: { "Content-Type": "application/json", },
             withCredentials: true,
         }
-        const user = await axios.post(`${host}/api/users`, { id, password, email, name }, config)
-         
+        const user = await axios.post(`${host}/api/users`, data, config)
+  
         return user;
 
     } catch(err) {
@@ -45,13 +46,14 @@ export const getUser = async () => {
 
 
 // 로그인 유저
-export const loginUser = async (id, password) => {
+export const loginUser = async data => {
     try {
+        const { id, password } = data;
         const config = {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const user = await axios.post(`${host}/api/users/login`, {id, password}, config)
+        const user = await axios.post(`${host}/api/users/login`, data, config)
         localStorage.setItem('X-access-token', user.data.accToken) 
         return user;
     } catch(err) {

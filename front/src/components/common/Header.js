@@ -23,10 +23,11 @@ const Header = () => {
     }
 
 
-    window.onbeforeunload = function() {
-      localStorage.removeItem('X-access-token');
-      return '';
-    };
+    // 이거 새로고침에도 없어짐;; 브라우저 종료하면 로컬저장소 없애는거 해야됨
+    // window.onbeforeunload = function() {
+    //   localStorage.removeItem('X-access-token');
+    //   return '';
+    // };
 
 
     
