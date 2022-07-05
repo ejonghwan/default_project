@@ -16,7 +16,7 @@ const ProgressBar = props => {
     }, [props.persent])
 
     return (
-        <div className='wrap'>
+        <div className="progress-wrap">
             <div><span ref={barRef} className="bar">{props.persent}</span></div>
         </div>
     )

@@ -6,8 +6,9 @@ const UserSchema = mongoose.Schema({
     email: { type: String, require: true, unique: true, },
     name: { type: String, require: true, },
     password: { type: String, require: true, },
-    token: { type: String, unique: true, }
-    
+    token: { type: String, unique: true, require: true, },
+    qeustion: { type: Number, unique: true, require: true, },
+    result: { type: String, unique: true, require: true, },
 }, {
     timestamps: true,
 })

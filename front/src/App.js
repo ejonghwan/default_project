@@ -10,53 +10,33 @@ import './assets/css/global.css'
 
 import { ImageProvider } from './context/ImageContext.js'
 import { UserProvider, UserContext } from './context/UserContext.js'
+import { getUser } from './reducers/UserRequest.js'
 import RoutesPage from './pages/index.js'
 
 
 
 const App = () => {
 
-  // 여기까지함. 만약 acc token이 에러 뜬다면 쿠키 가져와서 X-refresh-token을 header 로 보내면 됨
-  // const refreshCookie = getCookie('refresh')
-  // console.log('cookie', refreshCookie)
+  const {state, dispatch} = useContext(UserContext);
 
-  const {state, dispatch} = useContext(UserContext)
+  // 유저 새로고침
+  const userLoad = async () => {
+    try {
+      await dispatch({ type: "LOADING", loadingMessage: "" })
+      const user = await getUser();
+      const data = user.data;
+      dispatch({type: "USER_LOAD_SUCCESS", data})
 
-  const load = async () => {
-    const accToken = localStorage.getItem('X-access-token')
+    } catch(err) {
 
-    // 새로고침하면 state 에 유저없어서 에러ㅏ 
-
-    if(!accToken) {return false}
-    const user = await axios.get(`http://localhost:5000/api/users/load?${state.user._id}`, {
-      headers: {
-        'X-access-token': accToken,
-      },
-      withCredentials: true,
-    })
-
-    console.log('123', user)
-    localStorage.setItem('X-access-token', user.data.accToken)
-
-    dispatch({type: "USER_LOAD_SUCCESS", data: user.data})
-
-  }
-
-
-
-
-
-  async function test() {
-    const data = await axios.get('http://localhost:5000/api/users/test', { 
-      withCredentials: true // 쿠키 cors 통신 설정
-    })
-    console.log(data)
+      dispatch({ type: "USER_LOAD_FAILUE" })
+      console.err(err)
+    }
   }
 
 
   useEffect(() => {
-    load()
-    test()
+    userLoad()
   }, [])
 
 
@@ -65,17 +45,13 @@ const App = () => {
   }, [state])
  
 
- 
-
-  
-
   return (
-    
-        <div className="App"> 
-          <RoutesPage />
-        </div>
-    
+      <div className="App"> 
+        <RoutesPage />
+      </div>
   );
 }
+
+
 
 export default App;

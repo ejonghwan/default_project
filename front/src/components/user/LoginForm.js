@@ -3,7 +3,7 @@ import axios from 'axios'
 
 //module
 import { useInput } from '../common/hooks/index.js'
-import { axiosModule } from '../../utils/utils.js'
+
 
 // components
 import Input from '../common/form/Input.js'
@@ -12,7 +12,7 @@ import Label from '../common/form/Label.js'
 
 // context
 import { UserContext } from '../../context/UserContext.js'
-
+import { loginUser } from '../../reducers/UserRequest.js'
 
 const LoginForm = () => {
 
@@ -21,45 +21,26 @@ const LoginForm = () => {
     const {state, dispatch} = useContext(UserContext)
 
 
-    const handleSubmit = useCallback(async e => {
-        e.preventDefault();
+    const handleSubmit = useCallback( async e => {
         try {
-            await dispatch({ type: "LOADING", data: `로그인중`  })
-            const user = await axiosModule({
-                method: "post",
-                URI: "/api/users/login",
-                data: { id: userId, password: userPassword },
-                config: {
-                    headers: {
-                        // 'X-access-token': localStorage.getItem('token'),
-                        // 'encryption':
-                    },
-                    withCredentials: true // 쿠키 cors 통신 설정
-                },
-               
-            })
-           
-            await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
-            await localStorage.setItem('X-access-token', user.data.accToken) 
-            
+            e.preventDefault();
+            await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
+            const user = await loginUser(userId, userPassword)
+            dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
 
         } catch(err) {
             console.error(err)
             dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
         }
 
-    }, [userId, userPassword, state])
+    }, [userId, userPassword])
 
 
 
 
 
     useEffect(() => {
-        // console.log(state, dispatch)
-        // dispatch({ type: "USER_TEST", data: userId  })
-        // console.log(userId)
-
-
+        
     }, [handleSubmit])
 
 

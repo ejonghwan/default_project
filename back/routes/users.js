@@ -112,20 +112,22 @@ router.get('/logout', auth, (req, res) => {
 })
 
 
+// 회원가입 질응답 안들어옴 확인 
 
 //@ path    POST /api/users/
 //@ doc     회원가입 
 //@ access  public
 router.post('/', async (req, res) => {
     try {
-        const { id, password, email, name } = req.body;
+        const { id, password, email, name, qeustion, result } = req.body;
         if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
         if(!password ) return res.status(400).json({ err: 'is not password' }) 
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
 
-        const user = await new User({ id, password, email, name, token: null})
+        const user = await new User({ id, password, email, name, token: null, qeustion, result})
 
+        console.log('si', user, qeustion, result)
 
         await bcrypt.genSalt(10, async (err, salt) => {
 

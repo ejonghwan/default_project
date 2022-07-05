@@ -4,9 +4,9 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 import './ImageUploadForm.css'
-import ProgressBar from './ProgressBar.js'
+import ProgressBar from '../progress/ProgressBar.js'
 
-import { ImageContext } from '../context/ImageContext.js'
+import { ImageContext } from '../../context/ImageContext.js'
 
 
 
