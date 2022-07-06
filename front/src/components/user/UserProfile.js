@@ -11,7 +11,7 @@ import Label from '../common/form/Label.js'
 // import LoginForm from '../components/user/LoginForm.js'
 
 // context & request 
-// import { signupUser } from '../reducers/UserRequest.js'
+import { nmaeEditUser, emailEditUser } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
@@ -23,7 +23,7 @@ const UserProfile = () => {
     const [userName, handleUserName] = useInput('') 
     const [userEmail, handleUserEmail] = useInput('')
     const [submitActive, setSubmitActive] = useState(false);
-    const {state, dipatch} = useContext(UserContext)
+    const {state, dispatch} = useContext(UserContext)
 
 
 
@@ -39,12 +39,6 @@ const UserProfile = () => {
     }, [editNameState, editEmailState, setEditNameState, setEditEmailState])
 
 
-
-
-    useEffect(() => {
-        console.log('name',editNameState )
-        console.log('email',editEmailState )
-    }, [editNameState, editEmailState])
 
 
     // 요청
@@ -72,10 +66,10 @@ const UserProfile = () => {
     const handleEmailEdit = useCallback( async e => {
         try {
             e.preventDefault();
-            const user = await nmaeEditUser({ name: userName, _id: state.user._id })
+            const res = await emailEditUser({ email: userEmail, _id: state.user._id })
 
-            console.log('submit name', user);
-            setEditNameState(!editNameState)
+            dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
+            setEditEmailState(!editEmailState)
         } catch(err) {
             console.err(err)
         }
@@ -85,10 +79,15 @@ const UserProfile = () => {
     const handleNameEdit = useCallback( async e => {
         try {
             e.preventDefault();
-        } catch(err) {
+            const res = await nmaeEditUser({ name: userName, _id: state.user._id })
 
+            console.log('submit name', res);
+            dispatch({ type: "USER_NAME_EDIT_SUCCESS", data: res.data })
+            setEditNameState(!editNameState)
+        } catch(err) {
+            console.err(err)
         }
-    }, [userEmail])
+    }, [userName])
 
 
     return (
@@ -113,7 +112,8 @@ const UserProfile = () => {
                                 evt="onChange" 
                                 onChange={handleUserName} 
                             />
-                             <button name="name">완료</button>
+                             <button>완료</button>
+                             <button type="button" name="name" onClick={handleToggle}>취소</button>
                         </form>
                     ) : (
                         <Fragment>
@@ -138,6 +138,7 @@ const UserProfile = () => {
                                 onChange={handleUserEmail} 
                             />
                             <button name="email">완료</button>
+                            <button type="button" name="email" onClick={handleToggle}>취소</button>
                         </form>
                     ) : (
                         <Fragment>

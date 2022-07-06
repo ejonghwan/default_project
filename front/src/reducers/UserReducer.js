@@ -55,7 +55,37 @@ const UserReducer = (state = UserIntialState, action) => {
                 user: {},
             }
 
+            case "USER_NAME_EDIT_SUCCESS": return {
+                ...state,
+                error: '',
+                loading: '',
+                user: {
+                    ...state.user,
+                    name: action.data,
+                }
+            }
+            
+            case "USER_NAME_EDIT_FAILUE" : return {
+                ...state,
+                loading: '',
+                error: action.data
+            }
 
+            case "USER_MAIL_EDIT_SUCCESS": return {
+                ...state,
+                error: '',
+                loading: '',
+                user: {
+                    ...state.user,
+                    email: action.data,
+                }
+            }
+            
+            case "USER_MAIL_EDIT_FAILUE" : return {
+                ...state,
+                loading: '',
+                error: action.data
+            }
           
 
             

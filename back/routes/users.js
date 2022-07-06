@@ -167,14 +167,43 @@ router.post('/', async (req, res) => {
 
 
 // const user = await axios.patch(`${host}/api/users/edit/name/${_id}`, data, config)
-router.patch('/', auth, async(req, res) => {
+router.patch('/edit/name', auth, async(req, res) => {
     try {
-        const { name } = req.body;
-        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+        const { name, _id } = req.body;
+        // const { id } = req.params;
+        // console.log('bak', req.body)
+        // if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
 
 
-        const userPassword = await User.findById(_id, 'password')
+        const user = await User.findOneAndUpdate({ _id: _id }, { $set: {name: name} }, { new: true })
+        // user.save();
+        // console.log('??', user)
+        res.status(201).json(user.name)
+        
+
+
+    } catch(err) {
+        console.error(err)
+        res.status(400).json({ err: err.message })
+    }
+})
+
+
+router.patch('/edit/email', auth, async(req, res) => {
+    try {
+        const { email, _id } = req.body;
+        // const { id } = req.params;
+        // console.log('bak', req.body)
+        // if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+
+
+        const user = await User.findOneAndUpdate({ _id: _id }, { $set: {email: email} }, { new: true })
+        // user.save();
+
+        res.status(201).json(user.email)
+        console.log(user)
 
 
     } catch(err) {
