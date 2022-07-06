@@ -113,7 +113,6 @@ router.get('/logout', auth, (req, res) => {
 })
 
 
-// 회원가입 질응답 안들어옴 확인 
 
 //@ path    POST /api/users/
 //@ doc     회원가입 
@@ -142,7 +141,6 @@ router.post('/', async (req, res) => {
                     // save user
                     user.save().then(user => {
                         res.status(201).json({ 
-                           
                             _id: user._id,
                             id: user.id,
                             email: user.email,
@@ -168,6 +166,22 @@ router.post('/', async (req, res) => {
 
 
 
+// const user = await axios.patch(`${host}/api/users/edit/name/${_id}`, data, config)
+router.patch('/', auth, async(req, res) => {
+    try {
+        const { name } = req.body;
+        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+
+
+        const userPassword = await User.findById(_id, 'password')
+
+
+    } catch(err) {
+        console.error(err)
+        res.status(400).json({ err: err.message })
+    }
+})
 
 
 router.post('/profile/edit', auth, async (req, res) => {
@@ -191,9 +205,6 @@ router.post('/profile/edit', auth, async (req, res) => {
         if(password, checkedPassword) {
             
         }
-
-
-
 
 
     } catch(err) {

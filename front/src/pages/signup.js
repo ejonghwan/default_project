@@ -20,6 +20,8 @@ import { UserContext } from '../context/UserContext.js'
 // 카카오 네이버 로그인 추가 
 // https://lts0606.tistory.com/489
 
+// 로봇인증 추가
+
 // 2시간 지나면 로그아웃되는 로직 추가
 
 const Signup = () => {
@@ -37,6 +39,17 @@ const Signup = () => {
 
     const { state, dispatch } = useContext(UserContext)
     
+    const questionData = [
+        { questionType: 0, question: '질문1' },
+        { questionType: 1, question: '질문2' },
+        { questionType: 2, question: '질문3' },
+        { questionType: 3, question: '질문4' },
+        { questionType: 4, question: '질문5' },
+        { questionType: 5, question: '질문6' },
+        { questionType: 6, question: '질문7' },
+        { questionType: 7, question: '질문8' },
+        { questionType: 8, question: '질문9' },
+    ]
 
     const handleTerms = useCallback(e => {
         // setTerms({
@@ -51,7 +64,7 @@ const Signup = () => {
         setQeustionType(e.target.value)
     }, [qeustionType, setQeustionType])
 
-
+    
   
     // 요청
     const handleSubmit = useCallback(async e => {
@@ -79,7 +92,6 @@ const Signup = () => {
             console.error(err)
         }
     }, [userId, userPassword, userEmail, userName, passwordChecked, terms, qeustionType, result])
-
 
 
     useEffect(() => {
@@ -170,13 +182,11 @@ const Signup = () => {
                 <div>
                     <Label htmlFor="qeustion" content="질문" classN="label_t1"/>
                     <select name="qeustion" onChange={handleQeustion}>
-                        <option value="0">aa1</option>
-                        <option value="1">aa2</option>
-                        <option value="2">aa3</option>
-                        <option value="3">aa4</option>
-                        <option value="4">aa5</option>
-                        <option value="5">aa6</option>
-                        <option value="6">aa7</option>
+                        {   
+                            questionData && questionData.map((data, idx) => {
+                                return <option key={idx} value={data.qeustionType}>{data.question}</option>
+                            })
+                        }
                     </select>
                
                      <Label htmlFor="result" content="답" classN="label_t1"/>

@@ -85,4 +85,42 @@ export const logoutUser = async () => {
   }
 
 
+
+
+// edit
+// 이름 수정
+export const nmaeEditUser = async data => {
+    try {
+        const { name, _id } = data
+        const config = {
+            headers: { "Content-Type": "application/json", },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const user = await axios.patch(`${host}/api/users/edit/name/${_id}`, name, config)
+        localStorage.setItem('X-access-token', user.data.accToken) 
+
+        return user;
+    } catch(err) {
+        console.err(err)
+    }
+}
+
+
+// 이메일 수정
+export const emailEditUser = async data => {
+    try {
+        const { email, _id } = data
+        const config = {
+            headers: { "Content-Type": "application/json", },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const user = await axios.patch(`${host}/api/users/edit/name/${_id}`, data, config)
+        localStorage.setItem('X-access-token', user.data.accToken) 
+
+        return user;
+    } catch(err) {
+        console.err(err)
+    }
+}
+  
   

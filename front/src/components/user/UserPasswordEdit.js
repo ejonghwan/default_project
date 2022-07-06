@@ -4,13 +4,11 @@ import React, { Fragment, useState, useEffect, useCallback, useContext } from 'r
 import { useInput } from '../common/hooks/index.js'
 
 // components
-import Input from '../../components/common/form/Input.js'
-import Label from '../../components/common/form/Label.js'
-
+import Input from '../common/form/Input.js'
+import Label from '../common/form/Label.js'
 
 // components
 // import LoginForm from '../components/user/LoginForm.js'
-
 
 // context & request 
 // import { signupUser } from '../reducers/UserRequest.js'
@@ -19,24 +17,15 @@ import { UserContext } from '../../context/UserContext.js'
 
 const UserProfileEdit = () => {
 
-    const [userName, handleUserName] = useInput('') 
     const [prevPassword, handlePrevPassword] = useInput('') 
     const [newPassword, handleNewPassword] = useInput('') 
     const [newPasswordCheck, handleNewPasswordCheck] = useInput('') 
 
 
-    
-    const [userEmail, handleUserEmail] = useInput('') 
-    const [terms, setTerms] = useState(false) ;
     const [submitActive, setSubmitActive] = useState(false);
 
     const { state, dispatch } = useContext(UserContext)
     
-
-     
-
-
-
     // 요청
     const handleSubmit = useCallback(async e => {
         try {   
@@ -64,23 +53,14 @@ const UserProfileEdit = () => {
 
 
     return (
+
         <Fragment>
+            <br />
+            <br />
+            <br />
+            password change 
              <form onSubmit={handleSubmit}>
-               
-                <div>
-                    <Label htmlFor="userName" content="이름" classN="label_t1"/>
-                    <Input 
-                        id="userName" 
-                        type="text" 
-                        required={true} 
-                        placeholder="userName" 
-                        classN="input_text_t1" 
-                        name="userName" 
-                        value={userName} 
-                        evt="onChange" 
-                        onChange={handleUserName} 
-                    />
-                </div>
+
                 <div>
                     <Label htmlFor="prevPassword" content="이전 비밀번호" classN="label_t1"/>
                     <Input  
@@ -95,7 +75,6 @@ const UserProfileEdit = () => {
                         onChange={handlePrevPassword} 
                     />
                     <button>view password</button>
-                    <button>이전 비밀번호 확인하기</button>
 
                 </div>
                 <div>
@@ -130,21 +109,7 @@ const UserProfileEdit = () => {
                     <button>view password</button>
                     {/* {passwordChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)} */}
                 </div>
-                <div>
-                    <Label htmlFor="userEmail" content="이메일" classN="label_t1"/>
-                    <Input 
-                        id="userEmail" 
-                        type="email" 
-                        required={true} 
-                        placeholder="userEmail" 
-                        classN="input_text_t1" 
-                        name="userEmail" 
-                        value={userEmail} 
-                        evt="onChange" 
-                        onChange={handleUserEmail} 
-                    />
-                </div>
-               
+             
                 <button type="submit" className={submitActive ? 'checked' : 'none'} >회원가입</button>
             </form>
         </Fragment>

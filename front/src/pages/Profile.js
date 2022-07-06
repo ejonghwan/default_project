@@ -2,7 +2,7 @@ import React from 'react';
 
 // components
 import UserProfile from '../components/user/UserProfile.js'
-import UserProfileEdit from '../components/user/UserProfileEdit.js'
+import UserPasswordEdit from '../components/user/UserPasswordEdit.js'
 
 
 const Profile = () => {
@@ -10,7 +10,7 @@ const Profile = () => {
         <div>
             Profile
             <UserProfile />
-            <UserProfileEdit />
+            <UserPasswordEdit />
         </div>
     );
 };

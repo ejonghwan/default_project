@@ -2,14 +2,15 @@ import mongoose from "mongoose";
 
 
 const UserSchema = mongoose.Schema({
-    id: { type: String, require: true, unique: true, },
+    // 소문자로 이뤄진 6~15 공백없이 
+    id: { type: String, require: true, unique: true, }, /* minlength: 6, maxlength: 15, trim: true, lowercase: true,  */
     email: { type: String, require: true, unique: true, },
-    name: { type: String, require: true, },
-    password: { type: String, require: true, },
+    name: { type: String, require: true, trim: true }, /* minlength: 6, maxlength: 15, */
+    password: { type: String, require: true, }, /* minlength: 8, maxlength: 15, trim: true, */ /* 8 ~ 15공백제거  */
     token: { type: String, unique: true, require: true, },
     qeustion: { 
         qeustionType: { type: Number, unique: true, require: true },
-        result: { type: String, unique: true, require: true, },
+        result: { type: String, unique: true, require: true, }, /* minlength: 1, maxlength: 15, trim: true, lowercase: true,  */  /* 소문자 1 ~ 15공백제거  */
      },
 }, {
     timestamps: true,
