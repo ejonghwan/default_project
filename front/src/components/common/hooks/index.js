@@ -7,3 +7,4 @@ export const useInput = initialState => {
     }, [])
     return [val, handler]
 };
+

@@ -7,13 +7,16 @@ const host = 'http://localhost:5000'
 // 회원가입 유저
 export const signupUser = async data => {
     try {
-        const { id, password, email, name, qeustion } = data;
+        const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = data;
 
         if(!id && typeof id !== 'string') return;
         if(!password && typeof password !== 'string') return;
         if(!email && typeof email !== 'string') return;
         if(!name && typeof name !== 'string') return;
         if(!qeustion && typeof qeustion !== 'object') return;
+        if(!phoneNumber && typeof phoneNumber !== 'string') return;
+        if(!gender && typeof qeustion !== 'string') return;
+        if(!birthday && typeof birthday !== 'string') return;
         
         const config = {
             headers: { "Content-Type": "application/json", },

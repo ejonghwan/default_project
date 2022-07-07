@@ -21,6 +21,9 @@ export const auth = async (req, res, next) => {
                     id: user.id,
                     email: user.email,
                     name: user.name, 
+                    gender: user.gender, 
+                    phoneNumber: user.phoneNumber, 
+                    birthday: user.birthday, 
                     createdAt: user.createdAt,
                     updatedAt: user.updatedAt,
                 }
@@ -47,6 +50,9 @@ export const auth = async (req, res, next) => {
                             id: data.id,
                             email: data.email,
                             name: data.name, 
+                            gender: data.gender, 
+                            phoneNumber: data.phoneNumber, 
+                            birthday: data.birthday, 
                             createdAt: data.createdAt,
                             updatedAt: data.updatedAt,
                         }
@@ -67,6 +73,9 @@ export const auth = async (req, res, next) => {
                         id: user.id,
                         email: user.email,
                         name: user.name, 
+                        gender: user.gender, 
+                        phoneNumber: user.phoneNumber, 
+                        birthday: user.birthday, 
                         createdAt: user.createdAt,
                         updatedAt: user.updatedAt,
                     }

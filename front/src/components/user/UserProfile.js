@@ -140,6 +140,9 @@ const UserProfile = () => {
                         </Fragment>
                     ) }
                 </li>
+                <li>성별: {state.user.gender}</li>
+                <li>생일: {state.user.birthday}</li>
+                <li>전화번호: {state.user.phoneNumber}</li>
                 <li>가입일: {state.user.createdAt}</li>
                 <li>수정일: {state.user.updatedAt}</li>
             </ul>

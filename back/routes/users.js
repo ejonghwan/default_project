@@ -88,6 +88,9 @@ router.post('/login', async (req, res) => {
                             id: user.id,
                             email: user.email,
                             name: user.name, 
+                            gender: user.gender, 
+                            phoneNumber: user.phoneNumber, 
+                            birthday: user.birthday, 
                             createdAt: user.createdAt,
                             updatedAt: user.updatedAt,
                         });
@@ -120,14 +123,18 @@ router.get('/logout', auth, (req, res) => {
 //@ access  public
 router.post('/', async (req, res) => {
     try {
-        const { id, password, email, name, qeustion } = req.body;
+        const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = req.body;
         if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
         if(!password ) return res.status(400).json({ err: 'is not password' }) 
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
+        if(!qeustion || typeof qeustion !== 'object') return res.status(400).json({ err: 'is not qeustion' }) 
+        if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({ err: 'is not phoneNumber' }) 
+        if(!gender || typeof gender !== 'string') return res.status(400).json({ err: 'is not gender' }) 
+        if(!birthday || typeof birthday !== 'string') return res.status(400).json({ err: 'is not birthday' }) 
 
         const user = await new User(req.body, { token: null })
-
+        
         console.log('si', user, req.body)
 
         await bcrypt.genSalt(10, async (err, salt) => {
@@ -142,13 +149,7 @@ router.post('/', async (req, res) => {
                     // save user
                     user.save().then(user => {
                         res.status(201).json({ 
-                            // _id: user._id,
-                            // id: user.id,
-                            // email: user.email,
-                            // name: user.name, 
-                            // createdAt: user.createdAt,
-                            // updatedAt: user.updatedAt,
-                            message: '가입성공'
+                            message: '회원가입성공'
                         }) 
                     })
                 });

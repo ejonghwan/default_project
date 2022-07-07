@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 
 // module
-import { useInput } from '../components/common/hooks/index.js'
+import { useInput, useInputRadio } from '../components/common/hooks/index.js'
 
 // components
 import Input from '../components/common/form/Input.js'
@@ -50,7 +50,10 @@ const Signup = () => {
     const [result, handleResult] = useInput('') 
     const [terms, setTerms] = useState(false) ;
     const [submitActive, setSubmitActive] = useState(false);
-
+    const [phoneNumber, handlePhoneNumber] = useInput('') 
+    const [gender, handleGender] = useInput('') 
+    const [birthday, handleBirthday] = useInput('')
+  
     const { state, dispatch } = useContext(UserContext)
     
     const questionData = [
@@ -84,7 +87,7 @@ const Signup = () => {
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            if(!userId && !userPassword && !userEmail && !userName && !passwordIsChecked && !terms && !qeustionType && !result) return;
+            if(!userId && !userPassword && !userEmail && !userName && !passwordIsChecked && !terms && !qeustionType && !result && !phoneNumber && !gender && !birthday) return;
 
             await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
             const user = await signupUser({
@@ -93,6 +96,9 @@ const Signup = () => {
                 email: userEmail, 
                 name: userName,
                 qeustion: { qeustionType, result },
+                phoneNumber, 
+                gender, 
+                birthday,
        
             });
             dispatch({ type: "USER_SIGNUP_SUCCESS" })
@@ -104,16 +110,30 @@ const Signup = () => {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
             console.error(err)
         }
-    }, [userId, userPassword, userEmail, userName, passwordIsChecked, terms, qeustionType, result])
+    }, [userId, userPassword, userEmail, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
+
 
     useEffect(() => {
         userPassword === userPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
     }, [userPasswordCheck])
 
-    useEffect(() => {
-        if(userId && userPassword && userEmail && userName && passwordIsChecked && terms && qeustionType && result) setSubmitActive(true);
 
-    }, [userId, userEmail, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result])
+    useEffect(() => {
+        if(
+            userId && 
+            userPassword && 
+            userEmail && 
+            userName && 
+            passwordIsChecked && 
+            terms && 
+            qeustionType && 
+            result &&
+            phoneNumber && 
+            gender && 
+            birthday
+        ) setSubmitActive(true);
+    }, [userId, userEmail, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday])
+
 
 
 
@@ -198,8 +218,6 @@ const Signup = () => {
                         onChange={handleUserName} 
                     />
                 </div>
-                
-                {/* 추거 */}
                 <div>
                     <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
                     <Input 
@@ -209,41 +227,54 @@ const Signup = () => {
                         placeholder="phoneNumber" 
                         classN="input_text_t1" 
                         name="phoneNumber" 
-                        value={} 
+                        value={phoneNumber} 
                         evt="onChange" 
-                        onChange={} 
+                        onChange={handlePhoneNumber} 
                     />
                 </div>
                 <div>
-                    <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
-                    <Input 
-                        id="phoneNumber" 
-                        type="text" 
-                        required={true} 
-                        placeholder="phoneNumber" 
-                        classN="input_text_t1" 
-                        name="phoneNumber" 
-                        value={} 
-                        evt="onChange" 
-                        onChange={} 
-                    />
+                    성별:
+                    <span>
+                        <Label htmlFor="man" content="남자" classN="label_t1"/>
+                        <Input 
+                            id="man" 
+                            type="radio" 
+                            required={true} 
+                            classN="" 
+                            name="gender" 
+                            value="남" 
+                            evt="onChange" 
+                            onChange={handleGender} 
+                        />
+                    </span>
+                    <span>
+                        <Label htmlFor="woman" content="여자" classN="label_t1"/>
+                         <Input 
+                            id="woman" 
+                            type="radio" 
+                            required={true} 
+                            classN="" 
+                            name="gender" 
+                            value="여" 
+                            evt="onChange" 
+                            onChange={handleGender} 
+                        />
+                    </span>
                 </div>
                 <div>
-                    <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
+                    <Label htmlFor="birthday" content="생년월일" classN="label_t1"/>
                     <Input 
-                        id="phoneNumber" 
+                        id="birthday" 
                         type="text" 
                         required={true} 
-                        placeholder="phoneNumber" 
+                        placeholder="19870907 8자리" 
                         classN="input_text_t1" 
-                        name="phoneNumber" 
-                        value={} 
+                        name="birthday" 
+                        value={birthday} 
                         evt="onChange" 
-                        onChange={} 
+                        onChange={handleBirthday} 
                     />
                 </div>
-                {/* 추가 */}
-
                 <div>
                     <Label htmlFor="qeustion" content="질문" classN="label_t1"/>
                     <select name="qeustion" onChange={handleQeustion}>

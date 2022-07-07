@@ -7,9 +7,9 @@ const UserSchema = mongoose.Schema({
     email: { type: String, require: true, unique: true, },
     name: { type: String, require: true, trim: true }, /* minlength: 6, maxlength: 15, */
     password: { type: String, require: true, }, /* minlength: 8, maxlength: 15, trim: true, */ /* 8 ~ 15공백제거  */
-    phoneNumber: { type: Number, trim: true, unique: true, maxlength: 20},
+    phoneNumber: { type: String, trim: true, unique: true, maxlength: 20},
     gender: { type: String, require: true, },
-    birthday: { type: Number, trim: true,maxlength: 8},
+    birthday: { type: String, trim: true,maxlength: 8},
     token: { type: String, unique: true, require: true, },
     qeustion: { 
         qeustionType: { type: Number, unique: true, require: true },
