@@ -51,7 +51,7 @@ export const auth = async (req, res, next) => {
                             updatedAt: data.updatedAt,
                         }
                         req.reftoken = data.token,
-                        next() ;
+                        next();
                     });
                 };
 

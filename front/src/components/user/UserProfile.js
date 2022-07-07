@@ -45,16 +45,7 @@ const UserProfile = () => {
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            // if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms) return;
-
-            // await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
-            // const user = await signupUser({
-            //     id: userId, 
-            //     password: userPassword, 
-            //     email: userEmail, 
-            //     name: userName,
-            // });
-            // dispatch({ type: "USER_SIGNUP_SUCCESS" })
+          
             
 
         } catch(err) {
@@ -71,6 +62,7 @@ const UserProfile = () => {
             dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
             setEditEmailState(!editEmailState)
         } catch(err) {
+            dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
             console.err(err)
         }
     }, [userEmail])
@@ -81,10 +73,11 @@ const UserProfile = () => {
             e.preventDefault();
             const res = await nmaeEditUser({ name: userName, _id: state.user._id })
 
-            console.log('submit name', res);
+            // console.log('submit name', res);
             dispatch({ type: "USER_NAME_EDIT_SUCCESS", data: res.data })
             setEditNameState(!editNameState)
         } catch(err) {
+            dispatch({ type: "USER_NAME_EDIT_FAILUE", data: err.err })
             console.err(err)
         }
     }, [userName])
@@ -125,7 +118,7 @@ const UserProfile = () => {
                 <li>
                     { editEmailState ? (
                         <form onSubmit={handleEmailEdit}>
-                             <Label htmlFor="userEmail" content="이메일 수정중" classN="label_t1"/>
+                            <Label htmlFor="userEmail" content="이메일 수정중" classN="label_t1"/>
                             <Input 
                                 id="userEmail" 
                                 type="email" 

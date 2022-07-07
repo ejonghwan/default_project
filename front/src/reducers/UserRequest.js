@@ -7,14 +7,20 @@ const host = 'http://localhost:5000'
 // 회원가입 유저
 export const signupUser = async data => {
     try {
-        // const { id, password, email, name, qeustion } = data;
-        // console.log('saga', data)
+        const { id, password, email, name, qeustion } = data;
+
+        if(!id && typeof id !== 'string') return;
+        if(!password && typeof password !== 'string') return;
+        if(!email && typeof email !== 'string') return;
+        if(!name && typeof name !== 'string') return;
+        if(!qeustion && typeof qeustion !== 'object') return;
+        
         const config = {
             headers: { "Content-Type": "application/json", },
             withCredentials: true,
         }
         const user = await axios.post(`${host}/api/users`, data, config)
-  
+        
         return user;
 
     } catch(err) {
@@ -27,7 +33,7 @@ export const signupUser = async data => {
 export const getUser = async () => {
     try {
         const accToken = localStorage.getItem('X-access-token')
-        if(!accToken) { return false };
+        if(!accToken) return;
         const config = {
             headers: {
                 "Content-Type": "application/json",
@@ -49,6 +55,9 @@ export const getUser = async () => {
 export const loginUser = async data => {
     try {
         const { id, password } = data;
+        if(!id && typeof id !== 'string') return;
+        if(!password && typeof password !== 'string') return;
+
         const config = {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
@@ -66,8 +75,8 @@ export const loginUser = async data => {
 export const logoutUser = async () => {
     try {
         const accToken = localStorage.getItem('X-access-token')
-        console.log(accToken)
-        if(!accToken) {return false}
+        if(!accToken) return;
+
         const config = {
             headers: {
                 "Content-Type": "application/json",
@@ -95,12 +104,15 @@ export const nmaeEditUser = async data => {
         if(!accToken) return;
 
         const { name, _id } = data
+        if(!name && typeof name !== 'string') return;
+        if(!_id && typeof _id !== 'string') return;
+
         const config = {
             headers: { 
                 "Content-Type": "application/json", 
                 'X-access-token': accToken,
             },
-            withCredentials: true // 쿠키 cors 통신 설정
+            withCredentials: true,
         }
         const user = await axios.patch(`${host}/api/users/edit/name`, data, config)
       
@@ -117,7 +129,10 @@ export const emailEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
-        const { email, _id } = data
+        const { email, _id } = data;
+        if(!email && typeof email !== 'string') return;
+        if(!_id && typeof _id !== 'string') return;
+
         const config = {
             headers: { 
                 "Content-Type": "application/json", 
@@ -134,3 +149,32 @@ export const emailEditUser = async data => {
 }
   
   
+// 비번수정
+export const passwordEditUser = async data => {
+    try {
+        const accToken = localStorage.getItem('X-access-token')
+        if(!accToken) return;
+        const { prevPassword, newPassword, _id, newPasswordCheck } = data;
+        if(!prevPassword && typeof prevPassword !== 'string') return;
+        if(!newPassword && typeof newPassword !== 'string') return;
+        if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return;
+        if(!_id && typeof _id !== 'string') return;
+
+        console.log('request data', data)
+
+        const config = {
+            headers: { 
+                "Content-Type": "application/json", 
+                'X-access-token': accToken,
+            },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const user = await axios.post(`${host}/api/users/edit/password`, data, config)
+
+        console.log('client respose data', user)
+
+        return user;
+    } catch(err) {
+        console.err(err)
+    }
+}

@@ -16,6 +16,18 @@ import { UserContext } from '../context/UserContext.js'
 
 // 회원가입 시 메일인증
 // https://lakelouise.tistory.com/240
+// (https://nodemailer.com/about/)
+// https://velog.io/@neity16/NodeJs-%EC%9D%B4%EB%A9%94%EC%9D%BC-%EC%9D%B8%EC%A6%9D-%EA%B5%AC%ED%98%84nodemailer
+// 메일 구독 등 도메인으로 메일보내고 싶을떄.. https://www.peterkimzz.com/custom-email-service-for-free-forever/
+
+// https://charming-kyu.tistory.com/6
+
+
+// https://velog.io/@tkdfo93/Email-%EC%9D%B8%EC%A6%9D-%EA%B5%AC%ED%98%84-Final-Project-Skill <- 이거로 하자
+// 구글 OAuth https://velog.io/@tkdfo93/%EA%B5%AC%EA%B8%80-OAuth2.0-Final-Project
+// 카카오 네이버 Oauth https://tyrannocoding.tistory.com/49
+
+
 
 // 카카오 네이버 로그인 추가 
 // https://lts0606.tistory.com/489
@@ -24,12 +36,14 @@ import { UserContext } from '../context/UserContext.js'
 
 // 2시간 지나면 로그아웃되는 로직 추가
 
+
+// phoneNumber gender birthday 추가
 const Signup = () => {
 
     const [userId, handleUserId] = useInput('') 
     const [userPassword, handlePassword] = useInput('') 
     const [userPasswordCheck, handlePasswordCheck] = useInput('') 
-    const [passwordChecked, setPasswordChecked] = useState(false) 
+    const [passwordIsChecked, setPasswordIsChecked] = useState(false) 
     const [userEmail, handleUserEmail] = useInput('') 
     const [userName, handleUserName] = useInput('') 
     const [qeustionType, setQeustionType] = useState(null)
@@ -70,10 +84,9 @@ const Signup = () => {
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms && !qeustionType && !result) return;
+            if(!userId && !userPassword && !userEmail && !userName && !passwordIsChecked && !terms && !qeustionType && !result) return;
 
             await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
-           
             const user = await signupUser({
                 id: userId, 
                 password: userPassword, 
@@ -91,14 +104,16 @@ const Signup = () => {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
             console.error(err)
         }
-    }, [userId, userPassword, userEmail, userName, passwordChecked, terms, qeustionType, result])
-
+    }, [userId, userPassword, userEmail, userName, passwordIsChecked, terms, qeustionType, result])
 
     useEffect(() => {
-        userPassword === userPasswordCheck ? setPasswordChecked(true) : setPasswordChecked(false);
-        if(userId && userPassword && userEmail && userName && passwordChecked && terms && qeustionType && result) setSubmitActive(true);
+        userPassword === userPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
+    }, [userPasswordCheck])
 
-    }, [userId, userEmail, userName, passwordChecked, terms, userPassword, userPasswordCheck, qeustionType, result])
+    useEffect(() => {
+        if(userId && userPassword && userEmail && userName && passwordIsChecked && terms && qeustionType && result) setSubmitActive(true);
+
+    }, [userId, userEmail, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result])
 
 
 
@@ -149,7 +164,11 @@ const Signup = () => {
                         onChange={handlePasswordCheck} 
                     />
                     <button type="button">view password</button>
-                    {passwordChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)}
+                    { userPasswordCheck && (
+                        <div>
+                            {passwordIsChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)}
+                        </div>
+                    ) }
                 </div>
                 <div>
                     <Label htmlFor="userEmail" content="이메일" classN="label_t1"/>
@@ -179,12 +198,58 @@ const Signup = () => {
                         onChange={handleUserName} 
                     />
                 </div>
+                
+                {/* 추거 */}
+                <div>
+                    <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
+                    <Input 
+                        id="phoneNumber" 
+                        type="text" 
+                        required={true} 
+                        placeholder="phoneNumber" 
+                        classN="input_text_t1" 
+                        name="phoneNumber" 
+                        value={} 
+                        evt="onChange" 
+                        onChange={} 
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
+                    <Input 
+                        id="phoneNumber" 
+                        type="text" 
+                        required={true} 
+                        placeholder="phoneNumber" 
+                        classN="input_text_t1" 
+                        name="phoneNumber" 
+                        value={} 
+                        evt="onChange" 
+                        onChange={} 
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
+                    <Input 
+                        id="phoneNumber" 
+                        type="text" 
+                        required={true} 
+                        placeholder="phoneNumber" 
+                        classN="input_text_t1" 
+                        name="phoneNumber" 
+                        value={} 
+                        evt="onChange" 
+                        onChange={} 
+                    />
+                </div>
+                {/* 추가 */}
+
                 <div>
                     <Label htmlFor="qeustion" content="질문" classN="label_t1"/>
                     <select name="qeustion" onChange={handleQeustion}>
                         {   
                             questionData && questionData.map((data, idx) => {
-                                return <option key={idx} value={data.qeustionType}>{data.question}</option>
+                                return <option key={idx} value={data.questionType}>{data.question}</option>
                             })
                         }
                     </select>

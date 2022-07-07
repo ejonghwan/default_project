@@ -7,49 +7,51 @@ import { useInput } from '../common/hooks/index.js'
 import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
 
-// components
-// import LoginForm from '../components/user/LoginForm.js'
-
 // context & request 
-// import { signupUser } from '../reducers/UserRequest.js'
+import { passwordEditUser } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
-const UserProfileEdit = () => {
+
+const UserPasswordEdit = () => {
 
     const [prevPassword, handlePrevPassword] = useInput('') 
     const [newPassword, handleNewPassword] = useInput('') 
     const [newPasswordCheck, handleNewPasswordCheck] = useInput('') 
-
+    const [passwordIsChecked, setPasswordIsChecked] = useState(false) 
 
     const [submitActive, setSubmitActive] = useState(false);
 
     const { state, dispatch } = useContext(UserContext)
     
+    useEffect(() => {
+        newPassword === newPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
+        if(prevPassword && newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)
+    }, [newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked])
+
+
     // 요청
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            // if(!userId && !userPassword && !userEmail && !userName && !passwordChecked && !terms) return;
+            if(!prevPassword && !newPassword && !state, !passwordIsChecked) return;
 
-            // await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
-            // const user = await signupUser({
-            //     id: userId, 
-            //     password: userPassword, 
-            //     email: userEmail, 
-            //     name: userName,
-            // });
-            // dispatch({ type: "USER_SIGNUP_SUCCESS" })
+            await dispatch({ type: "LOADING", loadingMessage: "비번 변경중.." })
+            const user = await passwordEditUser({
+                prevPassword, 
+                newPassword, 
+                newPasswordCheck,
+                _id: state.user._id
+            });
+            dispatch({ type: "USER_PASSWORD_EDIT_SUCCESS", data: user.message })
             
             // 비밀번호 강화 로직 아직안함
 
-
-
         } catch(err) {
-            // dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
-            // console.error(err)
+            dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: err.err })
+            console.error(err)
         }
-    }, [])
+    }, [prevPassword, newPassword, state, passwordIsChecked])
 
 
     return (
@@ -74,7 +76,7 @@ const UserProfileEdit = () => {
                         evt="onChange" 
                         onChange={handlePrevPassword} 
                     />
-                    <button>view password</button>
+                    <button>view</button>
 
                 </div>
                 <div>
@@ -90,7 +92,7 @@ const UserProfileEdit = () => {
                         evt="onChange" 
                         onChange={handleNewPassword} 
                     />
-                    <button>view password</button>
+                    <button>view</button>
                 </div>
               
                 <div>
@@ -106,15 +108,19 @@ const UserProfileEdit = () => {
                         evt="onChange" 
                         onChange={handleNewPasswordCheck} 
                     />
-                    <button>view password</button>
-                    {/* {passwordChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)} */}
+                    <button>view</button>
+                    { newPasswordCheck && (
+                        <div>
+                            {passwordIsChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)}
+                        </div>
+                    ) }
                 </div>
              
-                <button type="submit" className={submitActive ? 'checked' : 'none'} >회원가입</button>
+                <button className={submitActive ? 'checked' : 'none'} disabled={!submitActive ? true: false}>비번변경</button>
             </form>
         </Fragment>
     )
 }
 
 
-export default UserProfileEdit;
+export default UserPasswordEdit;

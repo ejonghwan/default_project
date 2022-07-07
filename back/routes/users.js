@@ -1,10 +1,11 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'
-import { auth } from '../middleware/auth.js' 
+import jwt from 'jsonwebtoken';
+import { auth } from '../middleware/auth.js' ;
 
 // model 
-import User from '../models/users.js'
+import User from '../models/users.js';
 
 const router = express.Router();
 
@@ -18,10 +19,10 @@ router.get('/load', auth, async (req, res) => {
         if(req.reftoken) {
             console.log('모두 만료돼서 디비 토큰 다시 저장하고 acc 다시 발급')
             bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(req.reftoken, salt, async(err, hash) => {
+                bcrypt.hash(req.reftoken, salt,(err, hash) => {
                     // res
-                    await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
-                    await res.status(201).json(req.user)
+                    res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
+                    res.status(201).json(req.user)
                 })
             })
         } else {
@@ -31,7 +32,7 @@ router.get('/load', auth, async (req, res) => {
 
     } catch(err) {
         console.error(err)
-        res.status(400).json({ error: err.message })
+        res.status(500).json({ error: err.message })
     }
 
 })
@@ -47,7 +48,7 @@ router.get('/', auth, async (req, res) => {
         res.status(201).json({ user })
     } catch(err) {
         console.error(err)
-        res.status(400).json({ error: err.message })
+        res.status(500).json({ error: err.message })
     }
 
 })
@@ -100,7 +101,7 @@ router.post('/login', async (req, res) => {
 
     } catch(err) {
         console.error(err)
-        res.status(400).json({ err: err.message }) 
+        res.status(500).json({ err: err.message }) 
     }
 })
 
@@ -141,12 +142,13 @@ router.post('/', async (req, res) => {
                     // save user
                     user.save().then(user => {
                         res.status(201).json({ 
-                            _id: user._id,
-                            id: user.id,
-                            email: user.email,
-                            name: user.name, 
-                            createdAt: user.createdAt,
-                            updatedAt: user.updatedAt,
+                            // _id: user._id,
+                            // id: user.id,
+                            // email: user.email,
+                            // name: user.name, 
+                            // createdAt: user.createdAt,
+                            // updatedAt: user.updatedAt,
+                            message: '가입성공'
                         }) 
                     })
                 });
@@ -154,91 +156,86 @@ router.post('/', async (req, res) => {
             })
         })
 
-        /* res data 
-            {"user":{"id":"hoho123","email":"hoho123@naver.com","name":"hohoman","password":"$2b$10$tNvb0bavhmmegJwUxR.7COshNoGPXQwjOiHunhoQoCXFau9Z8n5Au","_id":"6290902af8a34b046421598d","createdAt":"2022-05-27T08:47:38.437Z","updatedAt":"2022-05-27T08:47:38.437Z","__v":0}}
-        */
-        
     } catch(err) {
         console.error(err)
-        res.status(400).json({ err: err.message }) 
+        res.status(500).json({ err: err.message }) 
     }
 })
 
 
-
-// const user = await axios.patch(`${host}/api/users/edit/name/${_id}`, data, config)
+//@ path    PATCH /api/users/edit/name
+//@ doc     이름 변경
+//@ access  private
 router.patch('/edit/name', auth, async(req, res) => {
     try {
         const { name, _id } = req.body;
-        // const { id } = req.params;
-        // console.log('bak', req.body)
-        // if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
-
+        if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
 
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {name: name} }, { new: true })
-        // user.save();
-        // console.log('??', user)
         res.status(201).json(user.name)
-        
-
 
     } catch(err) {
         console.error(err)
-        res.status(400).json({ err: err.message })
+        res.status(500).json({ err: err.message })
     }
 })
 
 
+//@ path    PATCH /api/users/edit/name
+//@ doc     이메일 변경
+//@ access  private
 router.patch('/edit/email', auth, async(req, res) => {
     try {
         const { email, _id } = req.body;
-        // const { id } = req.params;
-        // console.log('bak', req.body)
-        // if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
-
+        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
 
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {email: email} }, { new: true })
-        // user.save();
-
         res.status(201).json(user.email)
-        console.log(user)
-
 
     } catch(err) {
         console.error(err)
-        res.status(400).json({ err: err.message })
+        res.status(500).json({ err: err.message })
     }
 })
 
 
-router.post('/profile/edit', auth, async (req, res) => {
+//@ path    POST /api/users/edit/password
+//@ doc     패스워드 변경
+//@ access  private
+router.post('/edit/password', auth, async (req, res) => {
     try {
 
-        const { id, _id, password, checkedPassword, name } = req.body;
-        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
-        if(!password) return res.status(400).json({ err: 'is not password' }) 
-        if(!checkedPassword) return res.status(400).json({ err: 'is not checked password' }) 
-        if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
+        const { _id, prevPassword, newPassword, newPasswordCheck } = req.body;
+        console.log('back body: ', req.body)
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not _id' }) 
+        if(!prevPassword && typeof prevPassword !== 'string') return res.status(400).json({ err: 'is not prev password' }) 
+        if(!newPassword && typeof newPassword !== 'string') return res.status(400).json({ err: 'is not checked password' }) 
+        if(newPassword !== newPasswordCheck) return res.status(400).json({ err: 'not password matched' })
 
+        const user = await User.findById(_id)
+        const matched = await bcrypt.compare(prevPassword, user.password)
 
-        const userPassword = await User.findById(_id, 'password')
-        const matched = await bcrypt.compare(password, userPassword)
+        if(!user) return res.status(400).json({ err: 'is not user' })
+        if(!matched) return res.status(400).json({ err: '이전 비번 확인해주세요' })
 
-        if(!matched) return res.status(400).json({ err: '' })
-        if(!_id) return res.status(400).json({ err: 'is not user' })
-        if(password !== checkedPassword) return res.status(400).json({ err: 'not password matched ' })
-
-        if(password, checkedPassword) {
-            
+        if(matched) {
+            console.log('back 비번 매칭성공')
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(newPassword, salt, (err, hash) => {
+                    console.log('back hashed', hash)
+                    user.password = hash;
+                    user.save();
+                    res.status(200).json({ message: '비번 변경 성공!' })
+                })
+            })
         }
 
 
     } catch(err) {
         console.error(err)
-        res.status(400).json({ err: err.message })
+        res.status(500).json({ err: err.message })
     }
 })
 
