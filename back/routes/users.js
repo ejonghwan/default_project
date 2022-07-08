@@ -21,7 +21,7 @@ router.get('/load', auth, async (req, res) => {
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(req.reftoken, salt,(err, hash) => {
                     // res
-                    res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
+                    res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
                     res.status(201).json(req.user)
                 })
             })
@@ -29,7 +29,6 @@ router.get('/load', auth, async (req, res) => {
             console.log('디비 토큰 만료안돼서 이거넘김')
             res.status(201).json(req.user)
         }
-
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })
@@ -81,7 +80,7 @@ router.post('/login', async (req, res) => {
                     bcrypt.hash(user.token, salt, async (err, hash) => {
 
                         // res
-                        await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 9000000), httpOnly: true });
+                        await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
                         await res.status(201).json({
                             accToken,
                             _id: user._id,
@@ -232,8 +231,6 @@ router.post('/edit/password', auth, async (req, res) => {
                 })
             })
         }
-
-
     } catch(err) {
         console.error(err)
         res.status(500).json({ err: err.message })

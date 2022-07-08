@@ -119,19 +119,7 @@ const Signup = () => {
 
 
     useEffect(() => {
-        if(
-            userId && 
-            userPassword && 
-            userEmail && 
-            userName && 
-            passwordIsChecked && 
-            terms && 
-            qeustionType && 
-            result &&
-            phoneNumber && 
-            gender && 
-            birthday
-        ) setSubmitActive(true);
+        if(userId && userPassword && userEmail && userName && passwordIsChecked && terms && qeustionType && result &&phoneNumber && gender && birthday) setSubmitActive(true);
     }, [userId, userEmail, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday])
 
 

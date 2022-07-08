@@ -65,8 +65,10 @@ export const loginUser = async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const user = await axios.post(`${host}/api/users/login`, data, config)
-        localStorage.setItem('X-access-token', user.data.accToken) 
+
+        const user = await axios.post(`${host}/api/users/login`, data, config);
+        localStorage.setItem('X-access-token', user.data.accToken);
+
         return user;
     } catch(err) {
         console.err(err)

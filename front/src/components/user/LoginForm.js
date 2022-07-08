@@ -1,9 +1,12 @@
 import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
 import axios from 'axios'
 
-//module
+// module
 import { useInput } from '../common/hooks/index.js'
 
+
+// util
+import { timer } from '../../utils/utils.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -12,7 +15,7 @@ import Label from '../common/form/Label.js'
 
 // context
 import { UserContext } from '../../context/UserContext.js'
-import { loginUser } from '../../reducers/UserRequest.js'
+import { loginUser, logoutUser } from '../../reducers/UserRequest.js'
 
 const LoginForm = () => {
 
@@ -27,6 +30,13 @@ const LoginForm = () => {
             await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
             const user = await loginUser({ id: userId, password: userPassword })
             dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
+
+            // 로그인 후 2시간 되면 로그아웃
+            timer(7200, async () => {
+                console.log('로그아웃됨')
+                const logout = await logoutUser()
+                dispatch({ type: "USER_LOGOUT_SUCCESS" })
+            })
 
         } catch(err) {
             console.error(err)

@@ -22,6 +22,9 @@ const App = () => {
   // 유저 새로고침
   const userLoad = async () => {
     try {
+      const accToken = localStorage.getItem('X-access-token')
+      if(!accToken) return;
+
       await dispatch({ type: "LOADING", loadingMessage: "" })
       const user = await getUser();
       const data = user.data;
