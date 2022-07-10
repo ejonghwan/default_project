@@ -6,22 +6,26 @@ import { useInput } from '../common/hooks/index.js'
 
 
 // util
-import { timer } from '../../utils/utils.js'
+import { timer, delay, initTime } from '../../utils/utils.js'
 
 // components
 import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
-
+import LoginTimer from './LoginTimer.js';
 
 // context
 import { UserContext } from '../../context/UserContext.js'
 import { loginUser, logoutUser } from '../../reducers/UserRequest.js'
+
 
 const LoginForm = () => {
 
     const [userId, handleUserId] = useInput('')
     const [userPassword, handlePassword] = useInput('')
     const {state, dispatch} = useContext(UserContext)
+
+    const [timeRemaining, setTimeRemaining] = useState(null)
+    const [totalLoingTime, setTotalLoingTime] = useState(null)
 
 
     const handleSubmit = useCallback( async e => {
@@ -31,11 +35,17 @@ const LoginForm = () => {
             const user = await loginUser({ id: userId, password: userPassword })
             dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
 
-            // 로그인 후 2시간 되면 로그아웃
-            timer(7200, async () => {
-                console.log('로그아웃됨')
-                const logout = await logoutUser()
-                dispatch({ type: "USER_LOGOUT_SUCCESS" })
+            
+           setTotalLoingTime(10)
+           timer(10, 3, async (count) => {
+                setTimeRemaining(count)
+                
+                if(count === 0) {
+                    console.log('로그아웃됨')
+                    await logoutUser()
+                    dispatch({ type: "USER_LOGOUT_SUCCESS" })
+                }
+                console.log('count', count)
             })
 
         } catch(err) {
@@ -50,14 +60,17 @@ const LoginForm = () => {
 
 
     useEffect(() => {
-        
-    }, [handleSubmit])
+       
+    }, [])
 
 
     return (
         <Fragment>
+            
+            <LoginTimer totalLoingTime={totalLoingTime} timeRemaining={timeRemaining} />
             <form onSubmit={handleSubmit}>
             <div>
+            
                     <Label htmlFor="userId" content="아이디" classN="label_t1"/>
                     <Input  
                         id="userId" 
@@ -66,7 +79,6 @@ const LoginForm = () => {
                         placeholder="id" 
                         classN="input_text_t1" 
                         name="userId" 
-                        
                         value={userId} 
                         evt="onChange" 
                         onChange={handleUserId} 
@@ -87,6 +99,7 @@ const LoginForm = () => {
                     />
                     <button>view password</button>
                 </div>
+                
                 <button type="submit">로그인</button>
             </form>
         </Fragment>
