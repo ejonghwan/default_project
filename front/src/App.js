@@ -33,7 +33,7 @@ const App = () => {
     } catch(err) {
 
       dispatch({ type: "USER_LOAD_FAILUE" })
-      console.err(err)
+      console.error(err)
     }
   }
 

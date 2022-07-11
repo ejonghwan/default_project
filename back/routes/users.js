@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { auth } from '../middleware/auth.js' ;
+import { mailAuth } from '../middleware/mailAuth.js' ;
 
 // model 
 import User from '../models/users.js';
@@ -14,7 +15,7 @@ const router = express.Router();
 //@ path    GET /api/users/load
 //@ doc     로드 유저
 //@ access  public
-router.get('/load', auth, async (req, res) => {
+router.get('/load', mailAuth, auth, async (req, res) => {
     try {
         if(req.reftoken) {
             console.log('모두 만료돼서 디비 토큰 다시 저장하고 acc 다시 발급')

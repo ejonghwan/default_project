@@ -21,11 +21,14 @@ import { UserContext } from '../context/UserContext.js'
 // 메일 구독 등 도메인으로 메일보내고 싶을떄.. https://www.peterkimzz.com/custom-email-service-for-free-forever/
 
 // https://charming-kyu.tistory.com/6
+// https://blog.naver.com/PostView.nhn?isHttpsRedirect=true&blogId=sejun3278&logNo=221856823435&redirect=Dlog&widgetTypeCall=true&directAccess=false  <
 
 
 // https://velog.io/@tkdfo93/Email-%EC%9D%B8%EC%A6%9D-%EA%B5%AC%ED%98%84-Final-Project-Skill <- 이거로 하자
 // 구글 OAuth https://velog.io/@tkdfo93/%EA%B5%AC%EA%B8%80-OAuth2.0-Final-Project
 // 카카오 네이버 Oauth https://tyrannocoding.tistory.com/49
+
+
 
 
 
@@ -37,7 +40,6 @@ import { UserContext } from '../context/UserContext.js'
 // 2시간 지나면 로그아웃되는 로직 추가
 
 
-// phoneNumber gender birthday 추가
 const Signup = () => {
 
     const [userId, handleUserId] = useInput('') 

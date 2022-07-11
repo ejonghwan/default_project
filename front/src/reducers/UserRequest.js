@@ -89,8 +89,9 @@ export const logoutUser = async () => {
             },
             withCredentials: true,
           }
+        await localStorage.removeItem('X-access-token')
         const user = await axios.get(`${host}/api/users/logout`, config)
-        localStorage.removeItem('X-access-token')
+        
         
         return user;
     } catch(err) {
