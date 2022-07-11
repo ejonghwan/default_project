@@ -1,6 +1,9 @@
 import React from 'react';
 
+// components
 import ImageUploadForm from '../components/image/ImageUploadForm.js'
+import Auth from '../components/user/Auth.js'
+
 
 const Home = () => {
     return (
@@ -10,6 +13,7 @@ const Home = () => {
             <br />
             <br />
             <ImageUploadForm />
+            <Auth />
         </div>
     );
 };

@@ -1,9 +1,17 @@
+
+
 <html>
+
+<head>
+</head>
+
 <body>
-  <div>
-    <p style='color:black'>회원 가입을 위한 인증번호 입니다.</p>
-    <p style='color:black'>아래의 인증 번호를 입력하여 인증을 완료해주세요.</p>
-    <h2><%= authCode %></h2>
-  </div>
+    <div class="wrap">
+				<p class="info_text">💡 회원가입 인증 코드</p>
+        <div class="info_code">
+            <a href="http://localhost:5000/api/auth/signup?auth=<%= emailAuthToken %>" target="_blank" title="가입버튼">가입하기</a>
+        </div>
+    </div>
 </body>
+
 </html>

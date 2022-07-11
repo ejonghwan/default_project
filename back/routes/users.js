@@ -15,7 +15,7 @@ const router = express.Router();
 //@ path    GET /api/users/load
 //@ doc     로드 유저
 //@ access  public
-router.get('/load', mailAuth, auth, async (req, res) => {
+router.get('/load', auth, async (req, res) => {
     try {
         if(req.reftoken) {
             console.log('모두 만료돼서 디비 토큰 다시 저장하고 acc 다시 발급')
@@ -30,6 +30,7 @@ router.get('/load', mailAuth, auth, async (req, res) => {
             console.log('디비 토큰 만료안돼서 이거넘김')
             res.status(201).json(req.user)
         }
+            
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })

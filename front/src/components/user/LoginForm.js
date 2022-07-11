@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
-import axios from 'axios'
 
 // module
 import { useInput } from '../common/hooks/index.js'
-
 
 // util
 import { timer, delay, initTime } from '../../utils/utils.js'
@@ -37,7 +35,7 @@ const LoginForm = () => {
 
             
            setTotalLoingTime(10)
-           timer(10, 3, async (count) => {
+           timer(7200, 600, async (count) => {
                 setTimeRemaining(count)
                 
                 if(count === 0) {

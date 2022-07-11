@@ -2,6 +2,23 @@ import axios from 'axios'
 
 const host = 'http://localhost:5000'
 
+// 회원가입 유저
+export const emailAuth = async data => {
+    try {
+        const { email } = data;
+        if(!email && typeof email !== 'string') return;
+     
+        const config = {
+            headers: { "Content-Type": "application/json", },
+            withCredentials: true,
+        }
+        await axios.post(`${host}/api/auth`, data, config)
+
+    } catch(err) {
+        console.err(err)
+    }
+}
+
 
 
 // 회원가입 유저
