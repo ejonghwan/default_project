@@ -62,7 +62,7 @@ export const initTime = () => {
 
 const test = () => {
     // const sampleTimestamp = Date.now(); //현재시간 타임스탬프 13자리 예)1599891939914
-    // var date = new Date(sampleTimestamp); //타임스탬프를 인자로 받아 Date 객체 생성
+    // const date = new Date(sampleTimestamp); //타임스탬프를 인자로 받아 Date 객체 생성
 
     // var year = date.getFullYear().toString().slice(-2); //년도 뒤에 두자리
     // var month = ("0" + (date.getMonth() + 1)).slice(-2); //월 2자리 (01, 02 ... 12)
@@ -93,3 +93,5 @@ const test = () => {
         // // expected output: seconds elapsed = 2
         // }, 7000);
 }
+
+

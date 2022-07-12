@@ -36,7 +36,7 @@ export const auth = async (req, res, next) => {
                 const getRefreshToken = req.cookies["X-refresh-token"]
                 const refreshTokenDecode = decodeURIComponent(getRefreshToken)
                 const user = await User.findOne({ id: match.id })
-                
+
 
                 // db에 저장된 리프레시가 만료되었을 경우
                 const dbToken = await jwt.verify(user.token, process.env.JWT_KEY, {ignoreExpiration: true})

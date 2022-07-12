@@ -50,10 +50,18 @@ export const signupUser = async data => {
 
 
 // 유저 불러오기
-export const getUser = async () => {
+export const getUser = async (query) => {
     try {
-        const accToken = localStorage.getItem('X-access-token')
+        let accToken = null;
+
+        if(query) { accToken = query }
+        if(localStorage.getItem('X-access-token')) {
+            accToken = localStorage.getItem('X-access-token')
+        }
+
+        console.log('query', accToken)
         if(!accToken) return;
+
         const config = {
             headers: {
                 "Content-Type": "application/json",

@@ -23,21 +23,7 @@ dotenv.config()
 
 export const mailAuth = async (req, res, next) => {
     try {
-        // const authCode = Math.random().toString().substring(2, 8);
-        let mailTemplate = null;
-
-        await jwt.sign({ email: req.body.email }, process.env.JWT_KEY, { expiresIn: "1h" }, (err, token) => {
-            if(err) return console.error(err)
-
-            ejs.renderFile(`${__dirname}/template/authMail.ejs`, {emailAuthToken : token}, (err, data) => {
-                if(err) {return console.error('ejs render error')}
-                if(data) {
-                    mailTemplate = data;
-                }
-                
-            })
-        })
-        
+     
         const mailPoster = nodeMailer.createTransport({
             service: 'Naver',
             host: 'smtp.naver.com',
@@ -53,12 +39,12 @@ export const mailAuth = async (req, res, next) => {
           });
 
           
-        const mailOpt = (user_data, title, contents) => {
+        const mailOpt = (reqUser, title, contents) => {
             const mailOptions = {
             from: process.env.MAIL_ID,
-            to: req.body.email,
-            subject: '인증메일 입니다. 인증 번호를 입력해주세요.',
-            html: mailTemplate,
+            to: reqUser,
+            subject: title,
+            html: contents,
             };
         
             return mailOptions;
@@ -79,9 +65,35 @@ export const mailAuth = async (req, res, next) => {
         }
 
 
-        const mailOption = mailOpt();
-        sendMail(mailOption)
+        /*
+            이메일 체크 후 
+            user true =  email jwt token 전달하면서 로그인 인증 로직 : 버튼 클릭 시 유저정보 찾아서 res / 홈 화면으로
+            user false =  email jwt token 전달하면서 회원가입 인증 로직 : 버튼 클릭 시 회원가입 페이지로 
+        */
+        const { email } = req.body;
+        const user = await User.findOne({ email: email })
+        if(!email || typeof email !== 'string') return console.error('is not email');
 
+
+        await jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: "1h" }, (err, token) => {
+            if(err) return console.error(err)
+             // const authCode = Math.random().toString().substring(2, 8);
+            let mailTemplate = null; //이거 하나 스택 하나 밖에 있을떈 왜 안됨 ?
+            let templateName = null;
+            console.log('user??', user)
+            user ? templateName = 'authSigninMail' : templateName = 'authSignupMail';
+            
+            ejs.renderFile(`${__dirname}/template/${templateName}.ejs`, {emailAuthToken : token}, (err, data) => {
+                if(err) {return console.error('ejs render error')}
+                if(data) { mailTemplate = data;}
+            })
+
+            console.log('temp44', mailTemplate)
+            const mailOption = mailOpt(req.body.email, '인증메일 입니다.', mailTemplate);
+            sendMail(mailOption)
+        })
+        
+        
     } catch(err) {
         console.error(err)
     }
