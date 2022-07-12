@@ -16,10 +16,16 @@ import User from '../models/users.js'
 
 const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
-const __dirname =path.resolve(); 
+const __dirname = path.resolve(); 
 
 dotenv.config()
 
+// 내일할거
+// 인증완료에 토큰 1시간 준거 만료 로직 
+
+// mailAuth를 로그인/회원가입  or  아이디찾기 비번찾기에 사용되는 메일인증이랑 분리
+// 비번찾기  (질답, 이메일인증)
+// 아이디 찾기 (개인정보, 이메일인증)
 
 export const mailAuth = async (req, res, next) => {
     try {
@@ -78,8 +84,9 @@ export const mailAuth = async (req, res, next) => {
         await jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: "1h" }, (err, token) => {
             if(err) return console.error(err)
              // const authCode = Math.random().toString().substring(2, 8);
-            let mailTemplate = null; //이거 하나 스택 하나 밖에 있을떈 왜 안됨 ?
+            let mailTemplate = null; //이거 스택 하나 밖에 있을떈 왜 안됨 ?
             let templateName = null;
+
             console.log('user??', user)
             user ? templateName = 'authSigninMail' : templateName = 'authSignupMail';
             
@@ -88,7 +95,6 @@ export const mailAuth = async (req, res, next) => {
                 if(data) { mailTemplate = data;}
             })
 
-            console.log('temp44', mailTemplate)
             const mailOption = mailOpt(req.body.email, '인증메일 입니다.', mailTemplate);
             sendMail(mailOption)
         })

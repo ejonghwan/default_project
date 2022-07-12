@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 // module
 import { useInput, useInputRadio } from '../components/common/hooks/index.js'
@@ -46,7 +47,7 @@ const Signup = () => {
     const [userPassword, handlePassword] = useInput('') 
     const [userPasswordCheck, handlePasswordCheck] = useInput('') 
     const [passwordIsChecked, setPasswordIsChecked] = useState(false) 
-    const [userEmail, handleUserEmail] = useInput('') 
+    // const [userEmail, handleUserEmail] = useInput('') 
     const [userName, handleUserName] = useInput('') 
     const [qeustionType, setQeustionType] = useState(null)
     const [result, handleResult] = useInput('') 
@@ -57,6 +58,10 @@ const Signup = () => {
     const [birthday, handleBirthday] = useInput('')
   
     const { state, dispatch } = useContext(UserContext)
+
+    const [searchParams] = useSearchParams();
+    const email = decodeURIComponent(searchParams.get('email'));
+
     
     const questionData = [
         { questionType: 0, question: '질문1' },
@@ -89,13 +94,13 @@ const Signup = () => {
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-            if(!userId && !userPassword && !userEmail && !userName && !passwordIsChecked && !terms && !qeustionType && !result && !phoneNumber && !gender && !birthday) return;
+            if(!userId && !userPassword && !userName && !passwordIsChecked && !terms && !qeustionType && !result && !phoneNumber && !gender && !birthday) return;
 
             await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
             const user = await signupUser({
                 id: userId, 
                 password: userPassword, 
-                email: userEmail, 
+                email: email, 
                 name: userName,
                 qeustion: { qeustionType, result },
                 phoneNumber, 
@@ -112,7 +117,7 @@ const Signup = () => {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
             console.error(err)
         }
-    }, [userId, userPassword, userEmail, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
+    }, [userId, userPassword, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
 
 
     useEffect(() => {
@@ -121,8 +126,8 @@ const Signup = () => {
 
 
     useEffect(() => {
-        if(userId && userPassword && userEmail && userName && passwordIsChecked && terms && qeustionType && result &&phoneNumber && gender && birthday) setSubmitActive(true);
-    }, [userId, userEmail, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday])
+        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result &&phoneNumber && gender && birthday) setSubmitActive(true);
+    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday])
 
 
 
@@ -131,6 +136,21 @@ const Signup = () => {
         // id, password, email, name
         <div>
             <form onSubmit={handleSubmit}>
+                <div>
+                    <Label htmlFor="userEmail" content="이메일" classN="label_t1"/>
+                    <span>{email} / 인증완료</span>
+                    {/* <Input 
+                        id="userEmail" 
+                        type="email" 
+                        required={true} 
+                        placeholder="userEmail" 
+                        classN="input_text_t1" 
+                        name="userEmail" 
+                        value={userEmail} 
+                        evt="onChange" 
+                        onChange={handleUserEmail} 
+                    /> */}
+                </div>
                 <div>
                     <Label htmlFor="userId" content="아이디" classN="label_t1"/>
                     <Input  
@@ -179,20 +199,6 @@ const Signup = () => {
                             {passwordIsChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)}
                         </div>
                     ) }
-                </div>
-                <div>
-                    <Label htmlFor="userEmail" content="이메일" classN="label_t1"/>
-                    <Input 
-                        id="userEmail" 
-                        type="email" 
-                        required={true} 
-                        placeholder="userEmail" 
-                        classN="input_text_t1" 
-                        name="userEmail" 
-                        value={userEmail} 
-                        evt="onChange" 
-                        onChange={handleUserEmail} 
-                    />
                 </div>
                 <div>
                     <Label htmlFor="userName" content="이름" classN="label_t1"/>

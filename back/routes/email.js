@@ -17,6 +17,7 @@ const router = express.Router();
 
 
 
+
 //@ path    POST /api/auth
 //@ doc     회원가입 메일인증
 //@ access  public
@@ -24,7 +25,7 @@ router.post('/', mailAuth, async (req, res) => {
     try {
        
         console.log(req.body, '이메일인증')
-        res.status(200).json({ message: '회원가입 링크가 이메일로 전송되었습니다.', email: req.body.email })
+        res.status(200).json({ message: '이메일로 전송되었습니다.', email: req.body.email })
        
     } catch(err) {
         console.error(err)
@@ -36,15 +37,18 @@ router.post('/', mailAuth, async (req, res) => {
 //@ path    GET /api/auth/signup
 //@ doc     가입메일 요청
 //@ access  public
-router.get('/signup/', async (req, res) => {
+router.get('/signup', async (req, res) => {
     try {
        
         console.log(req.query, '이메일인증')
-
+        const { auth } = req.query;
+        const match = jwt.verify(auth, process.env.JWT_KEY, {ignoreExpiration: true},) 
+        const encode = encodeURIComponent(match.email)
+   
         //성공하면 회원가입페이지로 리디렉션
         //실패하면 에러페이지
-        const query = querystring.stringify({ valid: true, })
-        res.redirect(`${process.env.DOMAIN}/signup`)
+        const query = querystring.stringify({ valid: true, email: encode})
+        res.redirect(`${process.env.DOMAIN}/signup?${query}`)
        
     } catch(err) {
         console.error(err)
@@ -56,7 +60,7 @@ router.get('/signup/', async (req, res) => {
 //@ path    GET /api/auth/login
 //@ doc     가입메일 요청
 //@ access  public
-router.get('/login/', async (req, res) => {
+router.get('/login', async (req, res) => {
     try {
         const { auth } = req.query;
         const match = jwt.verify(auth, process.env.JWT_KEY, {ignoreExpiration: true},) 

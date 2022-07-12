@@ -55,16 +55,12 @@ const App = () => {
 
   const userEmailLoad = async () => {
     try {
-
-
-    console.log('useremailLoad')
   
     const valid = searchParams.get('valid');
     const accToken = searchParams.get('accToken');
 
     if(accToken && valid) {
         if(!accToken) return;
-        console.log('???????????????????????????????????????')
         await dispatch({ type: "LOADING", loadingMessage: "" })
         const user = await getUser(accToken);
         const data = user.data;

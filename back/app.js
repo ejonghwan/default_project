@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser';
 // router
 import imagesRoutes from './routes/images.js'
 import usersRoutes from './routes/users.js'
-import emailAuthRoutes from './routes/emailAuth.js'
+import emailRoutes from './routes/email.js'
 
 
 
@@ -39,7 +39,7 @@ mongoose.connect(process.env.MONGO_URI, {}).then(() => {
         console.log('mongodb connect')
         app.use('/api/images', imagesRoutes)
         app.use('/api/users', usersRoutes)
-        app.use('/api/auth', emailAuthRoutes)
+        app.use('/api/auth', emailRoutes)
         app.listen(PORT, () => console.log('express server listening port ' + PORT))
 
     } catch(err) {

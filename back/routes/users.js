@@ -113,7 +113,7 @@ router.post('/login', async (req, res) => {
 //@ path    GET /api/users/logout
 //@ doc     로그아웃
 //@ access  public
-router.get('/logout', auth, (req, res) => {
+router.get('/logout', (req, res) => {
     res.status(201).clearCookie('X-refresh-token').json({message: "로그아웃 되었습니다"})
 })
 
