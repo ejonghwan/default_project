@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { auth } from '../middleware/auth.js' ;
 import { mailAuth } from '../middleware/mailAuth.js' ;
+import { signMailAuth } from '../middleware/signMailAuth.js';
+import { mainAuthNumber } from '../middleware/mainAuthNumber.js';
 
 
 dotenv.config();
@@ -21,7 +23,7 @@ const router = express.Router();
 //@ path    POST /api/auth
 //@ doc     회원가입 메일인증
 //@ access  public
-router.post('/', mailAuth, async (req, res) => {
+router.post('/', signMailAuth, async (req, res) => {
     try {
        
         console.log(req.body, '이메일인증')
@@ -43,10 +45,15 @@ router.get('/signup', async (req, res) => {
         console.log(req.query, '이메일인증')
         const { auth } = req.query;
         const match = jwt.verify(auth, process.env.JWT_KEY, {ignoreExpiration: true},) 
+
+        // 만료시간 1시간. 지나면 실행
+        if(match.exp < Date.now().valueOf() / 1000) {
+            console.error('토큰시간 만료')
+            return res.redirect(`${process.env.DOMAIN}/error`)
+        }
+
+
         const encode = encodeURIComponent(match.email)
-   
-        //성공하면 회원가입페이지로 리디렉션
-        //실패하면 에러페이지
         const query = querystring.stringify({ valid: true, email: encode})
         res.redirect(`${process.env.DOMAIN}/signup?${query}`)
        
@@ -58,41 +65,63 @@ router.get('/signup', async (req, res) => {
 
 
 //@ path    GET /api/auth/login
-//@ doc     가입메일 요청
+//@ doc     로그인 메일 요청
 //@ access  public
 router.get('/login', async (req, res) => {
     try {
         const { auth } = req.query;
         const match = jwt.verify(auth, process.env.JWT_KEY, {ignoreExpiration: true},) 
-        // //{ email: 'jjongrrr@naver.com', iat: 1657599001, exp: 1657602601 }
+        if(match.exp < Date.now().valueOf() / 1000) {
+            console.error('토큰시간 만료')
+            return res.redirect(`${process.env.DOMAIN}/error`)
+        }
         
-        // console.log(match)
         const user = await User.findOne({ email: match.email })
-     
         jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
             if(err) throw new Error(err)
 
             // token hash
             bcrypt.genSalt(10, async (err, salt) => {
                 bcrypt.hash(user.token, salt,  (err, hash) => {
-
                     const query = querystring.stringify({ 
                         valid: true, 
                         accToken: accToken,
                     })
                     res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
                     res.redirect(`${process.env.DOMAIN}/?${query}`);
-                    
                 })
             })
         });
-
         
+
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })
     }
 })
+
+
+//@ path    POST /api/auth/number
+//@ doc     인증번호로 메일인증
+//@ access  public
+router.patch('/number', auth, mainAuthNumber, async (req, res) => {
+    try {
+       
+        console.log(req.body, '이메일 번호 인증')
+        res.status(200).json({ message: '이메일로 전송되었습니다.', email: req.body.email })
+       
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({ error: err.message })
+    }
+})
+
+
+
+
+
+
+
 
 
 

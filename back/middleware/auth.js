@@ -14,19 +14,8 @@ export const auth = async (req, res, next) => {
             if(match && match.exp > Date.now().valueOf() / 1000) { 
                 // console.log(match)
                 console.log('acc 토큰으로 인증함')
-                const user = await User.findOne({ id: match.id })
-                req.user = {
-                    accToken,
-                    _id: user._id,
-                    id: user.id,
-                    email: user.email,
-                    name: user.name, 
-                    gender: user.gender, 
-                    phoneNumber: user.phoneNumber, 
-                    birthday: user.birthday, 
-                    createdAt: user.createdAt,
-                    updatedAt: user.updatedAt,
-                }
+                const user = await User.findOne({ id: match.id }).select({ password: 0, qeustion: 0, token: 0 })
+                req.user = { accToken, ...user._doc }
                 next() 
 
             } else {
@@ -35,28 +24,17 @@ export const auth = async (req, res, next) => {
                 console.log('acc 토큰 만료돼서 refresh 토큰 으로 인증하고 다시 발급')
                 const getRefreshToken = req.cookies["X-refresh-token"]
                 const refreshTokenDecode = decodeURIComponent(getRefreshToken)
-                const user = await User.findOne({ id: match.id })
+                const user = await User.findOne({ id: match.id }).select({ password: 0, qeustion: 0 })
 
 
                 // db에 저장된 리프레시가 만료되었을 경우
                 const dbToken = await jwt.verify(user.token, process.env.JWT_KEY, {ignoreExpiration: true})
                 if(dbToken.exp < Date.now().valueOf() / 1000) {
                     user.token = jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" })
-                    user.save().then(data => {
+                    user.save().then(user => {
                         const acctoken = jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "2h" })
-                        req.user = {
-                            accToken: acctoken,
-                            _id: data._id,
-                            id: data.id,
-                            email: data.email,
-                            name: data.name, 
-                            gender: data.gender, 
-                            phoneNumber: data.phoneNumber, 
-                            birthday: data.birthday, 
-                            createdAt: data.createdAt,
-                            updatedAt: data.updatedAt,
-                        }
-                        req.reftoken = data.token,
+                        req.user = { accToken, ...user._doc }
+                        req.reftoken = user.token,
                         next();
                     });
                 };
@@ -67,18 +45,7 @@ export const auth = async (req, res, next) => {
                 if(refreshTokenMatch && dbToken.exp > Date.now().valueOf() / 1000) {
                     const acctoken = await jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "2h" })
                     // console.log('새로발급한 acc 토큰: ', acctoken)
-                    req.user = {
-                        accToken: acctoken,
-                        _id: user._id,
-                        id: user.id,
-                        email: user.email,
-                        name: user.name, 
-                        gender: user.gender, 
-                        phoneNumber: user.phoneNumber, 
-                        birthday: user.birthday, 
-                        createdAt: user.createdAt,
-                        updatedAt: user.updatedAt,
-                    }
+                    req.user = { accToken, user: user._doc }
                     next() 
                 } 
              

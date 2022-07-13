@@ -22,6 +22,7 @@ router.get('/load', auth, async (req, res) => {
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(req.reftoken, salt,(err, hash) => {
                     // res
+                    delete req.user._doc.token;
                     res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
                     res.status(201).json(req.user)
                 })
@@ -61,15 +62,12 @@ router.get('/', auth, async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { id, password } = req.body;
-       
 
         if(!id ) return res.status(400).json({ err: 'is not id' }) 
-        // if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
         if(!password) return res.status(400).json({ err: 'is not password' }) 
 
-        const user = await User.findOne({ id: id }) 
+        const user = await User.findOne({ id: id })
         if(!user) return res.status(400).json({ err: "is not find user" })
-        
 
         const match = await bcrypt.compare(password, user.password);
         if(!match) return res.status(400).json({ err: "password is not matched" })
@@ -79,29 +77,18 @@ router.post('/login', async (req, res) => {
 
                 // token hash
                 bcrypt.genSalt(10, async (err, salt) => {
-                    bcrypt.hash(user.token, salt, async (err, hash) => {
+                    bcrypt.hash(user.token, salt, (err, hash) => {
 
-                        // res
-                        await res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
-                        await res.status(201).json({
-                            accToken,
-                            _id: user._id,
-                            id: user.id,
-                            email: user.email,
-                            name: user.name, 
-                            gender: user.gender, 
-                            phoneNumber: user.phoneNumber, 
-                            birthday: user.birthday, 
-                            createdAt: user.createdAt,
-                            updatedAt: user.updatedAt,
-                        });
+                        delete user._doc.password;
+                        delete user._doc.token;
+                        delete user._doc.question;
+
+                        res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
+                        res.status(201).json({ accToken, ...user._doc });
                     })
                 })
-                
-
             });
         };
-
 
     } catch(err) {
         console.error(err)
@@ -135,11 +122,8 @@ router.post('/', async (req, res) => {
         if(!birthday || typeof birthday !== 'string') return res.status(400).json({ err: 'is not birthday' }) 
 
         const user = await new User(req.body, { token: null })
-        
-        console.log('si', user, req.body)
 
         await bcrypt.genSalt(10, async (err, salt) => {
-
             // password hash
             await bcrypt.hash(user.password, salt, async (err, hash) => {
                 if(err) throw new Error(err);
@@ -147,7 +131,6 @@ router.post('/', async (req, res) => {
 
                 jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" }, (err, reftoken) => {
                     user.token = reftoken
-                    // save user
                     user.save().then(user => {
                         res.status(201).json({ 
                             message: '회원가입성공'
@@ -240,24 +223,6 @@ router.post('/edit/password', auth, async (req, res) => {
 })
 
 
-
-// jwt auth api users test
-router.get('/test', async (req, res) => {
-    try {
-        // const findUser = await User.findOne({ _id: req.user._id })
-        // res.status(200).json({ findUser })
-
-
-        // console.log('cookies: ', req.cookies["X-refresh-token"])
-        res.cookie('hoho', '123', {maxAge: 10000})
-        // res.redirect('/');
-        res.json({a: 1})
-
-        // console.log('last line test api: ', req.user._id)
-    } catch(err) {
-        console.error(err)
-    }
-})
 
 
 export default router;
