@@ -6,7 +6,8 @@ import React from 'react';
 const Error = () => {
     return (
         <div>
-         error
+            error
+            토큰시간만료
         </div>
     );
 };

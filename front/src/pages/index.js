@@ -8,6 +8,7 @@ import Home from './home.js'
 import About from './about.js'
 import Profile from './profile.js'
 import Signup from './signup.js'
+import Error from './error.js'
 import StyleGuide from './guide/styleGuide.js'
 
 
@@ -25,7 +26,8 @@ const RoutesPage = () => {
                     <Route path='/about' element={<About />}></Route>
                     <Route path='/profile' element={<Profile />}></Route>
                     <Route path='/signup' element={<Signup />}></Route>
-                    <Route path='/style' element={<StyleGuide />}></Route>
+                    <Route path='/style/:id' element={<StyleGuide />}></Route>
+                    <Route path='/error' element={<Error />}></Route>
                 </Routes>
             </Layout>
         </Fragment>

@@ -19,8 +19,10 @@ import { getQueryString } from './utils/utils.js'
 const App = () => {
 
   const {state, dispatch} = useContext(UserContext);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   
+  const valid = searchParams.get('valid');
+  const accToken = searchParams.get('accToken');
 
   // 유저 새로고침
   const userLoad = async () => {
@@ -28,7 +30,7 @@ const App = () => {
       const accToken = localStorage.getItem('X-access-token')
       if(!accToken) return;
 
-      await dispatch({ type: "LOADING", loadingMessage: "" })
+      dispatch({ type: "LOADING", loadingMessage: "" })
       const user = await getUser();
       const data = user.data;
       dispatch({type: "USER_LOAD_SUCCESS", data})
@@ -55,27 +57,18 @@ const App = () => {
 
   const userEmailLoad = async () => {
     try {
-  
-    const valid = searchParams.get('valid');
-    const accToken = searchParams.get('accToken');
+      if(accToken && valid) {
+          if(!accToken) return;
+          dispatch({ type: "LOADING", loadingMessage: "" })
+          const user = await getUser(accToken);
+          const data = user.data;
+          dispatch({type: "USER_LOAD_SUCCESS", data})
 
-    if(accToken && valid) {
-        if(!accToken) return;
-        await dispatch({ type: "LOADING", loadingMessage: "" })
-        const user = await getUser(accToken);
-        const data = user.data;
-        dispatch({type: "USER_LOAD_SUCCESS", data})
-
-
-        console.log('valid', valid)
-        console.log('accToken', accToken)
-    }
-
-     
-
-
+          // searchParams.delete('valid') //이거 왜 안되지 ..
+          // searchParams.delete('accToken')
+          window.location.href = '/'
+      }
     } catch(err) {
-    
       dispatch({ type: "USER_LOAD_FAILUE" })
       console.error(err)
     }
@@ -86,8 +79,6 @@ const App = () => {
   useEffect(() => {
     userLoad()
     userEmailLoad()
-
-
   }, [])
 
 

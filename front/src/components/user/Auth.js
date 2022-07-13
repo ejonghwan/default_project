@@ -16,7 +16,7 @@ import { emailAuth } from '../../reducers/UserRequest.js'
 const Auth = () => {
 
     const [email, handleEmail] = useInput('');
-    const [auth, setAuth] = useState(false);
+    const [authData, setAuthData] = useState(null);
     const {state, dispatch} = useContext(UserContext);
     
 
@@ -24,9 +24,9 @@ const Auth = () => {
         try {
             e.preventDefault();
             await dispatch({ type: "LOADING", loadingMessage: "인증메일 보내는 중.." })
-            const user = await emailAuth({ email: email })
-            console.log(user)
-           setAuth(true)
+            const data = await emailAuth({ email: email })
+            setAuthData(data)
+            console.log('aa', authData)
         } catch(err) {
             console.error(err)
         }
@@ -36,7 +36,7 @@ const Auth = () => {
 
     return (
         <Fragment>
-            {!auth ? (
+            {!authData ? (
                 <form onSubmit={handleSubmit}>
                 <div>
                     <Label htmlFor="email" content="email" classN="label_t1"/>
@@ -52,13 +52,12 @@ const Auth = () => {
                         onChange={handleEmail} 
                     />
                 </div>
-               
                 
                 <button type="submit">인증</button>
             </form>
             ) : (
             <div>
-                이메일로 전송되었습니다
+                {`${authData.email}로 ${authData.message} `}
             </div>
         )}
              

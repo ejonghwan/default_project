@@ -54,21 +54,16 @@ const LoginForm = () => {
     }, [userId, userPassword])
 
 
-
-
-
     useEffect(() => {
        
     }, [])
-
 
     return (
         <Fragment>
             
             <LoginTimer totalLoingTime={totalLoingTime} timeRemaining={timeRemaining} />
             <form onSubmit={handleSubmit}>
-            <div>
-            
+                <div>
                     <Label htmlFor="userId" content="아이디" classN="label_t1"/>
                     <Input  
                         id="userId" 
