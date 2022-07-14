@@ -45,7 +45,7 @@ export const auth = async (req, res, next) => {
                 if(refreshTokenMatch && dbToken.exp > Date.now().valueOf() / 1000) {
                     const acctoken = await jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "2h" })
                     // console.log('새로발급한 acc 토큰: ', acctoken)
-                    req.user = { accToken, user: user._doc }
+                    req.user = { accToken, ...user._doc }
                     next() 
                 } 
              

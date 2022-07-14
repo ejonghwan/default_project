@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { BrowserRouter, useSearchParams  } from 'react-router-dom';
 import axios from 'axios';
 
@@ -24,6 +24,8 @@ const App = () => {
   const valid = searchParams.get('valid');
   const accToken = searchParams.get('accToken');
 
+
+
   // 유저 새로고침
   const userLoad = async () => {
     try {
@@ -42,17 +44,6 @@ const App = () => {
     }
   }
 
-
-  // 메모
-  // react-router-dom v6 이상 쓰시는 분들은
-  // useSearchParams 를 사용해 보세요
-  
-  // import { useSearchParams } from 'react-router-dom';
-  
-  // const [searchParams] = useSearchParams();
-  // const detail = searchParams.get('detail') === 'true';
-  
-  // qs 없이 쿼리스트링을 편하게 가져올수 있습니다
 
 
   const userEmailLoad = async () => {
@@ -75,10 +66,32 @@ const App = () => {
     
   }
 
+  // static 파일 axios로 잘 붙는지 테스트
+  // const [test, setTest] = useState(null) 
+  // const html = useRef()
+  // const aa = async () => {
+  //   const hoho = await axios.get('http://localhost:3001/index2.html', {
+  //     headers: {
+  //       'Content-Type': 'application/x-www-form-urlencoded',
+  //       'Access-Control-Allow-Origin': '*',
+  //       'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+  //       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With'
+  //     }
+  //   })
+  //   // console.log(hoho.data)
+  //   setTest(hoho.data)
+  // }
+  // useEffect(() => {
+  //   aa();
+  //   console.dir(html.current)
+  //   // html.current.innerHTML += `${test}`
+  // }, [])
+  
 
   useEffect(() => {
     userLoad()
     userEmailLoad()
+
   }, [])
 
 
@@ -90,6 +103,7 @@ const App = () => {
   return (
       <div className="App"> 
         <RoutesPage />
+        {/* <div className="hoho" ref={html}>{}</div> */}
       </div>
   );
 }

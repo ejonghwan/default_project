@@ -16,27 +16,29 @@ const __dirname = path.resolve();
 
 dotenv.config()
 
-export const mainAuthNumber = async (req, res, next) => {
+export const mailAuthNumber = async (req, res, next) => {
     try {
+       
         const authCode = Math.random().toString().substring(2, 8);
         const { email } = req.body;
         const user = await User.findOne({ email: email })
         if(!email || typeof email !== 'string') return console.error('is not email');
-        if(user) {res.status(400).json({ message: '이미 가입된 이메일입니다.' })}
+        if(user) {return res.status(400).json({ message: '이미 가입된 이메일입니다.' })}
 
-        await jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: 180 }, (err, token) => {
+        await jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: 180 }, async (err, token) => {
             // 인증시간 3분
             if(err) return console.error(err)
-
+      
             let mailTemplate = null;
-            ejs.renderFile(`${__dirname}/template/${templateName}.ejs`, {authCode : authCode}, (err, data) => {
-                if(err) {return console.error('ejs render error')}
+            await ejs.renderFile(`${__dirname}/template/authNumberMail.ejs`, {authCode : authCode}, (err, data) => {
+                if(err) {return console.error('ejs render error', err)}
                 if(data) { mailTemplate = data;}
             })
 
             const mailOption = mailOpt(req.body.email, '인증메일 입니다.', mailTemplate);
             sendMail(mailOption)
-            req.accToken = token
+            req.token = token;
+            req.authCode = authCode;
             next();
         })
         

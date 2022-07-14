@@ -17,12 +17,12 @@ const router = express.Router();
 //@ access  public
 router.get('/load', auth, async (req, res) => {
     try {
+        delete req.user.token;
         if(req.reftoken) {
             console.log('모두 만료돼서 디비 토큰 다시 저장하고 acc 다시 발급')
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(req.reftoken, salt,(err, hash) => {
                     // res
-                    delete req.user._doc.token;
                     res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
                     res.status(201).json(req.user)
                 })

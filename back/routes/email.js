@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import { auth } from '../middleware/auth.js' ;
 import { mailAuth } from '../middleware/mailAuth.js' ;
 import { signMailAuth } from '../middleware/signMailAuth.js';
-import { mainAuthNumber } from '../middleware/mainAuthNumber.js';
+import { mailAuthNumber } from '../middleware/mailAuthNumber.js';
 
 
 dotenv.config();
@@ -102,12 +102,14 @@ router.get('/login', async (req, res) => {
 
 
 //@ path    POST /api/auth/number
-//@ doc     인증번호로 메일인증
+//@ doc     가입된 상태에서 인증번호로 메일인증
 //@ access  public
-router.patch('/number', auth, mainAuthNumber, async (req, res) => {
+router.patch('/number', auth, mailAuthNumber, async (req, res) => {
     try {
-       
+        const { email, _id, authNumber } = req.body;
         console.log(req.body, '이메일 번호 인증')
+        console.log(req.token, '3분짜리 토큰')
+        console.log(req.authCode, '이메일 번호 6자리')
         res.status(200).json({ message: '이메일로 전송되었습니다.', email: req.body.email })
        
     } catch(err) {

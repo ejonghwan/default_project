@@ -19,9 +19,11 @@ const UserProfile = () => {
 
     const [editNameState, setEditNameState] = useState(false)
     const [editEmailState, setEditEmailState] = useState(false)
+    const [editEmailAuthState, setEditEmailAuthState] = useState(false)
     
     const [userName, handleUserName] = useInput('') 
     const [userEmail, handleUserEmail] = useInput('')
+    const [authNumber, handleAuthNumber] = useInput('')
     const [submitActive, setSubmitActive] = useState(false);
     const {state, dispatch} = useContext(UserContext)
 
@@ -29,14 +31,15 @@ const UserProfile = () => {
 
     const handleToggle = useCallback(e => {
         console.log(e.target.name)
-        const { name, value } = e.target;
+        const { name } = e.target;
         
         if(name === "name") return setEditNameState(!editNameState)
         if(name === "email") return setEditEmailState(!editEmailState)
+        if(name === "emailAuth") return setEditEmailAuthState(!editEmailAuthState)
 
         
    
-    }, [editNameState, editEmailState, setEditNameState, setEditEmailState])
+    }, [editNameState, editEmailState, editEmailAuthState, setEditNameState, setEditEmailState, setEditEmailAuthState])
 
 
 
@@ -57,7 +60,7 @@ const UserProfile = () => {
     const handleEmailEdit = useCallback( async e => {
         try {
             e.preventDefault();
-            const res = await emailEditUser({ email: userEmail, _id: state.user._id })
+            const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
 
             dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
             setEditEmailState(!editEmailState)
@@ -73,6 +76,8 @@ const UserProfile = () => {
             e.preventDefault();
             console.log('fff', userEmail, state.user._id)
             const res = await authNumberRequest({ email: userEmail, _id: state.user._id })
+
+            setEditEmailAuthState(true)
             // 여기해야댐
             // dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
             // setEditEmailState(!editEmailState)
@@ -120,6 +125,28 @@ const UserProfile = () => {
                         {/* <button name="email">완료</button> */}
                         <button name="email">인증번호 보내기</button>
                         <button type="button" name="email" onClick={handleToggle}>취소</button>
+                        
+                        {/* 인증 메일 보냈을 시 */}
+                        {editEmailAuthState ? (
+                                <form onSubmit={handleEmailEdit}>
+                                    <Label htmlFor="userEmail" content="인증번호 입력" classN="label_t1"/>
+                                    <Input 
+                                        id="authNumber" 
+                                        type="text" 
+                                        required={true} 
+                                        placeholder="인증번호 입력"
+                                        classN="input_text_t1" 
+                                        name="authNumber" 
+                                        value={authNumber} 
+                                        evt="onChange" 
+                                        onChange={handleAuthNumber} 
+                                    />
+                                    <button>확인</button>
+                                </form>
+                            ) : (
+                                <div>asd</div>
+                            )
+                        }
                     </form>
                 ) : (
                     <Fragment>
