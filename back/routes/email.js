@@ -105,7 +105,7 @@ router.get('/login', async (req, res) => {
 
 // 1. 인증완료에 토큰 1시간 준거 만료 로직 [O] 
 // 2. mailAuth를 로그인/회원가입  or  아이디찾기 비번찾기에 사용되는 메일인증이랑 분리 [0]
-// 3. 이메일 수정에  이메일 인증넣기
+// 3. 이메일 수정에  이메일 인증넣기 [0]
 // 4. 아이디 찾기 (개인정보, 이메일인증)
 // 5. 비번찾기  (질답, 이메일인증)
 
@@ -114,19 +114,35 @@ router.get('/login', async (req, res) => {
 //@ access  public
 router.patch('/number', auth, mailAuthNumber, async (req, res) => {
     try {
-        const { email, _id, authNumber } = req.body;
-        console.log(req.body, '이메일 번호 인증')
-        console.log(req.token, '3분짜리 토큰')
-        console.log(req.authCode, '이메일 번호 6자리')
-        res.status(200).json({ message: '이메일로 전송되었습니다.', email: req.body.email })
-       
+        const { email, _id } = req.body;
+        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
+        if(!_id) return res.status(400).json({ err: 'is not _id' }) 
+        // if(!authNumber) return res.status(400).json({ err: 'is not authNumber' }) 
+        // console.log(req.body, '이메일 번호 인증')
+        // console.log(req.token, '3분짜리 토큰')
+        // console.log(req.authCode, '이메일 번호 6자리')
+
+        // 3분토큰 만료인지 체크 
+        const match = jwt.verify(req.token, process.env.JWT_KEY, {ignoreExpiration: true}) 
+        if(match && match.exp < Date.now().valueOf() / 1000) {
+            return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' })
+        } 
+
+        const user = await User.findById(_id);
+        if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' })
+        console.log('123123',user.email)
+        user.email = email;
+        console.log('345345',user.email)
+        user.save();
+        
+        res.status(200).json({ message: '이메일이 정상적으로 변경되었습니다.', email: user.email })
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })
     }
 })
 
-
+// edit/email ?? 이 apu어딧지 ?
 
 
 
