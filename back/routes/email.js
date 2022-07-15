@@ -65,7 +65,7 @@ router.get('/signup', async (req, res) => {
 
 
 //@ path    GET /api/auth/login
-//@ doc     로그인 메일 요청
+//@ doc     메일 로그인 요청
 //@ access  public
 router.get('/login', async (req, res) => {
     try {
@@ -117,25 +117,8 @@ router.patch('/number', auth, mailAuthNumber, async (req, res) => {
         const { email, _id } = req.body;
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!_id) return res.status(400).json({ err: 'is not _id' }) 
-        // if(!authNumber) return res.status(400).json({ err: 'is not authNumber' }) 
-        // console.log(req.body, '이메일 번호 인증')
-        // console.log(req.token, '3분짜리 토큰')
-        // console.log(req.authCode, '이메일 번호 6자리')
-
-        // 3분토큰 만료인지 체크 
-        const match = jwt.verify(req.token, process.env.JWT_KEY, {ignoreExpiration: true}) 
-        if(match && match.exp < Date.now().valueOf() / 1000) {
-            return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' })
-        } 
-
-        const user = await User.findById(_id);
-        if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' })
-        console.log('123123',user.email)
-        user.email = email;
-        console.log('345345',user.email)
-        user.save();
-        
-        res.status(200).json({ message: '이메일이 정상적으로 변경되었습니다.', email: user.email })
+       
+        res.status(200).json({ message: '인증번호를 입력해주세요.', email })
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })

@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { auth } from '../middleware/auth.js' ;
 import { mailAuth } from '../middleware/mailAuth.js' ;
+import { mailAuthNumber } from '../middleware/mailAuthNumber.js' ;
 
 // model 
 import User from '../models/users.js';
@@ -170,14 +171,28 @@ router.patch('/edit/name', auth, async(req, res) => {
 //@ path    PATCH /api/users/edit/name
 //@ doc     이메일 변경
 //@ access  private
-router.patch('/edit/email', auth, async(req, res) => {
+router.patch('/edit/email', auth, mailAuthNumber, async(req, res) => {
     try {
-        const { email, _id } = req.body;
+        const { email, _id, authNumber } = req.body;
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+         if(!authNumber) return res.status(400).json({ err: 'is not authNumber' }) 
+        console.log(req.body, '이메일 번호 인증')
+        console.log(req.token, '3분짜리 토큰')
+        console.log(req.authCode, '이메일 번호 6자리')
+
+        // 3분토큰 만료인지 체크 
+        const match = jwt.verify(req.token, process.env.JWT_KEY, {ignoreExpiration: true}) 
+        if(match && match.exp < Date.now().valueOf() / 1000) {
+            return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' })
+        } 
+        if(req.authCode !== req.body.authNumber) return res.status(400).json({ message: '인증번호가 다릅니다'})
 
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {email: email} }, { new: true })
-        res.status(201).json(user.email)
+        if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' })
+      
+        res.status(200).json({ message: '이메일이 정상적으로 변경되었습니다.', email: user.email })
+
 
     } catch(err) {
         console.error(err)

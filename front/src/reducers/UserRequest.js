@@ -196,11 +196,12 @@ export const emailEditUser = async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const user = await axios.patch(`${host}/api/users/edit/email`, data, config)
+        const res = await axios.patch(`${host}/api/users/edit/email`, data, config)
 
-        return user;
+        return res;
     } catch(err) {
-        console.error(err)
+        console.error('saga error', err)
+        return err.response.message;
     }
 }
   

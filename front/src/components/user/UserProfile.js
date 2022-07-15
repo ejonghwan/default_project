@@ -59,31 +59,30 @@ const UserProfile = () => {
 
     const handleEmailEdit = useCallback( async e => {
         try {
+
+            // 716할거 - 구조 잘못잡음 디스패치 리퀘스트를 화면에서 하고 석세스 페일료를 사가에서 해야됨;;;
             e.preventDefault();
             const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
-
+            console.log('try res', res)
             dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
             setEditEmailState(!editEmailState)
         } catch(err) {
+            console.log('catch res', err)
             dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
-            console.err(err)
+            console.error(err)
         }
-    }, [userEmail])
+    }, [userEmail, authNumber])
 
 
+    
     const handleEmailAuth = useCallback( async e => {
         try {
             e.preventDefault();
-            console.log('fff', userEmail, state.user._id)
             const res = await authNumberRequest({ email: userEmail, _id: state.user._id })
 
             setEditEmailAuthState(true)
-            // 여기해야댐
-            // dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
-            // setEditEmailState(!editEmailState)
         } catch(err) {
-            // dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
-            console.err(err)
+            console.error(err)
         }
     }, [userEmail])
 
@@ -98,7 +97,7 @@ const UserProfile = () => {
             setEditNameState(!editNameState)
         } catch(err) {
             dispatch({ type: "USER_NAME_EDIT_FAILUE", data: err.err })
-            console.err(err)
+            console.error(err)
         }
     }, [userName])
 
@@ -109,6 +108,7 @@ const UserProfile = () => {
             <ul>
             <li>
                 { editEmailState ? (
+                    <Fragment>
                     <form onSubmit={handleEmailAuth}>
                         <Label htmlFor="userEmail" content="이메일 수정중" classN="label_t1"/>
                         <Input 
@@ -125,29 +125,28 @@ const UserProfile = () => {
                         {/* <button name="email">완료</button> */}
                         <button name="email">인증번호 보내기</button>
                         <button type="button" name="email" onClick={handleToggle}>취소</button>
-                        
-                        {/* 인증 메일 보냈을 시 */}
-                        {editEmailAuthState ? (
-                                <form onSubmit={handleEmailEdit}>
-                                    <Label htmlFor="userEmail" content="인증번호 입력" classN="label_t1"/>
-                                    <Input 
-                                        id="authNumber" 
-                                        type="text" 
-                                        required={true} 
-                                        placeholder="인증번호 입력"
-                                        classN="input_text_t1" 
-                                        name="authNumber" 
-                                        value={authNumber} 
-                                        evt="onChange" 
-                                        onChange={handleAuthNumber} 
-                                    />
-                                    <button>확인</button>
-                                </form>
-                            ) : (
-                                <div>asd</div>
-                            )
-                        }
                     </form>
+                    {/* 인증 메일 보냈을 시 */}
+                    {editEmailAuthState ? (
+                            <form onSubmit={handleEmailEdit}>
+                                <Label htmlFor="authNumber" content="인증번호 입력" classN="label_t1"/>
+                                <Input 
+                                    id="authNumber" 
+                                    type="text" 
+                                    required={true} 
+                                    placeholder="인증번호 입력"
+                                    classN="input_text_t1" 
+                                    name="authNumber" 
+                                    value={authNumber} 
+                                    evt="onChange" 
+                                    onChange={handleAuthNumber} 
+                                />
+                                <button>확인</button>
+                            </form>
+                        ) : (
+                            <div>asd</div>
+                        )}
+                   </Fragment>
                 ) : (
                     <Fragment>
                         이메일: {state.user.email} 

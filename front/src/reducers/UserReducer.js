@@ -80,7 +80,7 @@ const UserReducer = (state = UserIntialState, action) => {
                 loading: '',
                 user: {
                     ...state.user,
-                    email: action.data,
+                    email: action.data.email,
                 }
             }
             case "USER_MAIL_EDIT_FAILUE" : return {
