@@ -1,45 +1,6 @@
-import React, { useContext } from 'react';
-
-import { UserContext } from '../context/UserContext.js'
 import axios from 'axios'
 
-
 const host = 'http://localhost:5000'
-
-
-const UserRequest = () => {
-    const {state, dispatch} = useContext(UserContext)
-
-    
-
-    // 이메일 수정
-    const emailEditUser = async data => {
-        try {
-            const accToken = localStorage.getItem('X-access-token')
-            if(!accToken) return;
-            const { email, _id } = data;
-            if(!email && typeof email !== 'string') return;
-            if(!_id && typeof _id !== 'string') return;
-
-            const config = {
-                headers: { 
-                    "Content-Type": "application/json", 
-                    'X-access-token': accToken,
-                },
-                withCredentials: true // 쿠키 cors 통신 설정
-            }
-            const res = await axios.patch(`${host}/api/users/edit/email`, data, config)
-            dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
-            return res;
-        } catch(err) {
-            console.error('saga error', err)
-            dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
-        }
-    }
-    return {
-        emailEditUser
-    }
-}
 
 // 회원가입 유저
 export const emailAuth = async data => {
@@ -184,9 +145,10 @@ export const nmaeEditUser = async data => {
             },
             withCredentials: true,
         }
-        const res = await axios.patch(`${host}/api/users/edit/name`, data, config)
+        const user = await axios.patch(`${host}/api/users/edit/name`, data, config)
       
-        return res;
+
+        return user;
     } catch(err) {
         console.error(err)
     }
@@ -217,6 +179,32 @@ export const authNumberRequest = async data => {
 }
   
 
+
+// 이메일 수정
+export const emailEditUser = async data => {
+    try {
+        const accToken = localStorage.getItem('X-access-token')
+        if(!accToken) return;
+        const { email, _id } = data;
+        if(!email && typeof email !== 'string') return;
+        if(!_id && typeof _id !== 'string') return;
+
+        const config = {
+            headers: { 
+                "Content-Type": "application/json", 
+                'X-access-token': accToken,
+            },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const res = await axios.patch(`${host}/api/users/edit/email`, data, config)
+
+        return res;
+    } catch(err) {
+        console.error('saga error', err.response.data.message)
+        return err.response.data.message;
+    }
+}
+  
   
 // 비번수정
 export const passwordEditUser = async data => {
@@ -247,6 +235,3 @@ export const passwordEditUser = async data => {
         console.error(err)
     }
 }
-
-
-export default UserRequest;

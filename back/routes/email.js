@@ -125,8 +125,6 @@ router.patch('/number', auth, mailAuthNumber, async (req, res) => {
     }
 })
 
-// edit/email ?? 이 apu어딧지 ?
-
 
 
 

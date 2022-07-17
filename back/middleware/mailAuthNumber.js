@@ -19,7 +19,7 @@ dotenv.config()
 export const mailAuthNumber = async (req, res, next) => {
     try {
 
-       
+        
        
         const authCode = Math.random().toString().substring(2, 8);
         const { email } = req.body;
@@ -30,6 +30,7 @@ export const mailAuthNumber = async (req, res, next) => {
         await jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: 180 }, async (err, token) => {
             // 인증시간 3분
             if(err) return console.error(err)
+
       
             let mailTemplate = null;
             await ejs.renderFile(`${__dirname}/template/authNumberMail.ejs`, {authCode : authCode}, (err, data) => {
@@ -37,12 +38,16 @@ export const mailAuthNumber = async (req, res, next) => {
                 if(data) { mailTemplate = data;}
             })
 
-            // 만약 클라이언트에서 보낸 authNumber가 있다면 리턴
-            if(req.body.authNumber) {
+            
+            
+         // 만약 클라이언트에서 보낸 authNumber가 있다면 리턴
+             if(req.body.authNumber) {
                 req.token = token;
                 req.authCode = authCode;
                 return next()
             }
+       
+           
             console.log('여기오나 ?')
             const mailOption = mailOpt(req.body.email, '인증메일 입니다.', mailTemplate);
             sendMail(mailOption)

@@ -186,6 +186,7 @@ router.patch('/edit/email', auth, mailAuthNumber, async(req, res) => {
         if(match && match.exp < Date.now().valueOf() / 1000) {
             return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' })
         } 
+        // 클라 번호와 메일 번호가 같은지 체크
         if(req.authCode !== req.body.authNumber) return res.status(400).json({ message: '인증번호가 다릅니다'})
 
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {email: email} }, { new: true })
