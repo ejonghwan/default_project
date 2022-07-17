@@ -11,7 +11,7 @@ import Label from '../common/form/Label.js'
 // import LoginForm from '../components/user/LoginForm.js'
 
 // context & request 
-import { nmaeEditUser, emailEditUser, authNumberRequest } from '../../reducers/UserRequest.js'
+import UserRequest, { nmaeEditUser, emailEditUser, authNumberRequest } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
@@ -48,11 +48,12 @@ const UserProfile = () => {
     const handleSubmit = useCallback(async e => {
         try {   
             e.preventDefault();
-
         } catch(err) {
-            // dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
-            // console.error(err)
         }
+    }, [])
+
+    useEffect(() => {
+        console.dir(UserRequest)
     }, [])
 
 
@@ -60,15 +61,16 @@ const UserProfile = () => {
     const handleEmailEdit = useCallback( async e => {
         try {
 
-            // 716할거 - 구조 잘못잡음 디스패치 리퀘스트를 화면에서 하고 석세스 페일료를 사가에서 해야됨;;;
+            // 718할거 - 구조 잘못잡음 디스패치 리퀘스트를 화면에서 하고 석세스 페일료를 사가에서 해야됨;;;
             e.preventDefault();
-            const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
-            console.log('try res', res)
-            dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
+            // 요청하는거 자체가 request saga..
+            // const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
+            // console.log('try res', res)
+            // dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
             setEditEmailState(!editEmailState)
         } catch(err) {
             console.log('catch res', err)
-            dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
+            // dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
             console.error(err)
         }
     }, [userEmail, authNumber])
