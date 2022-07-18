@@ -9,13 +9,15 @@ export const axiosModule = ({ method, URI, data, config }) => {
 export const debounce = (cb, waitTime = 500) => {
     let timeout;
     return (...args) => {
-        console.log(...args)
+        // console.log(...args)
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             cb(...args)
         }, waitTime);
     }
 }
+
+// window.addEventListener('click', debounce((e) => {}, 3000))
 
 export const testfn = () => {
     console.log('testfn')

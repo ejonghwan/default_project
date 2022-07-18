@@ -97,31 +97,26 @@ const UserProfile = () => {
 
     
     // 아씨 클릭은 이렇게 되는데 서브밋은 이렇게 안됨;'
-    const ttt = debounce(() => {
-        console.log(11)
-    }, 2000)((e) => {
-        e.preventDefault();
-        console.log('ttttt', e)
-    })
-
-    // const ttt = (e) => {
-    //     e.preventDefault();
+    // const ttt = () => debounce((e) => {
     //     console.log(11)
+    //     e.preventDefault();
+    //     console.log('ttttt', e)
+    // }, 2000)
 
-    //     debounce(e => {
-    //         console.log('ttttt', e)
-    //         console.log('ttttt')
-    //     }, 1000)()
 
-    //     testfn();
-    // }
+    function ttt() {
+        return debounce(e => {
+            e.preventDefault();
+            console.log('ttttt', e)
+        }, 2000)
+    }
 
 
 
     return (
         <Fragment>
 
-            <form onClick={ttt}>
+            <form onSubmit={ttt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')}>
                 <input type="text" />
                 <button>click</button>
             </form>
