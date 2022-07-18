@@ -6,6 +6,35 @@ export const axiosModule = ({ method, URI, data, config }) => {
     return axios[method](`http://localhost:5000${URI}`, data, config,);    
 }
 
+export const debounce = (cb, waitTime = 500) => {
+    let timeout;
+    return (...args) => {
+        console.log(...args)
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            cb(...args)
+        }, waitTime);
+    }
+}
+
+export const testfn = () => {
+    console.log('testfn')
+}
+
+export const throttle = (cb, waitTime = 0) => {
+    let waiting = true;
+    return (...args) => {
+        if(waiting) {
+            cb(...args)
+            waiting = false;
+            setTimeout(() => {
+                waiting = true;
+            }, waitTime)
+        }
+    }
+}
+
+
 
 export const delay = (endSecond, cb) => {
     if(!endSecond || !cb) return console.error('인수 모두 채워주세요');

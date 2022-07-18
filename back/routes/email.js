@@ -112,13 +112,16 @@ router.get('/login', async (req, res) => {
 //@ path    POST /api/auth/number
 //@ doc     가입된 상태에서 인증번호로 메일인증
 //@ access  public
-router.patch('/number', auth, mailAuthNumber, async (req, res) => {
+router.post('/number', auth, mailAuthNumber, async (req, res) => {
     try {
         const { email, _id } = req.body;
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!_id) return res.status(400).json({ err: 'is not _id' }) 
        
-        res.status(200).json({ message: '인증번호를 입력해주세요.', email })
+        console.log('number api : ', req.authCode)
+
+        res.cookie('authCode', req.authCode, { expires: new Date(Date.now() + 180000), httpOnly: true });
+        res.status(200).json({ message: '인증번호를 입력해주세요.', email})
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })

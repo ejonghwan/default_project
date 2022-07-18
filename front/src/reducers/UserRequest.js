@@ -170,7 +170,7 @@ export const authNumberRequest = async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = await axios.patch(`${host}/api/auth/number`, data, config)
+        const res = await axios.post(`${host}/api/auth/number`, data, config)
 
         return res;
     } catch(err) {
@@ -200,8 +200,8 @@ export const emailEditUser = async data => {
 
         return res;
     } catch(err) {
-        console.error('saga error', err.response.data.message)
-        return err.response.data.message;
+        console.error('saga error', err.response)
+        return err.response;
     }
 }
   

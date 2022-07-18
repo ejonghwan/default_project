@@ -2,6 +2,7 @@ import React, { Fragment, useState, useEffect, useCallback, useContext } from 'r
 
 // module
 import { useInput } from '../common/hooks/index.js'
+import { timer, debounce, testfn } from '../../utils/utils.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -20,81 +21,71 @@ const UserProfile = () => {
     const [editNameState, setEditNameState] = useState(false)
     const [editEmailState, setEditEmailState] = useState(false)
     const [editEmailAuthState, setEditEmailAuthState] = useState(false)
+    // const [submitActive, setSubmitActive] = useState(false);
     
     const [userName, handleUserName] = useInput('') 
     const [userEmail, handleUserEmail] = useInput('')
     const [authNumber, handleAuthNumber] = useInput('')
-    const [submitActive, setSubmitActive] = useState(false);
+    
     const {state, dispatch} = useContext(UserContext)
-
+    const [timerNumber, setTimerNumber] = useState(180)
 
 
     const handleToggle = useCallback(e => {
         console.log(e.target.name)
         const { name } = e.target;
-        
         if(name === "name") return setEditNameState(!editNameState)
         if(name === "email") return setEditEmailState(!editEmailState)
         if(name === "emailAuth") return setEditEmailAuthState(!editEmailAuthState)
-
-        
-   
     }, [editNameState, editEmailState, editEmailAuthState, setEditNameState, setEditEmailState, setEditEmailAuthState])
 
 
-
-
-    // 요청
-    const handleSubmit = useCallback(async e => {
-        try {   
-            e.preventDefault();
-        } catch(err) {
-        }
-    }, [])
-
-    useEffect(() => {
-        // console.dir(UserRequest.name)
-    }, [])
-
-
-
+    // 이메일 수정 
     const handleEmailEdit = useCallback( async e => {
         try {
-
-            // 718할거 - 구조 잘못잡음 디스패치 리퀘스트를 화면에서 하고 석세스 페일료를 사가에서 해야됨;;;
             e.preventDefault();
-            // 요청하는거 자체가 request saga..
             const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
-            console.log('try res', res)
-            // dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
+            // 실패시
+            if(res.status === 400) return dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: res.data.message })
+        
+            dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
             setEditEmailState(!editEmailState)
+            setEditEmailAuthState(!editEmailAuthState)
         } catch(err) {
             console.log('catch res', err)
-            // dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.err })
             console.error(err)
         }
     }, [userEmail, authNumber])
 
 
-    
-    const handleEmailAuth = useCallback( async e => {
-        try {
-            e.preventDefault();
-            const res = await authNumberRequest({ email: userEmail, _id: state.user._id })
+    // 이메일 수정 인증번호 요청 debounce
+    const handleEmailAuth = useCallback(async e => {
+        e.preventDefault();
+        debounce(async e => {
+            try {
+                console.log(e)
+                const res = await authNumberRequest({ email: userEmail, _id: state.user._id })
+                setEditEmailAuthState(true)
+                // 타이머
+                timer(180, 180, count => {
+                    if(count === 0) return setTimerNumber(null)
+                    setTimerNumber(count)
+                })
+            } catch(err) {
+                console.error(err)
+            }
+        }, 2000)
+            
+    }, [userEmail, timerNumber])
 
-            setEditEmailAuthState(true)
-        } catch(err) {
-            console.error(err)
-        }
-    }, [userEmail])
-
     
+    // 이름 수정 요청
     const handleNameEdit = useCallback( async e => {
         try {
+        
             e.preventDefault();
+            console.log(e)
             const res = await nmaeEditUser({ name: userName, _id: state.user._id })
-
-            // console.log('submit name', res);
             dispatch({ type: "USER_NAME_EDIT_SUCCESS", data: res.data })
             setEditNameState(!editNameState)
         } catch(err) {
@@ -104,9 +95,38 @@ const UserProfile = () => {
     }, [userName])
 
 
+    
+    // 아씨 클릭은 이렇게 되는데 서브밋은 이렇게 안됨;'
+    const ttt = debounce(() => {
+        console.log(11)
+    }, 2000)((e) => {
+        e.preventDefault();
+        console.log('ttttt', e)
+    })
+
+    // const ttt = (e) => {
+    //     e.preventDefault();
+    //     console.log(11)
+
+    //     debounce(e => {
+    //         console.log('ttttt', e)
+    //         console.log('ttttt')
+    //     }, 1000)()
+
+    //     testfn();
+    // }
+
+
+
     return (
         <Fragment>
-            프로필
+
+            <form onClick={ttt}>
+                <input type="text" />
+                <button>click</button>
+            </form>
+
+            <div>프로필</div>
             <ul>
             <li>
                 { editEmailState ? (
@@ -124,8 +144,11 @@ const UserProfile = () => {
                             evt="onChange" 
                             onChange={handleUserEmail} 
                         />
-                        {/* <button name="email">완료</button> */}
-                        <button name="email">인증번호 보내기</button>
+                        {!editEmailAuthState && timerNumber ? (
+                             <button name="email">{timerNumber && timerNumber ? ("인증번호 보내기") : ("인증번호 다시 보내기")}</button>
+                        ): (
+                            <div>asd</div>
+                        )}
                         <button type="button" name="email" onClick={handleToggle}>취소</button>
                     </form>
                     {/* 인증 메일 보냈을 시 */}
@@ -142,8 +165,12 @@ const UserProfile = () => {
                                     value={authNumber} 
                                     evt="onChange" 
                                     onChange={handleAuthNumber} 
+                                    disabled={timerNumber ? false : true}
                                 />
                                 <button>확인</button>
+                                {state.error && <p>{state.error}</p>}
+                                <br />
+                                {timerNumber && timerNumber ? (<p>{timerNumber}초 남음</p>) : (<p>인증시간이 만료되었습니다.</p>)}
                             </form>
                         ) : (
                             <div>asd</div>
