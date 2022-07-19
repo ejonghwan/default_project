@@ -1,4 +1,7 @@
+import React from 'react'
 import axios from 'axios'
+
+import { UserContext } from '../context/UserContext.js'
 
 const host = 'http://localhost:5000'
 
@@ -178,7 +181,6 @@ export const authNumberRequest = async data => {
     }
 }
   
-
 
 // 이메일 수정
 export const emailEditUser = async data => {

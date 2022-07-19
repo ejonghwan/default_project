@@ -32,7 +32,7 @@ export const debounce = (cb, waitTime = 500) => {
 //     return debounceValue
 // }
 
-export const useDebounce = (cb, waitTime = 500, deps) => { 
+export const useDebounce = (cb, waitTime = 500, deps = []) => { 
         const callback = React.useCallback(cb, deps)
 
         React.useEffect(() => {
