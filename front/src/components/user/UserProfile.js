@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect, useCallback, useContext } from 'r
 
 // module
 import { useInput } from '../common/hooks/index.js'
-import { timer, debounce, testfn } from '../../utils/utils.js'
+import { timer, debounce, useDebounce } from '../../utils/utils.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -96,30 +96,62 @@ const UserProfile = () => {
 
 
     
-    // 아씨 클릭은 이렇게 되는데 서브밋은 이렇게 안됨;'
-    // const ttt = () => debounce((e) => {
-    //     console.log(11)
-    //     e.preventDefault();
-    //     console.log('ttttt', e)
-    // }, 2000)
 
+    const handleSubmit_ = debounce((e) => {
+        // e.preventDefault();
+        console.log('test', e)
+    }, 2000)
 
-    function ttt() {
-        return debounce(e => {
-            e.preventDefault();
-            console.log('ttttt', e)
-        }, 2000)
+    const handleSubmit_22 = e => {
+        e.preventDefault(); 
+        handleSubmit_();
     }
 
+
+
+    const handlehuhu = e => {
+        e.preventDefault();
+        console.log(e)
+    }
+
+    useDebounce((e) => {
+        console.log('huhu', e)
+    }, 2000, [handlehuhu])
+
+   
+
+    const [val, setVal] = useState('')
+    useDebounce((e) => {
+        // setVal(e.target.value)
+        console.log(val, e)
+    }, 2000, [val])
+
+    const handlehoho = e => {
+        setVal(e.target.value)
+    }
 
 
     return (
         <Fragment>
 
-            <form onSubmit={ttt('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')}>
+             {/* jsx onSubmit */}
+            <form onSubmit={ handleSubmit_22 }>
                 <input type="text" />
                 <button>click</button>
             </form>
+
+
+            <form onSubmit={handlehuhu}>
+                <input type="text" />
+                <button>click</button>
+            </form>
+
+            <input type="text" onChange={handlehoho} value={val}/>
+            {/* <input type="text" onChange={function(e) {setVal(e.target.value)}  } value={val}/> */}
+            {val}
+
+
+
 
             <div>프로필</div>
             <ul>
@@ -146,6 +178,7 @@ const UserProfile = () => {
                         )}
                         <button type="button" name="email" onClick={handleToggle}>취소</button>
                     </form>
+
                     {/* 인증 메일 보냈을 시 */}
                     {editEmailAuthState ? (
                             <form onSubmit={handleEmailEdit}>

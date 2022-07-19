@@ -1,3 +1,4 @@
+import React from 'react';
 import axios from 'axios';
 
 
@@ -9,19 +10,41 @@ export const axiosModule = ({ method, URI, data, config }) => {
 export const debounce = (cb, waitTime = 500) => {
     let timeout;
     return (...args) => {
-        // console.log(...args)
-        clearTimeout(timeout);
+        if(timeout) clearTimeout(timeout);
         timeout = setTimeout(() => {
             cb(...args)
         }, waitTime);
     }
 }
 
-// window.addEventListener('click', debounce((e) => {}, 3000))
 
-export const testfn = () => {
-    console.log('testfn')
-}
+// export const useDebounce = (value, waitTime = 500) => {
+//     const [debounceValue, setDebounceValue] = React.useState(value) 
+//     React.useEffect(() => {
+//         const handler = setTimeout(() => {
+//             setDebounceValue(value)
+//         }, waitTime)
+
+//         return () => {
+//             clearTimeout(handler)
+//         }
+//     }, [value, waitTime])
+//     return debounceValue
+// }
+
+export const useDebounce = (cb, waitTime = 500, deps) => { 
+        const callback = React.useCallback(cb, deps)
+
+        React.useEffect(() => {
+            const timer = setTimeout(() => callback(), waitTime);
+            return () => clearTimeout(timer);
+          }, [callback, waitTime]);
+    }
+
+
+
+
+
 
 export const throttle = (cb, waitTime = 0) => {
     let waiting = true;
