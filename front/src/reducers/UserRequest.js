@@ -157,8 +157,8 @@ export const nmaeEditUser = async data => {
     }
 }
 
-// 인증번호 보내기
-export const authNumberRequest = async data => {
+// 회원인사람 인증번호 보내기
+export const memberAuthNumberRequest = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -173,7 +173,7 @@ export const authNumberRequest = async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = await axios.post(`${host}/api/auth/number`, data, config)
+        const res = await axios.post(`${host}/api/auth/member/number`, data, config)
 
         return res;
     } catch(err) {
@@ -181,6 +181,26 @@ export const authNumberRequest = async data => {
     }
 }
   
+
+// 비회원인사람 인증번호 보내기
+export const nonMemberAuthNumberRequest = async data => {
+    try {
+        const { email, name } = data;
+        if(!email && typeof email !== 'string') return;
+        if(!name && typeof name !== 'string') return;
+
+        const config = {
+            headers: { "Content-Type": "application/json", },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const res = await axios.post(`${host}/api/auth/nonMember/number`, data, config)
+
+        return res;
+    } catch(err) {
+        console.error(err)
+    }
+}
+
 
 // 이메일 수정
 export const emailEditUser = async data => {
@@ -237,3 +257,27 @@ export const passwordEditUser = async data => {
         console.error(err)
     }
 }
+
+
+// 아이디 찾기  // 비회원 인증번호 받은 사람은 이걸로 다시 쿠키 주면서 요청해야됨 
+export const findUserId = async data => {
+    try {
+        const { userName, userEmail } = data;
+        if(!userName && typeof userName !== 'string') return;
+        if(!userEmail && typeof userEmail !== 'string') return;
+
+        console.log('request data', data)
+
+        const config = {
+            headers: { "Content-Type": "application/json", },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+
+        const findId = axios.post(`${host}/api/users/find/id`, data, config)
+
+        return findId;
+
+    } catch(err) {
+        console.error(err)
+    }
+} 

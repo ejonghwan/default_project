@@ -12,7 +12,7 @@ import Label from '../common/form/Label.js'
 // import LoginForm from '../components/user/LoginForm.js'
 
 // context & request 
-import  { nmaeEditUser, emailEditUser, authNumberRequest } from '../../reducers/UserRequest.js'
+import  { nmaeEditUser, emailEditUser, memberAuthNumberRequest } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
@@ -64,7 +64,7 @@ const UserProfile = () => {
         debounce(async e => {
             try {
                 console.log(e)
-                const res = await authNumberRequest({ email: userEmail, _id: state.user._id })
+                const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id })
                 setEditEmailAuthState(true)
                 // 타이머
                 timer(180, 180, count => {

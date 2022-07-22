@@ -2,6 +2,7 @@ import React, { Fragment, useState, useEffect, useCallback, useContext } from 'r
 
 // module
 import { useInput } from '../common/hooks/index.js'
+import { findUserId, nonMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -36,11 +37,35 @@ const FindId = () => {
 
     const {authNumber, handleAuthNumber} = useInput('');
     const {authToggle, setAuthToggle} = useState(false);
-    const [userName, handleUserName] = useInput('');
-    const [userEmail, handleUserEmail] = useInput(''); 
+    const [name, handleName] = useInput('');
+    const [email, handleEmail] = useInput(''); 
     
     
+    const handleAuthNumberSubmit = async e => {
+        try {
+            e.preventDefault();
+            const findId = await nonMemberAuthNumberRequest({ name, email }); 
 
+            
+            setAuthToggle(!authToggle)
+            console.log('view =>', findId)
+
+        } catch(err) {
+            console.error(err)
+        }
+    }
+
+    const handleFindIdSubmit = async e => {
+        try {
+            e.preventDefault();
+            const findId = await findUserId({ }); 
+            // 여기선 쿠키보내야됨
+            console.log('view =>', findId)
+
+        } catch(err) {
+            console.error(err)
+        }
+    }
 
     
     useEffect(() => {
@@ -50,7 +75,7 @@ const FindId = () => {
 
     return (
         <Fragment>
-            <form>
+            <form onSubmit={handleAuthNumberSubmit}>
                 <div>
                     <Label htmlFor="userName" content="이름" classN="label_t1"/>
                     <Input 
@@ -58,11 +83,12 @@ const FindId = () => {
                         type="text" 
                         required={true} 
                         placeholder="userName" 
+
                         classN="input_text_t1" 
                         name="userName" 
-                        value={userName} 
+                        value={name} 
                         evt="onChange" 
-                        onChange={handleUserName} 
+                        onChange={handleName} 
                     />
                 </div>
                 <div>
@@ -74,30 +100,35 @@ const FindId = () => {
                         placeholder="userEmail" 
                         classN="input_text_t1" 
                         name="userEmail" 
-                        value={userEmail} 
+                        value={email} 
                         evt="onChange" 
-                        onChange={handleUserEmail} 
+                        onChange={handleEmail} 
                     />
                 </div>
+                <button>인증번호 보내기</button>
             </form>
-            <form>
-                 {/* auth n */}
-                 <div>
-                    <Label htmlFor="authNumber" content="인증번호" classN="label_t1"/>
-                    <Input 
-                        id="authNumber" 
-                        type="text" 
-                        required={true} 
-                        placeholder="인증번호를 입력해주세요" 
-                        classN="input_text_t1" 
-                        name="authNumber" 
-                        value={authNumber} 
-                        evt="onChange" 
-                        onChange={handleAuthNumber} 
-                        disabled={authToggle ? false : true }
-                    />
-                </div>
-            </form>
+            {authToggle ? (
+                <form>
+                  <div>
+                     <Label htmlFor="authNumber" content="인증번호" classN="label_t1"/>
+                     <Input 
+                         id="authNumber" 
+                         type="text" 
+                         required={true} 
+                         placeholder="인증번호를 입력해주세요" 
+                         classN="input_text_t1" 
+                         name="authNumber" 
+                         value={authNumber} 
+                         evt="onChange" 
+                         onChange={handleAuthNumber} 
+                         disabled={authToggle ? false : true }
+                     />
+                 </div>
+             </form>
+            ) : (
+                <div></div>
+            ) }
+          
         </Fragment>
     )
 }

@@ -17,6 +17,8 @@ const __dirname = path.resolve();
 
 dotenv.config()
 
+
+// 회원이든 아니든 무조건 db에서 이메일찾아서 인증번호 보냄 // 한개 더 만들어야함....아래껀 가입된 이메일 걸러내는게 있네 ;;
 export const mailAuthNumber = async (req, res, next) => {
     try {
         const authCode = Math.random().toString().substring(2, 8);
@@ -41,8 +43,6 @@ export const mailAuthNumber = async (req, res, next) => {
                 next();
             })
         })
-        
-      
         
         
     } catch(err) {

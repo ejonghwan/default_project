@@ -106,13 +106,13 @@ router.get('/login', async (req, res) => {
 // 1. 인증완료에 토큰 1시간 준거 만료 로직 [O] 
 // 2. mailAuth를 로그인/회원가입  or  아이디찾기 비번찾기에 사용되는 메일인증이랑 분리 [0]
 // 3. 이메일 수정에  이메일 인증넣기 [0]
-// 4. 아이디 찾기 (개인정보, 이메일인증)
+// 4. 아이디 찾기 (개인정보, 이메일인증) 
 // 5. 비번찾기  (질답, 이메일인증)
 
-//@ path    POST /api/auth/number
+//@ path    POST /api/auth/member/member/number
 //@ doc     가입된 상태에서 인증번호로 메일인증
 //@ access  public
-router.post('/number', auth, mailAuthNumber, async (req, res) => {
+router.post('/member/number', auth, mailAuthNumber, async (req, res) => {
     try {
         const { email, _id } = req.body;
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
@@ -128,6 +128,25 @@ router.post('/number', auth, mailAuthNumber, async (req, res) => {
     }
 })
 
+
+//@ path    POST /api/auth/nonMember/number
+//@ doc     가입되지않은 상태에서 인증번호로 메일인증
+//@ access  public
+router.post('/nonMember/number', mailAuthNumber, async (req, res) => {
+    try {
+        const { email, _id } = req.body;
+        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
+        if(!_id) return res.status(400).json({ err: 'is not _id' }) 
+       
+        console.log('number api : ', req.authCode)
+
+        res.cookie('authCode', req.authCode, { expires: new Date(Date.now() + 180000), httpOnly: true });
+        res.status(200).json({ message: '인증번호를 입력해주세요.', email})
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({ error: err.message })
+    }
+})
 
 
 

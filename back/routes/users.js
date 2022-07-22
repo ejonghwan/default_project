@@ -206,7 +206,6 @@ router.patch('/edit/email', auth, async(req, res) => {
 //@ access  private
 router.post('/edit/password', auth, async (req, res) => {
     try {
-
         const { _id, prevPassword, newPassword, newPasswordCheck } = req.body;
         console.log('back body: ', req.body)
         if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not _id' }) 
@@ -237,6 +236,18 @@ router.post('/edit/password', auth, async (req, res) => {
     }
 })
 
+
+//@ path    POST /api/users/find/id
+//@ doc     아이디 찾기
+//@ access  public
+router.post('/find/id', async (req, res) => {
+    try {
+        
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({ err: err.message })
+    }
+})
 
 
 
