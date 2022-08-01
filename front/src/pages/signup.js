@@ -147,8 +147,7 @@ const Signup = () => {
                         classN="input_text_t1" 
                         name="userEmail" 
                         value={userEmail} 
-                        evt="onChange" 
-                        onChange={handleUserEmail} 
+                        
                     /> */}
                 </div>
                 <div>
