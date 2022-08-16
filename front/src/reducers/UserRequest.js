@@ -180,7 +180,6 @@ export const memberAuthNumberRequest = async data => {
         console.error(err)
     }
 }
-  
 
 // 비회원인사람 인증번호 보내기
 export const nonMemberAuthNumberRequest = async data => {
@@ -200,6 +199,29 @@ export const nonMemberAuthNumberRequest = async data => {
         console.error(err)
     }
 }
+
+
+// 회원+비로그인 인증번호 보내기
+export const nonLoginMemberAuthNumberRequest = async data => {
+    try {
+        const { email, name } = data;
+        if(!email && typeof email !== 'string') return;
+        if(!name && typeof name !== 'string') return;
+
+        const config = {
+            headers: { "Content-Type": "application/json", },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const res = await axios.post(`${host}/api/auth/nonLoginMember/number`, data, config)
+
+        return res;
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+
+
 
 
 // 이메일 수정

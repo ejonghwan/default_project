@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 
 const Input = props => {
 
-    const { classN, id, type, required, placeholder, name, value, evt, onChange, disabled } = props;
+    const { classN, id, type, required, placeholder, name, value, onChange, disabled } = props;
 
     // console.log(props)
     return (

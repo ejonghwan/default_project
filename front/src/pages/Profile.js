@@ -10,12 +10,16 @@ import FindPassword from '../components/user/FindPassword.js'
 const Profile = () => {
     return (
         <div>
-            Profile
+            UserProfile
             <UserProfile />
+            <br />
+            UserPasswordEdit
             <UserPasswordEdit />
             <br />
-            <br />
+            FindId
             <FindId />
+            <br />
+            FindPassword
             <FindPassword />
         </div>
     );

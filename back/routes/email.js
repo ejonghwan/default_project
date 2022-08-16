@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import { auth } from '../middleware/auth.js' ;
 import { mailAuth } from '../middleware/mailAuth.js' ;
 import { signMailAuth } from '../middleware/signMailAuth.js';
-import { mailAuthNumber } from '../middleware/mailAuthNumber.js';
+import { mailAuthNumber, nonLoginAuthNumber } from '../middleware/mailAuthNumber.js';
 
 
 dotenv.config();
@@ -110,7 +110,7 @@ router.get('/login', async (req, res) => {
 // 5. 비번찾기  (질답, 이메일인증)
 
 //@ path    POST /api/auth/member/member/number
-//@ doc     가입된 상태에서 인증번호로 메일인증
+//@ doc     가입된 + 로그인된 회원 인증번호로 메일인증
 //@ access  public
 router.post('/member/number', auth, mailAuthNumber, async (req, res) => {
     try {
@@ -137,6 +137,29 @@ router.post('/nonMember/number', mailAuthNumber, async (req, res) => {
         const { email, _id } = req.body;
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
         if(!_id) return res.status(400).json({ err: 'is not _id' }) 
+       
+        console.log('number api : ', req.authCode)
+
+        res.cookie('authCode', req.authCode, { expires: new Date(Date.now() + 180000), httpOnly: true });
+        res.status(200).json({ message: '인증번호를 입력해주세요.', email})
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({ error: err.message })
+    }
+})
+
+
+
+
+//@ path    POST /api/auth/nonLoginMember/number
+//@ doc     회원 + 비로그인 인증메일  
+//@ access  public
+router.post('/nonLoginMember/number', nonLoginAuthNumber, async (req, res) => {
+    try {
+        console.log('회원 / 비로그인 ')
+        const { email, id } = req.body;
+        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
+        if(!id) return res.status(400).json({ err: 'is not _id' }) 
        
         console.log('number api : ', req.authCode)
 

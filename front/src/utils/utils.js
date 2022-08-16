@@ -41,11 +41,6 @@ export const useDebounce = (cb, waitTime = 500, deps = []) => {
           }, [callback, waitTime]);
     }
 
-
-
-
-
-
 export const throttle = (cb, waitTime = 0) => {
     let waiting = true;
     return (...args) => {
@@ -72,7 +67,6 @@ export const delay = (endSecond, cb) => {
 
 }
 
-
 export const timer = (endSecond, startingPoint, cb) => {
     if(!endSecond || !startingPoint || !cb ) return console.error('인수 모두 채워주세요');
     if(typeof endSecond !== 'number' || typeof startingPoint !== 'number' || typeof cb !== 'function' ) {
@@ -91,7 +85,6 @@ export const timer = (endSecond, startingPoint, cb) => {
     }, countPoint * 1000)
   
 }
-
 
 export const initTime = () => {
     const sampleTimestamp = Date.now();

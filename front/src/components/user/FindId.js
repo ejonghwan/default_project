@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect, useCallback, useContext } from 'r
 
 // module
 import { useInput } from '../common/hooks/index.js'
-import { findUserId, nonMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
+import { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -40,12 +40,11 @@ const FindId = () => {
     const [name, handleName] = useInput('');
     const [email, handleEmail] = useInput(''); 
     
-    
+    // 0816 여기까찌함 
     const handleAuthNumberSubmit = async e => {
         try {
             e.preventDefault();
-            const findId = await nonMemberAuthNumberRequest({ name, email }); 
-
+            const findId = await nonLoginMemberAuthNumberRequest({ name, email }); 
             
             setAuthToggle(!authToggle)
             console.log('view =>', findId)
@@ -83,7 +82,6 @@ const FindId = () => {
                         type="text" 
                         required={true} 
                         placeholder="userName" 
-
                         classN="input_text_t1" 
                         name="userName" 
                         value={name} 
