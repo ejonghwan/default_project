@@ -109,6 +109,15 @@ router.get('/login', async (req, res) => {
 // 4. 아이디 찾기 (개인정보, 이메일인증) 
 // 5. 비번찾기  (질답, 이메일인증)
 
+
+/* 인증로직 간단하게 
+1. c: 인증번호 요청 
+2. s: 메일로 인증번호 날림. 
+      미들웨어에서 bcrypt로 암호화해서 req.body에 담아 넘김. 
+      email router에서 jwt쿠폰으로 유효기간 설정 후 쿠키로 res 
+3. c: 인증번호 입력 후 서버로 보낼 때 쿠키도 같이보냄 
+4. s: c에서 넘어온 쿠키 유효기간 체크하고..지났으면 에러를 안지났으면 bcript로 비교 후 
+*/
 //@ path    POST /api/auth/member/member/number
 //@ doc     가입된 + 로그인된 회원 인증번호로 메일인증
 //@ access  public
@@ -149,22 +158,21 @@ router.post('/nonMember/number', mailAuthNumber, async (req, res) => {
 })
 
 
-
-
 //@ path    POST /api/auth/nonLoginMember/number
 //@ doc     회원 + 비로그인 인증메일  
 //@ access  public
 router.post('/nonLoginMember/number', nonLoginAuthNumber, async (req, res) => {
     try {
-        console.log('회원 / 비로그인 ')
-        const { email, id } = req.body;
+        console.log(req.body)
+        const { name, email } = req.body;
         if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
-        if(!id) return res.status(400).json({ err: 'is not _id' }) 
+        if(!name) return res.status(400).json({ err: 'is not name' }) 
        
-        console.log('number api : ', req.authCode)
+        console.log('number api : ', req.authCode, req._id)
 
         res.cookie('authCode', req.authCode, { expires: new Date(Date.now() + 180000), httpOnly: true });
-        res.status(200).json({ message: '인증번호를 입력해주세요.', email})
+        res.cookie('_id', req._id, { expires: new Date(Date.now() + 180000), httpOnly: true });
+        res.status(200).json({ message: '인증번호를 입력해주세요.'})
     } catch(err) {
         console.error(err)
         res.status(500).json({ error: err.message })

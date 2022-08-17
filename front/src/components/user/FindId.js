@@ -1,15 +1,18 @@
-import React, { Fragment, useState, useEffect, useCallback, useContext } from 'react';
+import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo } from 'react';
+
 
 // module
 import { useInput } from '../common/hooks/index.js'
 import { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
+import debounce from 'lodash.debounce'
+import throttle from 'lodash.throttle'
 
 // components
 import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
-
-// components
+// import { DebounceButton } from '../common/form/Button.js'
 // import LoginForm from '../components/user/LoginForm.js'
+
 
 // context & request 
 import { nmaeEditUser, emailEditUser } from '../../reducers/UserRequest.js'
@@ -35,8 +38,8 @@ const FindId = () => {
         이름, 전화번호로 찾기
     */
 
-    const {authNumber, handleAuthNumber} = useInput('');
-    const {authToggle, setAuthToggle} = useState(false);
+    const [authNumber, handleAuthNumber] = useInput('');
+    const [authToggle, setAuthToggle] = useState(false);
     const [name, handleName] = useInput('');
     const [email, handleEmail] = useInput(''); 
     
@@ -46,7 +49,8 @@ const FindId = () => {
             e.preventDefault();
             const findId = await nonLoginMemberAuthNumberRequest({ name, email }); 
             
-            setAuthToggle(!authToggle)
+            setAuthToggle(true)
+            console.log(authToggle)
             console.log('view =>', findId)
 
         } catch(err) {
@@ -57,23 +61,43 @@ const FindId = () => {
     const handleFindIdSubmit = async e => {
         try {
             e.preventDefault();
-            const findId = await findUserId({ }); 
+            const findId = await findUserId({ authNumber }); 
             // 여기선 쿠키보내야됨
-            console.log('view =>', findId)
+            await console.log('find Id view =>', findId)
 
         } catch(err) {
             console.error(err)
         }
     }
 
-    
-    useEffect(() => {
 
+    const [tt1, settt1] = useState('aa')
+    const testd2 = e => {
+        settt1(e.target.value)
+    }
+    const testd1 = useMemo(() => debounce(testd2, 300), []);
+
+    const tt11 = e => {
+        console.log(11)
+        return debounce((e) => console.log('ccccccccccccccccccccccccccccccccccccccc',e), 300)
+    }
+
+
+    // 이거 보다가 감....
+    const tt22 = debounce(() => console.log('ccccccccccccccccccccccccccccccccccccccc'), 300)
+
+    useEffect(() => {
+       return () => {
+            testd1.cancel()
+       }
     }, [])
 
 
     return (
         <Fragment>
+
+            <input type="text" value={tt1} onChange={testd1}/>
+            <button type="button" onClick={tt11()}>ttttttttttttttt</button>
             <form onSubmit={handleAuthNumberSubmit}>
                 <div>
                     <Label htmlFor="userName" content="이름" classN="label_t1"/>
@@ -105,8 +129,8 @@ const FindId = () => {
                 </div>
                 <button>인증번호 보내기</button>
             </form>
-            {authToggle ? (
-                <form>
+            {authToggle && (
+                <form onSubmit={handleFindIdSubmit}>
                   <div>
                      <Label htmlFor="authNumber" content="인증번호" classN="label_t1"/>
                      <Input 
@@ -122,10 +146,9 @@ const FindId = () => {
                          disabled={authToggle ? false : true }
                      />
                  </div>
+                 <button>아이디 찾기</button>
              </form>
-            ) : (
-                <div></div>
-            ) }
+            )}
           
         </Fragment>
     )

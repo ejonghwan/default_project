@@ -61,28 +61,24 @@ const UserProfile = () => {
     // 이메일 수정 인증번호 요청 debounce
     const handleEmailAuth = useCallback(async e => {
         e.preventDefault();
-        debounce(async e => {
-            try {
-                console.log(e)
-                const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id })
-                setEditEmailAuthState(true)
-                // 타이머
-                timer(180, 180, count => {
-                    if(count === 0) return setTimerNumber(null)
-                    setTimerNumber(count)
-                })
-            } catch(err) {
-                console.error(err)
-            }
-        }, 2000)
-            
+        try {
+            console.log(e)
+            const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id })
+            setEditEmailAuthState(true)
+            // 타이머
+            timer(180, 180, count => {
+                if(count === 0) return setTimerNumber(null)
+                setTimerNumber(count)
+            })
+        } catch(err) {
+            console.error(err)
+        }
     }, [userEmail, timerNumber])
 
     
     // 이름 수정 요청
     const handleNameEdit = useCallback( async e => {
         try {
-        
             e.preventDefault();
             console.log(e)
             const res = await nmaeEditUser({ name: userName, _id: state.user._id })
@@ -95,64 +91,8 @@ const UserProfile = () => {
     }, [userName])
 
 
-    
-
-    const handleSubmit_ = debounce((e) => {
-        // e.preventDefault();
-        console.log('test', e)
-    }, 2000)
-
-    const handleSubmit_22 = e => {
-        e.preventDefault(); 
-        handleSubmit_();
-    }
-
-
-
-    const handlehuhu = e => {
-        e.preventDefault();
-        console.log(e)
-    }
-
-    useDebounce((e) => {
-        console.log('huhu', e)
-    }, 2000, [handlehuhu])
-
-   
-
-    const [val, setVal] = useState('')
-    useDebounce((e) => {
-        // setVal(e.target.value)
-        console.log(val, e)
-    }, 2000, [val])
-
-    const handlehoho = e => {
-        setVal(e.target.value)
-    }
-
-
     return (
         <Fragment>
-
-             {/* jsx onSubmit */}
-            <form onSubmit={ handleSubmit_22 }>
-                <input type="text" />
-                <button>click</button>
-            </form>
-
-
-            <form onSubmit={handlehuhu}>
-                <input type="text" />
-                <button>click</button>
-            </form>
-
-            <input type="text" onChange={handlehoho} value={val}/>
-            {/* <input type="text" onChange={function(e) {setVal(e.target.value)}  } value={val}/> */}
-            {val}
-
-
-
-
             <div>프로필</div>
             <ul>
             <li>

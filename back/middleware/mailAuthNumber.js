@@ -43,8 +43,7 @@ export const mailAuthNumber = async (req, res, next) => {
                 next();
             })
         })
-        
-        
+
     } catch(err) {
         console.error(err)
     }
@@ -55,7 +54,6 @@ export const mailAuthNumber = async (req, res, next) => {
 // 가입되었지만 비번/아이디 찾는 
 export const nonLoginAuthNumber = async (req, res, next) => {
     try {
-
         console.log('여기넘어오나 ???????????????????????')
         const authCode = Math.random().toString().substring(2, 8);
         const { email } = req.body;
@@ -75,6 +73,7 @@ export const nonLoginAuthNumber = async (req, res, next) => {
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(authCode, salt, (err, hash) => {
                 req.authCode = hash;
+                req._id = user._id;
                 next();
             })
         })

@@ -2,11 +2,12 @@ import React from 'react'
 import axios from 'axios'
 
 import { UserContext } from '../context/UserContext.js'
+import debounce from 'lodash.debounce'
 
 const host = 'http://localhost:5000'
 
 // 회원가입 유저
-export const emailAuth = async data => {
+export const emailAuth = debounce(async data => {
     try {
         const { email } = data;
         if(!email && typeof email !== 'string') return;
@@ -20,12 +21,11 @@ export const emailAuth = async data => {
     } catch(err) {
         console.error(err)
     }
-}
-
+}, 700)
 
 
 // 회원가입 유저
-export const signupUser = async data => {
+export const signupUser = debounce(async data => {
     try {
         const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = data;
 
@@ -49,12 +49,16 @@ export const signupUser = async data => {
     } catch(err) {
         console.error(err)
     }
-}
+}, 700)
 
 
 // 유저 불러오기
-export const getUser = async (query) => {
+export const getUser = async query => {
     try {
+
+        await debounce(() => {
+            console.log('deb')
+        },700)
         let accToken = null;
 
         if(query) { accToken = query }
@@ -83,7 +87,7 @@ export const getUser = async (query) => {
 
 
 // 로그인 유저
-export const loginUser = async data => {
+export const loginUser = debounce(async data => {
     try {
         const { id, password } = data;
         if(!id && typeof id !== 'string') return;
@@ -101,11 +105,10 @@ export const loginUser = async data => {
     } catch(err) {
         console.error(err)
     }
-}
-
+}, 700)
 
 // 로그아웃 유저
-export const logoutUser = async () => {
+export const logoutUser = debounce(async () => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -125,14 +128,13 @@ export const logoutUser = async () => {
     } catch(err) {
         console.error(err)
     }
-  }
-
+  }, 700)
 
 
 
 // edit
 // 이름 수정
-export const nmaeEditUser = async data => {
+export const nmaeEditUser = debounce(async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -155,10 +157,10 @@ export const nmaeEditUser = async data => {
     } catch(err) {
         console.error(err)
     }
-}
+}, 700)
 
 // 회원인사람 인증번호 보내기
-export const memberAuthNumberRequest = async data => {
+export const memberAuthNumberRequest = debounce(async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -179,10 +181,10 @@ export const memberAuthNumberRequest = async data => {
     } catch(err) {
         console.error(err)
     }
-}
+}, 700)
 
 // 비회원인사람 인증번호 보내기
-export const nonMemberAuthNumberRequest = async data => {
+export const nonMemberAuthNumberRequest = debounce(async data => {
     try {
         const { email, name } = data;
         if(!email && typeof email !== 'string') return;
@@ -198,11 +200,11 @@ export const nonMemberAuthNumberRequest = async data => {
     } catch(err) {
         console.error(err)
     }
-}
+}, 700)
 
 
 // 회원+비로그인 인증번호 보내기
-export const nonLoginMemberAuthNumberRequest = async data => {
+export const nonLoginMemberAuthNumberRequest = debounce(async data => {
     try {
         const { email, name } = data;
         if(!email && typeof email !== 'string') return;
@@ -218,14 +220,14 @@ export const nonLoginMemberAuthNumberRequest = async data => {
     } catch(err) {
         console.error(err)
     }
-}
+}, 2000)
 
 
 
 
 
 // 이메일 수정
-export const emailEditUser = async data => {
+export const emailEditUser = debounce(async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -247,11 +249,11 @@ export const emailEditUser = async data => {
         console.error('saga error', err.response)
         return err.response;
     }
-}
+}, 700)
   
   
 // 비번수정
-export const passwordEditUser = async data => {
+export const passwordEditUser = debounce(async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -278,15 +280,14 @@ export const passwordEditUser = async data => {
     } catch(err) {
         console.error(err)
     }
-}
+}, 700)
 
 
 // 아이디 찾기  // 비회원 인증번호 받은 사람은 이걸로 다시 쿠키 주면서 요청해야됨 
-export const findUserId = async data => {
+export const findUserId = debounce(async data => {
     try {
-        const { userName, userEmail } = data;
-        if(!userName && typeof userName !== 'string') return;
-        if(!userEmail && typeof userEmail !== 'string') return;
+        const { authNumber } = data;
+        if(!authNumber && typeof authNumber !== 'string') return;
 
         console.log('request data', data)
 
@@ -302,4 +303,4 @@ export const findUserId = async data => {
     } catch(err) {
         console.error(err)
     }
-} 
+}, 700)

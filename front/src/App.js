@@ -29,13 +29,16 @@ const App = () => {
   // 유저 새로고침
   const userLoad = async () => {
     try {
-      const accToken = localStorage.getItem('X-access-token')
+      const accToken = await localStorage.getItem('X-access-token')
       if(!accToken) return;
 
       dispatch({ type: "LOADING", loadingMessage: "" })
+      console.log('1 언제??')
       const user = await getUser();
-      const data = user.data;
-      dispatch({type: "USER_LOAD_SUCCESS", data})
+      console.log('2 언제??', user)
+      const data = await user.data;
+      console.log('3 언제??', data)
+      await dispatch({type: "USER_LOAD_SUCCESS", data})
 
     } catch(err) {
 

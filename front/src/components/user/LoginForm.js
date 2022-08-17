@@ -31,7 +31,7 @@ const LoginForm = () => {
             e.preventDefault();
             await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
             const user = await loginUser({ id: userId, password: userPassword })
-            dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
+            await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
 
             
            setTotalLoingTime(10)

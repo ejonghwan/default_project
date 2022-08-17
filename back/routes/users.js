@@ -237,12 +237,40 @@ router.post('/edit/password', auth, async (req, res) => {
 })
 
 
+/* 인증로직 간단하게 
+1. c: 인증번호 요청 
+2. s: 메일로 인증번호 날림. 
+      미들웨어에서 bcrypt로 암호화해서 req.body에 담아 넘김. 
+      email router에서 jwt쿠폰으로 유효기간 설정 후 쿠키로 res 
+3. c: 인증번호 입력 후 서버로 보낼 때 쿠키도 같이보냄 
+4. s: c에서 넘어온 쿠키 유효기간 체크하고..지났으면 에러를 안지났으면 bcript로 비교 후 
+*/
+
 //@ path    POST /api/users/find/id
 //@ doc     아이디 찾기
 //@ access  public
 router.post('/find/id', async (req, res) => {
     try {
-        
+        const getAuthCode = req.cookies["authCode"];
+        const get_id = req.cookies["_id"];
+        const { authNumber } = req.body;
+
+        if(!mongoose.isValidObjectId(get_id)) return res.status(400).json({ err: 'id type check' });
+        if(!authNumber) return res.status(400).json({ err: 'is not authNumber' });
+
+        // 3분토큰 만료인지 체크 
+        if(!getAuthCode) return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' });
+    
+        // 클라 번호와 메일 번호가 같은지 체크
+        const match = await bcrypt.compare(authNumber, getAuthCode);
+        if(!match) return res.status(400).json({ message: '인증번호가 다릅니다'});
+
+        const user = await User.findById(get_id)
+        if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
+
+        res.status(200).json({message: `id는 ${user.id}입니다`, id: user.id})
+
+
     } catch(err) {
         console.error(err)
         res.status(500).json({ err: err.message })

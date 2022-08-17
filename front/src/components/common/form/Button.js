@@ -1,11 +1,9 @@
 import React, { Fragment } from 'react'
-import debounce from 'lodash.debounce'
 
 
-export const DebounceButton = props => {
 
-    console.log(debounce)
 
+export const Button = props => {
     const { classN, id, type, placeholder, value, onChange, disabled, onClick } = props;
 
     // console.log(props)
