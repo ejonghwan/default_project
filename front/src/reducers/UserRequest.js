@@ -1,13 +1,17 @@
 import React from 'react'
 import axios from 'axios'
-
+import _debounce from 'lodash.debounce'
 import { UserContext } from '../context/UserContext.js'
-import debounce from 'lodash.debounce'
+
+
+// ddebounceFn
+import { debounce } from '../utils/utils.js'
+
 
 const host = 'http://localhost:5000'
 
 // 회원가입 유저
-export const emailAuth = debounce(async data => {
+export const emailAuth = async data => {
     try {
         const { email } = data;
         if(!email && typeof email !== 'string') return;
@@ -16,16 +20,18 @@ export const emailAuth = debounce(async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true,
         }
-        const res = await axios.post(`${host}/api/auth`, data, config)
+        // const res = await axios.post(`${host}/api/auth`, data, config)
+        // return res.data
+        const res = debounce(() => axios.post(`${host}/api/auth`, data, config), 700)
         return res.data
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
 
 
 // 회원가입 유저
-export const signupUser = debounce(async data => {
+export const signupUser = async data => {
     try {
         const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = data;
 
@@ -42,31 +48,28 @@ export const signupUser = debounce(async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true,
         }
-        const user = await axios.post(`${host}/api/users`, data, config)
-        
+
+        // 0818 debounce 넣음
+        // const user = await axios.post(`${host}/api/users`, data, config)
+        // return user;
+        const user = debounce(() => axios.post(`${host}/api/users`, data, config), 700)
         return user;
 
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
+
 
 
 // 유저 불러오기
 export const getUser = async query => {
     try {
-
-        await debounce(() => {
-            console.log('deb')
-        },700)
         let accToken = null;
-
         if(query) { accToken = query }
         if(localStorage.getItem('X-access-token')) {
             accToken = localStorage.getItem('X-access-token')
         }
-
-        console.log('query', accToken)
         if(!accToken) return;
 
         const config = {
@@ -76,8 +79,7 @@ export const getUser = async query => {
             },
             withCredentials: true,
         }
-        const user = await axios.get(`${host}/api/users/load`, config)
-        localStorage.setItem('X-access-token', user.data.accToken)
+        const user = debounce(() => axios.get(`${host}/api/users/load`, config), 300)
         return user;
 
     } catch(err) {
@@ -85,10 +87,54 @@ export const getUser = async query => {
     }
 }
 
+// export const getUser = async query => {
+//     try {
+//         let accToken = null;
+
+//         if(query) { accToken = query }
+//         if(localStorage.getItem('X-access-token')) {
+//             accToken = localStorage.getItem('X-access-token')
+//         }
+//         if(!accToken) return;
+
+//         const config = {
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 'X-access-token': accToken,
+//             },
+//             withCredentials: true,
+//         }
+//         await setTimeout(async () => {
+//             return await axios.get(`${host}/api/users/load`, config)
+//         }, 1000)
+//         // return await axios.get(`${host}/api/users/load`, config)
+//         // console.log('?????????????????????????????', user)
+//         // localStorage.setItem('X-access-token', user.data.accToken)
+        
+//         // console.log('setTime')
+//         // return user;
+    
+
+//     } catch(err) {
+//         console.error(err)
+//     }
+// }
+
+
+var hoho = _debounce((cb, waiting) => {
+    debugger
+    return new Promise((resolve, reject) => {
+        debugger
+          const data = cb();
+          resolve(data);
+    })
+  }, 1000)
+
 
 // 로그인 유저
-export const loginUser = debounce(async data => {
+export const loginUser = async data => {
     try {
+        // debugger
         const { id, password } = data;
         if(!id && typeof id !== 'string') return;
         if(!password && typeof password !== 'string') return;
@@ -97,18 +143,21 @@ export const loginUser = debounce(async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-
-        const user = await axios.post(`${host}/api/users/login`, data, config);
+        // debugger
+        // const user = await hoho(() => axios.post(`${host}/api/users/login`, data, config), 700)
+      
+        // debugger
+        const user = await axios.post(`${host}/api/users/login`, data, config)
         localStorage.setItem('X-access-token', user.data.accToken);
 
         return user;
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
 
 // 로그아웃 유저
-export const logoutUser = debounce(async () => {
+export const logoutUser = async () => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -122,19 +171,18 @@ export const logoutUser = debounce(async () => {
           }
         await localStorage.removeItem('X-access-token')
         const user = await axios.get(`${host}/api/users/logout`, config)
-        
-        
         return user;
+
     } catch(err) {
         console.error(err)
     }
-  }, 700)
+  }
 
 
 
 // edit
 // 이름 수정
-export const nmaeEditUser = debounce(async data => {
+export const nmaeEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -150,17 +198,16 @@ export const nmaeEditUser = debounce(async data => {
             },
             withCredentials: true,
         }
-        const user = await axios.patch(`${host}/api/users/edit/name`, data, config)
-      
-
+        const user = debounce(() => axios.patch(`${host}/api/users/edit/name`, data, config), 700)
         return user;
+
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
 
 // 회원인사람 인증번호 보내기
-export const memberAuthNumberRequest = debounce(async data => {
+export const memberAuthNumberRequest = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -175,16 +222,16 @@ export const memberAuthNumberRequest = debounce(async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = await axios.post(`${host}/api/auth/member/number`, data, config)
-
+        const res = debounce(() => axios.post(`${host}/api/auth/member/number`, data, config), 700)
         return res;
+
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
 
 // 비회원인사람 인증번호 보내기
-export const nonMemberAuthNumberRequest = debounce(async data => {
+export const nonMemberAuthNumberRequest = async data => {
     try {
         const { email, name } = data;
         if(!email && typeof email !== 'string') return;
@@ -194,17 +241,17 @@ export const nonMemberAuthNumberRequest = debounce(async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = await axios.post(`${host}/api/auth/nonMember/number`, data, config)
+        const res = debounce(() => axios.post(`${host}/api/auth/nonMember/number`, data, config), 700)
 
         return res;
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
 
 
 // 회원+비로그인 인증번호 보내기
-export const nonLoginMemberAuthNumberRequest = debounce(async data => {
+export const nonLoginMemberAuthNumberRequest = async data => {
     try {
         const { email, name } = data;
         if(!email && typeof email !== 'string') return;
@@ -214,20 +261,20 @@ export const nonLoginMemberAuthNumberRequest = debounce(async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = await axios.post(`${host}/api/auth/nonLoginMember/number`, data, config)
+        const res = debounce(() => axios.post(`${host}/api/auth/nonLoginMember/number`, data, config), 700)
 
         return res;
     } catch(err) {
         console.error(err)
     }
-}, 2000)
+}
 
 
 
 
 
 // 이메일 수정
-export const emailEditUser = debounce(async data => {
+export const emailEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -242,18 +289,18 @@ export const emailEditUser = debounce(async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = await axios.patch(`${host}/api/users/edit/email`, data, config)
+        const res = debounce(() => axios.patch(`${host}/api/users/edit/email`, data, config), 700)
 
         return res;
     } catch(err) {
         console.error('saga error', err.response)
         return err.response;
     }
-}, 700)
+}
   
   
 // 비번수정
-export const passwordEditUser = debounce(async data => {
+export const passwordEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -272,19 +319,17 @@ export const passwordEditUser = debounce(async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const user = await axios.post(`${host}/api/users/edit/password`, data, config)
-
-        console.log('client respose data', user)
-
+        const user = debounce(() => axios.post(`${host}/api/users/edit/password`, data, config), 700)
         return user;
+
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}
 
 
 // 아이디 찾기  // 비회원 인증번호 받은 사람은 이걸로 다시 쿠키 주면서 요청해야됨 
-export const findUserId = debounce(async data => {
+export const findUserId = async data => {
     try {
         const { authNumber } = data;
         if(!authNumber && typeof authNumber !== 'string') return;
@@ -296,11 +341,10 @@ export const findUserId = debounce(async data => {
             withCredentials: true // 쿠키 cors 통신 설정
         }
 
-        const findId = axios.post(`${host}/api/users/find/id`, data, config)
-
+        const findId = debounce(() => axios.post(`${host}/api/users/find/id`, data, config), 700)
         return findId;
 
     } catch(err) {
         console.error(err)
     }
-}, 700)
+}

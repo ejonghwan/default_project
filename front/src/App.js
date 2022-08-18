@@ -33,15 +33,14 @@ const App = () => {
       if(!accToken) return;
 
       dispatch({ type: "LOADING", loadingMessage: "" })
-      console.log('1 언제??')
-      const user = await getUser();
-      console.log('2 언제??', user)
+      const user = await getUser(); //700 이후이니깐 기다려줘야되는데 안기다림
+    
+
       const data = await user.data;
-      console.log('3 언제??', data)
-      await dispatch({type: "USER_LOAD_SUCCESS", data})
+      dispatch({type: "USER_LOAD_SUCCESS", data})
+
 
     } catch(err) {
-
       dispatch({ type: "USER_LOAD_FAILUE" })
       console.error(err)
     }

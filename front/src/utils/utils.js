@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import _debounce from 'lodash.debounce'
 
 
 
@@ -7,54 +8,22 @@ export const axiosModule = ({ method, URI, data, config }) => {
     return axios[method](`http://localhost:5000${URI}`, data, config,);    
 }
 
-export const debounce = (cb, waitTime = 500) => {
-    let timeout;
-    return (...args) => {
-        if(timeout) clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            cb(...args)
-        }, waitTime);
-    }
-}
 
 
-// export const useDebounce = (value, waitTime = 500) => {
-//     const [debounceValue, setDebounceValue] = React.useState(value) 
-//     React.useEffect(() => {
-//         const handler = setTimeout(() => {
-//             setDebounceValue(value)
-//         }, waitTime)
-
-//         return () => {
-//             clearTimeout(handler)
-//         }
-//     }, [value, waitTime])
-//     return debounceValue
-// }
-
-export const useDebounce = (cb, waitTime = 500, deps = []) => { 
-        const callback = React.useCallback(cb, deps)
-
-        React.useEffect(() => {
-            const timer = setTimeout(() => callback(), waitTime);
-            return () => clearTimeout(timer);
-          }, [callback, waitTime]);
-    }
-
-export const throttle = (cb, waitTime = 0) => {
-    let waiting = true;
-    return (...args) => {
-        if(waiting) {
-            cb(...args)
-            waiting = false;
-            setTimeout(() => {
-                waiting = true;
-            }, waitTime)
-        }
-    }
-}
-
-
+export const debounce = (cb, waiting) => {
+    // console.log('11 ??????????')
+    (_debounce(() => {
+        // console.log('22 ??????????')
+        return new Promise((resolve, reject) => {
+              const data = cb();
+              resolve(data);
+        })
+    
+    }, 1000))()
+    
+   
+  }
+  
 
 export const delay = (endSecond, cb) => {
     if(!endSecond || !cb) return console.error('인수 모두 채워주세요');
@@ -107,6 +76,76 @@ export const initTime = () => {
 
 
 
+
+
+
+// 커스텀 디바운스 쓰로틀... 이해만 하고 그냥 로대쉬꺼 씀
+// export const debounce = (cb, waitTime = 500) => {
+//     let timeout;
+//     return (...args) => {
+//         if(timeout) clearTimeout(timeout);
+//         timeout = setTimeout(() => {
+//             cb(...args)
+//         }, waitTime);
+//     }
+// }
+
+
+
+// export const useDebounce = (value, waitTime = 500) => {
+//     const [debounceValue, setDebounceValue] = React.useState(value) 
+//     React.useEffect(() => {
+//         const handler = setTimeout(() => {
+//             setDebounceValue(value)
+//         }, waitTime)
+
+//         return () => {
+//             clearTimeout(handler)
+//         }
+//     }, [value, waitTime])
+//     return debounceValue
+// }
+
+
+
+// export const useDebounce = (cb, waitTime = 500, deps = []) => { 
+//     const callback = React.useCallback(cb, deps)
+
+//     React.useEffect(() => {
+//         const timer = setTimeout(() => callback(), waitTime);
+//         return () => clearTimeout(timer);
+//         }, [callback, waitTime]);
+// }
+
+
+
+
+// export const throttle = (cb, waitTime = 0) => {
+//     let waiting = true;
+//     return (...args) => {
+//         if(waiting) {
+//             cb(...args)
+//             waiting = false;
+//             setTimeout(() => {
+//                 waiting = true;
+//             }, waitTime)
+//         }
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const test = () => {
     // const sampleTimestamp = Date.now(); //현재시간 타임스탬프 13자리 예)1599891939914
     // const date = new Date(sampleTimestamp); //타임스탬프를 인자로 받아 Date 객체 생성
@@ -140,5 +179,8 @@ const test = () => {
         // // expected output: seconds elapsed = 2
         // }, 7000);
 }
+
+
+
 
 

@@ -79,9 +79,18 @@ const FindId = () => {
 
     const tt11 = e => {
         console.log(11)
-        return debounce((e) => console.log('ccccccccccccccccccccccccccccccccccccccc',e), 300)
+        // hoho(() => console.log('hoho cb', e))
+        // debounce(function(){console.log('ccccccccccccccccccccccccccccccccccccccc',e)}, 300)
+        return debounce(() => {console.log('디바디바')}, 1000)
     }
 
+    const hoho = (fn) => {
+        console.log('hoho fn')
+        fn()
+    }
+
+
+    
 
     // 이거 보다가 감....
     const tt22 = debounce(() => console.log('ccccccccccccccccccccccccccccccccccccccc'), 300)

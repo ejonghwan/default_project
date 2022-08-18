@@ -1,4 +1,6 @@
 import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
+import _debounce from 'lodash.debounce'
+
 
 // module
 import { useInput } from '../common/hooks/index.js'
@@ -26,32 +28,60 @@ const LoginForm = () => {
     const [totalLoingTime, setTotalLoingTime] = useState(null)
 
 
-    const handleSubmit = useCallback( async e => {
-        try {
-            e.preventDefault();
-            await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
-            const user = await loginUser({ id: userId, password: userPassword })
-            await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
+    // const handleSubmit = useCallback( async e => {
+    //     try {
+    //         e.preventDefault();
+    //         await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
+    //         const user = await loginUser({ id: userId, password: userPassword })
+    //         await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
 
             
-           setTotalLoingTime(10)
-           timer(7200, 600, async (count) => {
-                setTimeRemaining(count)
+    //        setTotalLoingTime(10)
+    //        timer(7200, 600, async (count) => {
+    //             setTimeRemaining(count)
                 
-                if(count === 0) {
-                    console.log('로그아웃됨')
-                    await logoutUser()
-                    dispatch({ type: "USER_LOGOUT_SUCCESS" })
-                }
-                console.log('count', count)
-            })
+    //             if(count === 0) {
+    //                 console.log('로그아웃됨')
+    //                 await logoutUser()
+    //                 dispatch({ type: "USER_LOGOUT_SUCCESS" })
+    //             }
+    //             console.log('count', count)
+    //         })
 
-        } catch(err) {
-            console.error(err)
-            dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
+    //     } catch(err) {
+    //         console.error(err)
+    //         dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
+    //     }
+
+    // }, [userId, userPassword])
+
+    
+    const handleSubmit = ((e) => {
+        
+        console.log(123, e)
+        return function(e) {
+            console.log(e)
         }
+        // e.preventDefault()
+        // return _debounce(async (e) => {
+        //     e.preventDefault()
+        //     console.log(123, e)
+        // }, 1000)
 
-    }, [userId, userPassword])
+
+    })
+
+    const fn = (e) => {
+        e.preventDefault();
+        console.log(e)
+    }
+
+    const dd = _debounce((e) => {
+        e.preventDefault();
+        alert(e)
+        console.log(111111111111111)
+    }, 1000)
+
 
 
     useEffect(() => {
@@ -62,7 +92,7 @@ const LoginForm = () => {
         <Fragment>
             
             <LoginTimer totalLoingTime={totalLoingTime} timeRemaining={timeRemaining} />
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={dd}>
                 <div>
                     <Label htmlFor="userId" content="아이디" classN="label_t1"/>
                     <Input  
