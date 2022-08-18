@@ -20,10 +20,9 @@ export const emailAuth = async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true,
         }
-        // const res = await axios.post(`${host}/api/auth`, data, config)
-        // return res.data
-        const res = debounce(() => axios.post(`${host}/api/auth`, data, config), 700)
-        return res.data
+        const res = await axios.post(`${host}/api/auth`, data, config);
+        return res.data;
+     
     } catch(err) {
         console.error(err)
     }
@@ -49,10 +48,7 @@ export const signupUser = async data => {
             withCredentials: true,
         }
 
-        // 0818 debounce 넣음
-        // const user = await axios.post(`${host}/api/users`, data, config)
-        // return user;
-        const user = debounce(() => axios.post(`${host}/api/users`, data, config), 700)
+        const user = await axios.post(`${host}/api/users`, data, config)
         return user;
 
     } catch(err) {
@@ -79,7 +75,7 @@ export const getUser = async query => {
             },
             withCredentials: true,
         }
-        const user = debounce(() => axios.get(`${host}/api/users/load`, config), 300)
+        const user = await axios.get(`${host}/api/users/load`, config)
         return user;
 
     } catch(err) {
@@ -121,20 +117,10 @@ export const getUser = async query => {
 // }
 
 
-var hoho = _debounce((cb, waiting) => {
-    debugger
-    return new Promise((resolve, reject) => {
-        debugger
-          const data = cb();
-          resolve(data);
-    })
-  }, 1000)
-
 
 // 로그인 유저
 export const loginUser = async data => {
     try {
-        // debugger
         const { id, password } = data;
         if(!id && typeof id !== 'string') return;
         if(!password && typeof password !== 'string') return;
@@ -143,14 +129,11 @@ export const loginUser = async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        // debugger
-        // const user = await hoho(() => axios.post(`${host}/api/users/login`, data, config), 700)
       
-        // debugger
         const user = await axios.post(`${host}/api/users/login`, data, config)
         localStorage.setItem('X-access-token', user.data.accToken);
-
         return user;
+
     } catch(err) {
         console.error(err)
     }
@@ -198,7 +181,7 @@ export const nmaeEditUser = async data => {
             },
             withCredentials: true,
         }
-        const user = debounce(() => axios.patch(`${host}/api/users/edit/name`, data, config), 700)
+        const user = await axios.patch(`${host}/api/users/edit/name`, data, config);
         return user;
 
     } catch(err) {
@@ -222,7 +205,7 @@ export const memberAuthNumberRequest = async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = debounce(() => axios.post(`${host}/api/auth/member/number`, data, config), 700)
+        const res = await axios.post(`${host}/api/auth/member/number`, data, config)
         return res;
 
     } catch(err) {
@@ -241,9 +224,9 @@ export const nonMemberAuthNumberRequest = async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = debounce(() => axios.post(`${host}/api/auth/nonMember/number`, data, config), 700)
-
+        const res = axios.post(`${host}/api/auth/nonMember/number`, data, config);
         return res;
+
     } catch(err) {
         console.error(err)
     }
@@ -261,9 +244,9 @@ export const nonLoginMemberAuthNumberRequest = async data => {
             headers: { "Content-Type": "application/json", },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = debounce(() => axios.post(`${host}/api/auth/nonLoginMember/number`, data, config), 700)
-
+        const res = await axios.post(`${host}/api/auth/nonLoginMember/number`, data, config)
         return res;
+
     } catch(err) {
         console.error(err)
     }
@@ -289,9 +272,9 @@ export const emailEditUser = async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const res = debounce(() => axios.patch(`${host}/api/users/edit/email`, data, config), 700)
-
+        const res = await axios.patch(`${host}/api/users/edit/email`, data, config);
         return res;
+
     } catch(err) {
         console.error('saga error', err.response)
         return err.response;
@@ -319,7 +302,7 @@ export const passwordEditUser = async data => {
             },
             withCredentials: true // 쿠키 cors 통신 설정
         }
-        const user = debounce(() => axios.post(`${host}/api/users/edit/password`, data, config), 700)
+        const user = await axios.post(`${host}/api/users/edit/password`, data, config);
         return user;
 
     } catch(err) {
@@ -341,7 +324,7 @@ export const findUserId = async data => {
             withCredentials: true // 쿠키 cors 통신 설정
         }
 
-        const findId = debounce(() => axios.post(`${host}/api/users/find/id`, data, config), 700)
+        const findId = await axios.post(`${host}/api/users/find/id`, data, config);
         return findId;
 
     } catch(err) {

@@ -9,21 +9,19 @@ export const axiosModule = ({ method, URI, data, config }) => {
 }
 
 
-
 export const debounce = (cb, waiting) => {
-    // console.log('11 ??????????')
-    (_debounce(() => {
-        // console.log('22 ??????????')
-        return new Promise((resolve, reject) => {
-              const data = cb();
-              resolve(data);
-        })
+    debugger
+    let val = new Promise((resolve, reject) => {
+        _debounce(() => {
+          debugger
+          const data = cb();
+          resolve(data);
+        }, waiting)
+    });
+    return val
     
-    }, 1000))()
+}
     
-   
-  }
-  
 
 export const delay = (endSecond, cb) => {
     if(!endSecond || !cb) return console.error('인수 모두 채워주세요');
