@@ -9,20 +9,6 @@ export const axiosModule = ({ method, URI, data, config }) => {
 }
 
 
-export const debounce = (cb, waiting) => {
-    debugger
-    let val = new Promise((resolve, reject) => {
-        _debounce(() => {
-          debugger
-          const data = cb();
-          resolve(data);
-        }, waiting)
-    });
-    return val
-    
-}
-    
-
 export const delay = (endSecond, cb) => {
     if(!endSecond || !cb) return console.error('인수 모두 채워주세요');
     if(typeof endSecond !== 'number' || typeof cb !== 'function' ) {
@@ -36,9 +22,8 @@ export const delay = (endSecond, cb) => {
 
 export const timer = (endSecond, startingPoint, cb) => {
     if(!endSecond || !startingPoint || !cb ) return console.error('인수 모두 채워주세요');
-    if(typeof endSecond !== 'number' || typeof startingPoint !== 'number' || typeof cb !== 'function' ) {
-        console.error('인수 타입체크해주세요')
-    }
+    if(typeof endSecond !== 'number' || typeof startingPoint !== 'number' || typeof cb !== 'function' ) return console.error('인수 타입체크해주세요')
+
     const countPoint = endSecond - startingPoint //startingPoint = 몇초가 지났을때
  
     setTimeout(() => {
@@ -50,8 +35,27 @@ export const timer = (endSecond, startingPoint, cb) => {
             if(down <= 0) { clearInterval(time) }
         }, 1000)
     }, countPoint * 1000)
-  
 }
+
+// ?????????????? 타이머는 왜 없고 얘는 있음?
+export const bb = (endSecond, startingPoint, cb) => {
+    console.log(this, 11)
+    if(!endSecond || !startingPoint || !cb ) return console.error('인수 모두 채워주세요');
+    if(typeof endSecond !== 'number' || typeof startingPoint !== 'number' || typeof cb !== 'function' ) return console.error('인수 타입체크해주세요')
+
+    const countPoint = endSecond - startingPoint //startingPoint = 몇초가 지났을때
+ 
+    setTimeout(() => {
+        let down = startingPoint;
+        let time = setInterval(() => {
+            down -= 1
+            
+            cb(down)
+            if(down <= 0) { clearInterval(time) }
+        }, 1000)
+    }, countPoint * 1000)
+}
+
 
 export const initTime = () => {
     const sampleTimestamp = Date.now();

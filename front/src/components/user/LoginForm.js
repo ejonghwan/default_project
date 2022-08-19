@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
+import React, { useState, useCallback, useEffect, Fragment, useContext, useMemo } from 'react';
 import _debounce from 'lodash.debounce'
 
 
@@ -31,16 +31,13 @@ const LoginForm = () => {
    
     const handleSubmit = async e => {
         e.preventDefault();
-        dd();
+        submit();
     }
 
-    const dd = _debounce(async () => {
-        debugger
+    const submit = useMemo(() => _debounce(async () => {
         try {
-            debugger
             await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
             const user = await loginUser({ id: userId, password: userPassword })
-            debugger
             console.log('111??', user)
             await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
 
@@ -56,12 +53,17 @@ const LoginForm = () => {
                 }
                 console.log('count', count)
             })
-
         } catch(err) {
             console.error(err)
             dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
         }
-    }, 1000)
+    }, 500), [userId, userPassword])
+
+    useEffect(() => {
+        return () => {
+         submit.cancel();
+        }
+     }, [userId, userPassword])
   
 
     // 이거 꼭 기억하자;;
@@ -74,15 +76,7 @@ const LoginForm = () => {
     //     console.log(e)
     //     dd();
     // }
-  
-
-
-
-    useEffect(() => {
-       return () => {
-        dd.cancel();
-       }
-    }, [])
+ 
 
     return (
         <Fragment>

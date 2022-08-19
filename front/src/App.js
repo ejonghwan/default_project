@@ -24,8 +24,6 @@ const App = () => {
   const valid = searchParams.get('valid');
   const accToken = searchParams.get('accToken');
 
-
-
   // 유저 새로고침
   const userLoad = async () => {
     try {
@@ -33,20 +31,15 @@ const App = () => {
       if(!accToken) return;
 
       dispatch({ type: "LOADING", loadingMessage: "" })
-      const user = await getUser(); //700 이후이니깐 기다려줘야되는데 안기다림
-    
-
-      const data = await user.data;
+      const user = await getUser(); 
+      const data = user.data;
       dispatch({type: "USER_LOAD_SUCCESS", data})
-
 
     } catch(err) {
       dispatch({ type: "USER_LOAD_FAILUE" })
       console.error(err)
     }
   }
-
-
 
   const userEmailLoad = async () => {
     try {
@@ -65,7 +58,6 @@ const App = () => {
       dispatch({ type: "USER_LOAD_FAILUE" })
       console.error(err)
     }
-    
   }
 
   // static 파일 axios로 잘 붙는지 테스트

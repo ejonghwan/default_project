@@ -4,8 +4,11 @@ import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo 
 // module
 import { useInput } from '../common/hooks/index.js'
 import { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
-import debounce from 'lodash.debounce'
-import throttle from 'lodash.throttle'
+import _debounce from 'lodash.debounce'
+import _throttle from 'lodash.throttle'
+
+// util
+import { timer } from '../../utils/utils.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -20,7 +23,6 @@ import { UserContext } from '../../context/UserContext.js'
 
 
 const FindId = () => {
-
     /*
         1. 아이디찾기 클릭
         1-1. 이름, 이메일 입력,
@@ -40,73 +42,76 @@ const FindId = () => {
 
     const [authNumber, handleAuthNumber] = useInput('');
     const [authToggle, setAuthToggle] = useState(false);
-    const [name, handleName] = useInput('');
-    const [email, handleEmail] = useInput(''); 
-    
-    // 0816 여기까찌함 
-    const handleAuthNumberSubmit = async e => {
-        try {
-            e.preventDefault();
-            const findId = await nonLoginMemberAuthNumberRequest({ name, email }); 
-            
-            setAuthToggle(true)
-            console.log(authToggle)
-            console.log('view =>', findId)
+    const [name, handleName, setName] = useInput('');
+    const [email, handleEmail, setEmail] = useInput(''); 
+    const [resMsg, setResMsg] = useState({})
 
+    const [counting, setCounting] = useState(null)
+    
+
+    const handleAuthNumberSubmit = e => {
+        e.preventDefault();
+        authSubmit();
+    }
+    const authSubmit = useMemo(() => _debounce(async() => {
+        try {
+            const number = await nonLoginMemberAuthNumberRequest({ name, email }); 
+            setResMsg({ ...resMsg, ...number.data })
+            if(number.status === 400) return;
+
+            console.log(timer)
+
+            // 성공 시 
+            setAuthToggle(true)
+            timer(180, 180, count => {
+                setCounting(count)
+                if(count === 0) {
+                    setResMsg({ ...resMsg, message: '인증시간이 초과했습니다.' });
+                    setAuthToggle(false);
+                }
+            })
+          
         } catch(err) {
             console.error(err)
         }
-    }
+    }, 1000), [name, email])
+
 
     const handleFindIdSubmit = async e => {
+        e.preventDefault();
+        findIdSubmit();
+    }
+    const findIdSubmit = useMemo(() => _debounce(async() => {
         try {
-            e.preventDefault();
             const findId = await findUserId({ authNumber }); 
-            // 여기선 쿠키보내야됨
-            await console.log('find Id view =>', findId)
-
+            // 여기선 쿠키 2개 보냄
+            // 3분 타이머 만들어야함. 
+            console.log('find Id view =>', findId)
+            setResMsg({ ...resMsg, ...findId.data })
+            if(findId.status === 200) { 
+                setAuthToggle(false);
+                setName('');
+                setEmail(''); 
+            }
+            
         } catch(err) {
             console.error(err)
         }
-    }
+    }, 1000), [authNumber])
 
 
-    const [tt1, settt1] = useState('aa')
-    const testd2 = e => {
-        settt1(e.target.value)
-    }
-    const testd1 = useMemo(() => debounce(testd2, 300), []);
-
-    const tt11 = e => {
-        console.log(11)
-        // hoho(() => console.log('hoho cb', e))
-        // debounce(function(){console.log('ccccccccccccccccccccccccccccccccccccccc',e)}, 300)
-        return debounce(() => {console.log('디바디바')}, 1000)
-    }
-
-    const hoho = (fn) => {
-        console.log('hoho fn')
-        fn()
-    }
-
-
-    
-
-    // 이거 보다가 감....
-    const tt22 = debounce(() => console.log('ccccccccccccccccccccccccccccccccccccccc'), 300)
 
     useEffect(() => {
-       return () => {
-            testd1.cancel()
-       }
-    }, [])
+        console.log(resMsg)
+        return () => {
+            authSubmit.cancel()
+            findIdSubmit.cancel()
+        }
+    }, [name, email, authNumber, resMsg])
 
 
     return (
         <Fragment>
-
-            <input type="text" value={tt1} onChange={testd1}/>
-            <button type="button" onClick={tt11()}>ttttttttttttttt</button>
             <form onSubmit={handleAuthNumberSubmit}>
                 <div>
                     <Label htmlFor="userName" content="이름" classN="label_t1"/>
@@ -120,6 +125,7 @@ const FindId = () => {
                         value={name} 
                         evt="onChange" 
                         onChange={handleName} 
+                        disabled={authToggle && true}
                     />
                 </div>
                 <div>
@@ -134,14 +140,16 @@ const FindId = () => {
                         value={email} 
                         evt="onChange" 
                         onChange={handleEmail} 
+                        disabled={authToggle && true}
                     />
                 </div>
-                <button>인증번호 보내기</button>
+                <button disabled={authToggle && true}>인증번호 보내기</button>
             </form>
             {authToggle && (
                 <form onSubmit={handleFindIdSubmit}>
                   <div>
-                     <Label htmlFor="authNumber" content="인증번호" classN="label_t1"/>
+                    남은시간: {counting} <br />
+                     <Label htmlFor="authNumber" content="메일로 인증번호가 전송되었습니다" classN="label_t1"/>
                      <Input 
                          id="authNumber" 
                          type="text" 
@@ -158,7 +166,13 @@ const FindId = () => {
                  <button>아이디 찾기</button>
              </form>
             )}
-          
+
+
+            <br /><br />
+            {resMsg && (<div>
+                <p>{resMsg.id}</p>
+                <p>{resMsg.message}</p>
+            </div>)}
         </Fragment>
     )
 }

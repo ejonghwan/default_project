@@ -25,6 +25,7 @@ export const emailAuth = async data => {
      
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -53,6 +54,7 @@ export const signupUser = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -80,42 +82,9 @@ export const getUser = async query => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
-
-// export const getUser = async query => {
-//     try {
-//         let accToken = null;
-
-//         if(query) { accToken = query }
-//         if(localStorage.getItem('X-access-token')) {
-//             accToken = localStorage.getItem('X-access-token')
-//         }
-//         if(!accToken) return;
-
-//         const config = {
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 'X-access-token': accToken,
-//             },
-//             withCredentials: true,
-//         }
-//         await setTimeout(async () => {
-//             return await axios.get(`${host}/api/users/load`, config)
-//         }, 1000)
-//         // return await axios.get(`${host}/api/users/load`, config)
-//         // console.log('?????????????????????????????', user)
-//         // localStorage.setItem('X-access-token', user.data.accToken)
-        
-//         // console.log('setTime')
-//         // return user;
-    
-
-//     } catch(err) {
-//         console.error(err)
-//     }
-// }
-
 
 
 // 로그인 유저
@@ -136,6 +105,7 @@ export const loginUser = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -158,6 +128,7 @@ export const logoutUser = async () => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
   }
 
@@ -186,6 +157,7 @@ export const nmaeEditUser = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -210,6 +182,7 @@ export const memberAuthNumberRequest = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -229,6 +202,7 @@ export const nonMemberAuthNumberRequest = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -248,7 +222,8 @@ export const nonLoginMemberAuthNumberRequest = async data => {
         return res;
 
     } catch(err) {
-        console.error(err)
+        console.error('user request ', err)
+        return err.response
     }
 }
 
@@ -277,7 +252,7 @@ export const emailEditUser = async data => {
 
     } catch(err) {
         console.error('saga error', err.response)
-        return err.response;
+        return err.response
     }
 }
   
@@ -307,6 +282,7 @@ export const passwordEditUser = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }
 
@@ -329,5 +305,6 @@ export const findUserId = async data => {
 
     } catch(err) {
         console.error(err)
+        return err.response
     }
 }

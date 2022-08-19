@@ -5,6 +5,6 @@ export const useInput = initialState => {
     const handler = useCallback(e => {
         setVal(e.target.value)
     }, [])
-    return [val, handler]
+    return [val, handler, setVal]
 };
 
