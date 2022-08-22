@@ -18,13 +18,13 @@ const __dirname = path.resolve();
 dotenv.config()
 
 
-// 회원이든 아니든 무조건 db에서 이메일찾아서 인증번호 보냄 // 한개 더 만들어야함....아래껀 가입된 이메일 걸러내는게 있네 ;;
+// 가입 + 로그인  인증번호 발송
 export const mailAuthNumber = async (req, res, next) => {
     try {
         const authCode = Math.random().toString().substring(2, 8);
         const { email } = req.body;
         const user = await User.findOne({ email: email })
-        if(!email || typeof email !== 'string') return console.error('is not email');
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: '이메일을 제대로 입력해주세요' });
         if(user) {return res.status(400).json({ message: '이미 가입된 이메일입니다.' })}
 
 
@@ -51,13 +51,13 @@ export const mailAuthNumber = async (req, res, next) => {
 
 
 
-// 가입되었지만 비번/아이디 찾는 
+// 가입 + 비로그인  인증번호 발송
 export const nonLoginAuthNumber = async (req, res, next) => {
     try {
         const authCode = Math.random().toString().substring(2, 8);
         const { name, email } = req.body;
-        if(!name || typeof name !== 'string') return console.error('is not name');
-        if(!email || typeof email !== 'string') return console.error('is not email');
+        if(!name || typeof name !== 'string') return res.status(400).json({ message: '이름이 없어요 ' });
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: '이메일이 없어요' });
 
         const user = await User.findOne({ email: email })
         if(!user || user.name !== name) {return res.status(400).json({ message: '정보가 잘못되었습니다' })}
@@ -82,6 +82,7 @@ export const nonLoginAuthNumber = async (req, res, next) => {
         
     } catch(err) {
         console.error(err)
+        res.status(400).json({ message: err.message }) 
     }
 }
 

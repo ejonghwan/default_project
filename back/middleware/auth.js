@@ -3,6 +3,7 @@ import User from '../models/users.js'
 import bcrypt from 'bcrypt'
 
 
+// 토큰 인증 미들웨어
 // client 에서 넘어온 token값 보고 인증... 
 export const auth = async (req, res, next) => {
     try {
@@ -52,13 +53,13 @@ export const auth = async (req, res, next) => {
             }
 
         } else {
-            return res.status(400).json({ err: "acc 토큰 없음. 로그인 다시 해주세요" })
+            return res.status(400).json({ message: "acc 토큰 없음. 로그인 다시 해주세요" })
         }
        
 
     } catch(err) {
         console.log(err)
-        return res.status(400).json({ err: "인증에러" })
+        return res.status(400).json({ message: "인증에러" })
     }
        
 }

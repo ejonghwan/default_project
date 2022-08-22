@@ -16,6 +16,8 @@ const __dirname = path.resolve();
 
 dotenv.config()
 
+
+// 이거 대체 어디다쓴거지 ? 
 export const mailAuth = async (req, res, next) => {
     try {
         /*
@@ -35,6 +37,7 @@ export const mailAuth = async (req, res, next) => {
             let templateName = null;
 
             console.log('user??', user)
+            // 가입이 이미 되어있으면 로그인으로, 안되어있으면 회원가입으로 
             user ? templateName = 'authSigninMail' : templateName = 'authSignupMail';
             
             ejs.renderFile(`${__dirname}/template/${templateName}.ejs`, {emailAuthToken : token}, (err, data) => {

@@ -5,23 +5,22 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { auth } from '../middleware/auth.js' ;
-import { mailAuth } from '../middleware/mailAuth.js' ;
+import { mailAuth } from '../middleware/mailAuth.js'; //이거 대체 어디쓴거지 ?
+
 import { signMailAuth } from '../middleware/signMailAuth.js';
 import { mailAuthNumber, nonLoginAuthNumber } from '../middleware/mailAuthNumber.js';
-
-
-dotenv.config();
 
 // model 
 import User from '../models/users.js';
 
 const router = express.Router();
+dotenv.config();
 
-
+// 이메일 보내는 곳
 
 
 //@ path    POST /api/auth
-//@ doc     회원가입 메일인증
+//@ doc     회원가입 시 메일인증 보냄
 //@ access  public
 router.post('/', signMailAuth, async (req, res) => {
     try {
@@ -31,13 +30,13 @@ router.post('/', signMailAuth, async (req, res) => {
        
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 
 
 //@ path    GET /api/auth/signup
-//@ doc     가입메일 요청
+//@ doc     메일 가서 유저가 가입버튼 누르면 여기로 옴
 //@ access  public
 router.get('/signup', async (req, res) => {
     try {
@@ -59,6 +58,7 @@ router.get('/signup', async (req, res) => {
        
     } catch(err) {
         console.error(err)
+        res.status(500).json({ message: err.message })
         res.redirect(`${process.env.DOMAIN}/error`)
     }
 })
@@ -96,7 +96,7 @@ router.get('/login', async (req, res) => {
 
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 
@@ -124,8 +124,8 @@ router.get('/login', async (req, res) => {
 router.post('/member/number', auth, mailAuthNumber, async (req, res) => {
     try {
         const { email, _id } = req.body;
-        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
-        if(!_id) return res.status(400).json({ err: 'is not _id' }) 
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: 'is not email' }) 
+        if(!_id) return res.status(400).json({ message: 'is not _id' }) 
        
         console.log('number api : ', req.authCode)
 
@@ -133,7 +133,7 @@ router.post('/member/number', auth, mailAuthNumber, async (req, res) => {
         res.status(200).json({ message: '인증번호를 입력해주세요.', email})
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 
@@ -144,8 +144,8 @@ router.post('/member/number', auth, mailAuthNumber, async (req, res) => {
 router.post('/nonMember/number', mailAuthNumber, async (req, res) => {
     try {
         const { email, _id } = req.body;
-        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
-        if(!_id) return res.status(400).json({ err: 'is not _id' }) 
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: 'is not email' }) 
+        if(!_id) return res.status(400).json({ message: 'is not _id' }) 
        
         console.log('number api : ', req.authCode)
 
@@ -153,7 +153,7 @@ router.post('/nonMember/number', mailAuthNumber, async (req, res) => {
         res.status(200).json({ message: '인증번호를 입력해주세요.', email})
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 
@@ -165,8 +165,8 @@ router.post('/nonLoginMember/number', nonLoginAuthNumber, async (req, res) => {
     try {
         console.log(req.body)
         const { name, email } = req.body;
-        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
-        if(!name) return res.status(400).json({ err: 'is not name' }) 
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: 'is not email' }) 
+        if(!name) return res.status(400).json({ message: 'is not name' }) 
        
         console.log('number api : ', req.authCode, req._id)
 
@@ -175,7 +175,7 @@ router.post('/nonLoginMember/number', nonLoginAuthNumber, async (req, res) => {
         res.status(200).json({ message: '인증번호를 입력해주세요.'})
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 

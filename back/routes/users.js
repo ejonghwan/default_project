@@ -3,8 +3,6 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { auth } from '../middleware/auth.js' ;
-import { mailAuth } from '../middleware/mailAuth.js' ;
-import { mailAuthNumber } from '../middleware/mailAuthNumber.js' ;
 
 // model 
 import User from '../models/users.js';
@@ -35,7 +33,7 @@ router.get('/load', auth, async (req, res) => {
             
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 
 })
@@ -51,7 +49,7 @@ router.get('/', auth, async (req, res) => {
         res.status(201).json({ user })
     } catch(err) {
         console.error(err)
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ message: err.message })
     }
 
 })
@@ -64,14 +62,14 @@ router.post('/login', async (req, res) => {
     try {
         const { id, password } = req.body;
 
-        if(!id ) return res.status(400).json({ err: 'is not id' }) 
-        if(!password) return res.status(400).json({ err: 'is not password' }) 
+        if(!id ) return res.status(400).json({ message: 'is not id' }) 
+        if(!password) return res.status(400).json({ message: 'is not password' }) 
 
         const user = await User.findOne({ id: id })
-        if(!user) return res.status(400).json({ err: "is not find user" })
+        if(!user) return res.status(400).json({ message: "is not find user" })
 
         const match = await bcrypt.compare(password, user.password);
-        if(!match) return res.status(400).json({ err: "password is not matched" })
+        if(!match) return res.status(400).json({ message: "password is not matched" })
         if(match) {
             jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
                 if(err) throw new Error(err)
@@ -93,7 +91,7 @@ router.post('/login', async (req, res) => {
 
     } catch(err) {
         console.error(err)
-        res.status(500).json({ err: err.message }) 
+        res.status(500).json({ message: err.message }) 
     }
 })
 
@@ -107,20 +105,23 @@ router.get('/logout', (req, res) => {
 
 
 
-//@ path    POST /api/users/
+//@ path    POST /api/users/signup
 //@ doc     회원가입 
 //@ access  public
-router.post('/', async (req, res) => {
+router.post('/signup', async (req, res) => {
     try {
         const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = req.body;
-        if(!id || typeof id !== 'string') return res.status(400).json({ err: 'is not id' }) 
-        if(!password ) return res.status(400).json({ err: 'is not password' }) 
-        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' }) 
-        if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
-        if(!qeustion || typeof qeustion !== 'object') return res.status(400).json({ err: 'is not qeustion' }) 
-        if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({ err: 'is not phoneNumber' }) 
-        if(!gender || typeof gender !== 'string') return res.status(400).json({ err: 'is not gender' }) 
-        if(!birthday || typeof birthday !== 'string') return res.status(400).json({ err: 'is not birthday' }) 
+        if(!id || typeof id !== 'string') return res.status(400).json({ message: 'is not id' }) 
+        if(!password ) return res.status(400).json({ message: 'is not password' }) 
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: 'is not email' }) 
+        if(!name || typeof name !== 'string') return res.status(400).json({ message: 'is not name' }) 
+        if(!qeustion || typeof qeustion !== 'object') return res.status(400).json({ message: 'is not qeustion' }) 
+        if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({ message: 'is not phoneNumber' }) 
+        if(!gender || typeof gender !== 'string') return res.status(400).json({ message: 'is not gender' }) 
+        if(!birthday || typeof birthday !== 'string') return res.status(400).json({ message: 'is not birthday' }) 
+
+        const existingUser = await User.findOne(id)
+        if(existingUser) return res.status(400).json({ err: '유저가 이미 존재합니다' }) 
 
         const user = await new User(req.body, { token: null })
 
@@ -144,7 +145,7 @@ router.post('/', async (req, res) => {
 
     } catch(err) {
         console.error(err)
-        res.status(500).json({ err: err.message }) 
+        res.status(500).json({ message: err.message }) 
     }
 })
 
@@ -155,15 +156,15 @@ router.post('/', async (req, res) => {
 router.patch('/edit/name', auth, async(req, res) => {
     try {
         const { name, _id } = req.body;
-        if(!name || typeof name !== 'string') return res.status(400).json({ err: 'is not name' }) 
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' }) 
+        if(!name || typeof name !== 'string') return res.status(400).json({ message: 'is not name' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ message: 'is not id' }) 
 
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {name: name} }, { new: true })
         res.status(201).json(user.name)
 
     } catch(err) {
         console.error(err)
-        res.status(500).json({ err: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 
@@ -175,9 +176,9 @@ router.patch('/edit/email', auth, async(req, res) => {
     try {
         const getAuthCode = req.cookies["authCode"];
         const { email, _id, authNumber } = req.body;
-        if(!email || typeof email !== 'string') return res.status(400).json({ err: 'is not email' });
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not id' });
-        if(!authNumber) return res.status(400).json({ err: 'is not authNumber' });
+        if(!email || typeof email !== 'string') return res.status(400).json({ message: 'is not email' });
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ message: 'is not id' });
+        if(!authNumber) return res.status(400).json({ message: 'is not authNumber' });
 
         // 3분토큰 만료인지 체크 
         if(!getAuthCode) return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' });
@@ -208,16 +209,16 @@ router.post('/edit/password', auth, async (req, res) => {
     try {
         const { _id, prevPassword, newPassword, newPasswordCheck } = req.body;
         console.log('back body: ', req.body)
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ err: 'is not _id' }) 
-        if(!prevPassword && typeof prevPassword !== 'string') return res.status(400).json({ err: 'is not prev password' }) 
-        if(!newPassword && typeof newPassword !== 'string') return res.status(400).json({ err: 'is not checked password' }) 
-        if(newPassword !== newPasswordCheck) return res.status(400).json({ err: 'not password matched' })
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ message: 'is not _id' }) 
+        if(!prevPassword && typeof prevPassword !== 'string') return res.status(400).json({ message: 'is not prev password' }) 
+        if(!newPassword && typeof newPassword !== 'string') return res.status(400).json({ message: 'is not checked password' }) 
+        if(newPassword !== newPasswordCheck) return res.status(400).json({ message: 'not password matched' })
 
         const user = await User.findById(_id)
         const matched = await bcrypt.compare(prevPassword, user.password)
 
-        if(!user) return res.status(400).json({ err: 'is not user' })
-        if(!matched) return res.status(400).json({ err: '이전 비번 확인해주세요' })
+        if(!user) return res.status(400).json({ message: 'is not user' })
+        if(!matched) return res.status(400).json({ message: '이전 비번 확인해주세요' })
 
         if(matched) {
             console.log('back 비번 매칭성공')
@@ -232,7 +233,7 @@ router.post('/edit/password', auth, async (req, res) => {
         }
     } catch(err) {
         console.error(err)
-        res.status(500).json({ err: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 
@@ -255,8 +256,8 @@ router.post('/find/id', async (req, res) => {
         const get_id = req.cookies["_id"];
         const { authNumber } = req.body;
 
-        if(!mongoose.isValidObjectId(get_id)) return res.status(400).json({ err: 'id type check' });
-        if(!authNumber) return res.status(400).json({ err: 'is not authNumber' });
+        if(!mongoose.isValidObjectId(get_id)) return res.status(400).json({ message: 'id type check' });
+        if(!authNumber) return res.status(400).json({ message: 'is not authNumber' });
 
         // 3분토큰 만료인지 체크 
         if(!getAuthCode) return res.status(500).json({ message: '인증시간 만료. 다시 인증번호 발급받아주세요' });
@@ -273,7 +274,7 @@ router.post('/find/id', async (req, res) => {
 
     } catch(err) {
         console.error(err)
-        res.status(500).json({ err: err.message })
+        res.status(500).json({ message: err.message })
     }
 })
 

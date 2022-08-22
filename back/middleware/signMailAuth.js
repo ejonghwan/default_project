@@ -21,14 +21,8 @@ const __dirname = path.resolve();
 
 dotenv.config()
 
-// 내일할거
-// 1. 인증완료에 토큰 1시간 준거 만료 로직 [O] 
 
-// 2. mailAuth를 로그인/회원가입  or  아이디찾기 비번찾기에 사용되는 메일인증이랑 분리
-// 3. 비번찾기  (질답, 이메일인증)
-// 4. 아이디 찾기 (개인정보, 이메일인증)
-// 5. 이메일 수정에  이메일 인증넣기
-
+// 회원가입 메일발송
 export const signMailAuth = async (req, res, next) => {
     try {
         /*
@@ -39,6 +33,7 @@ export const signMailAuth = async (req, res, next) => {
         const { email } = req.body;
         const user = await User.findOne({ email: email })
         if(!email || typeof email !== 'string') return console.error('is not email');
+        if(user) return res.status(400).json({ message: '동일한 메일이 이미 존재합니다' }) 
 
 
         await jwt.sign({ email: email }, process.env.JWT_KEY, { expiresIn: "1h" }, (err, token) => {
@@ -61,6 +56,7 @@ export const signMailAuth = async (req, res, next) => {
         
     } catch(err) {
         console.error(err)
+        res.status(400).json({ message: err.message }) 
     }
 }
 

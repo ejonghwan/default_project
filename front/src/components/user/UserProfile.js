@@ -66,10 +66,10 @@ const UserProfile = () => {
             const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id })
             setEditEmailAuthState(true)
             // 타이머
-            timer(180, 180, count => {
-                if(count === 0) return setTimerNumber(null)
-                setTimerNumber(count)
-            })
+            // timer(180, 180, count => {
+            //     if(count === 0) return setTimerNumber(null)
+            //     setTimerNumber(count)
+            // })
         } catch(err) {
             console.error(err)
         }

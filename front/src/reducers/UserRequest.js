@@ -21,7 +21,7 @@ export const emailAuth = async data => {
             withCredentials: true,
         }
         const res = await axios.post(`${host}/api/auth`, data, config);
-        return res.data;
+        return res;
      
     } catch(err) {
         console.error(err)
@@ -49,7 +49,7 @@ export const signupUser = async data => {
             withCredentials: true,
         }
 
-        const user = await axios.post(`${host}/api/users`, data, config)
+        const user = await axios.post(`${host}/api/users/signup`, data, config)
         return user;
 
     } catch(err) {

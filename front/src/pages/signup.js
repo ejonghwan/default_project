@@ -64,7 +64,7 @@ const Signup = () => {
 
     
     const questionData = [
-        { questionType: 0, question: '질문1' },
+        { questionType: 0, question: '질문을 선택해주세요' },
         { questionType: 1, question: '질문2' },
         { questionType: 2, question: '질문3' },
         { questionType: 3, question: '질문4' },
@@ -134,6 +134,7 @@ const Signup = () => {
 
     return (
         // id, password, email, name
+        // 이메일은 먼저 인증하고 시작함(임시로 홈에있음)
         <div>
             <form onSubmit={handleSubmit}>
                 <div>
@@ -280,7 +281,7 @@ const Signup = () => {
                         }
                     </select>
                
-                     <Label htmlFor="result" content="답" classN="label_t1"/>
+                    <Label htmlFor="result" content="답" classN="label_t1"/>
                     <Input 
                         id="result" 
                         type="text" 

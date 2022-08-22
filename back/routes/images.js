@@ -50,7 +50,7 @@ router.post('/', upload.single("image"), async (req, res) => {
     try {
         //post로 이미지를 보낼때 이미 req에 저장이 되어있음. upload(미들웨어)를 이용해서 저장된 이미지 가져옴 
         // postman  body -> form-data -> key에 위에 미들웨어와 동일한 키값 image넣음
-        if(!req.file) return res.status(400).json({ err: 'is not file' })
+        if(!req.file) return res.status(400).json({ message: 'is not file' })
         
         const image = await new ImageModel({
             key: req.file.filename, 
@@ -62,7 +62,7 @@ router.post('/', upload.single("image"), async (req, res) => {
         res.json(req.file);
 
     } catch(err) {
-        res.status(400).json({ err: err.message })
+        res.status(400).json({ message: err.message })
     }
 })
 

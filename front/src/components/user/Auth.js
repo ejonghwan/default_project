@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useEffect, Fragment, useContext } from 'react';
+import React, { useState, useCallback, useEffect, Fragment, useContext, useMemo } from 'react';
+import _debounce from 'lodash.debounce'
+
 
 // module
 import { useInput } from '../common/hooks/index.js'
@@ -6,6 +8,7 @@ import { useInput } from '../common/hooks/index.js'
 // components
 import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
+import Timer from '../../components/common/utils/Timer.js'
 
 // context
 import { UserContext } from '../../context/UserContext.js'
@@ -18,26 +21,42 @@ const Auth = () => {
     const [email, handleEmail] = useInput('');
     const [authData, setAuthData] = useState(null);
     const {state, dispatch} = useContext(UserContext);
+
+    const [authState, setAuthState] = useState(false);
+    const [message, setMessage] = useState('');
     
 
-    const handleSubmit = useCallback( async e => {
+    const handleAuthMailSubmit = e => {
+        e.preventDefault();
+        authMail();
+    }
+
+    // 0822 여기하다가 감
+    
+    const authMail = useMemo(() => _debounce(async e => {
         try {
-            e.preventDefault();
             await dispatch({ type: "LOADING", loadingMessage: "인증메일 보내는 중.." })
-            const data = await emailAuth({ email: email })
-            setAuthData(data)
-            console.log('aa', authData)
+            const res = await emailAuth({ email: email })
+            setAuthData(res.data)
+            console.log('홈어스 resdata:', res)
+            setMessage(res.data.message)
         } catch(err) {
             console.error(err)
         }
-    }, [email])
+    }, 500), [email])
 
+
+    useEffect(() => {
+        return () => {
+            authMail.cancel();
+        }
+    }, [email])
 
 
     return (
         <Fragment>
             {!authData ? (
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleAuthMailSubmit}>
                 <div>
                     <Label htmlFor="email" content="email" classN="label_t1"/>
                     <Input  
@@ -57,10 +76,18 @@ const Auth = () => {
             </form>
             ) : (
             <div>
-                {`${authData.email}로 ${authData.message} `}
+                {`${authData.email}로 ${authData.message} `}<br />
+                메일로 가서 회원가입을 완료해주세요
+                {authState && <Timer  
+                    endSecond={180} 
+                    startingPoint={180} 
+                    countingName={''} 
+                    endMessage={'인증시간이 만료되었습니다'}
+                    callback={() => console.log('timer end')}
+                />}
             </div>
         )}
-             
+             {message && message}
         </Fragment>
     )
 }

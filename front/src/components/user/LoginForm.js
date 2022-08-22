@@ -43,16 +43,16 @@ const LoginForm = () => {
 
             
            setTotalLoingTime(10)
-           timer(7200, 600, async (count) => {
-                setTimeRemaining(count)
+        //    timer(7200, 600, async (count) => {
+        //         setTimeRemaining(count)
                 
-                if(count === 0) {
-                    console.log('로그아웃됨')
-                    await logoutUser()
-                    dispatch({ type: "USER_LOGOUT_SUCCESS" })
-                }
-                console.log('count', count)
-            })
+        //         if(count === 0) {
+        //             console.log('로그아웃됨')
+        //             await logoutUser()
+        //             dispatch({ type: "USER_LOGOUT_SUCCESS" })
+        //         }
+        //         console.log('count', count)
+        //     })
         } catch(err) {
             console.error(err)
             dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })

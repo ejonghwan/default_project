@@ -3,60 +3,78 @@ import axios from 'axios';
 import _debounce from 'lodash.debounce'
 
 
-
-export const axiosModule = ({ method, URI, data, config }) => {
-    return axios[method](`http://localhost:5000${URI}`, data, config,);    
-}
-
-
+/** 
+ * 딜레이 함수
+ * @param {number} endSecond - 몇초 지연 후 실행할건지
+ * @param {function} cb - 콜백함수()
+ * @returns {undefined} 
+ */
 export const delay = (endSecond, cb) => {
     if(!endSecond || !cb) return console.error('인수 모두 채워주세요');
-    if(typeof endSecond !== 'number' || typeof cb !== 'function' ) {
-        console.error('인수 타입체크해주세요')
-    }
+    if(typeof endSecond !== 'number' || typeof cb !== 'function' ) {console.error('인수 타입체크해주세요')}
     setTimeout(() => {
         cb()
     }, endSecond * 1000)
 
 }
 
-export const timer = (endSecond, startingPoint, cb) => {
+
+
+/** 
+ * 타이머 함수
+ * @param {number} endSecond - 끝나는 시간
+ * @param {number} startingPoint - 카운팅 시작하는 시간
+ * @param {function} cb - 콜백함수(카운트)
+ * @param {undefined} initialVariable - 인터벌 저장할 변수
+ * @returns {undefined} 
+ */
+export const timer = (endSecond, startingPoint, cb, initialVariable) => {
     if(!endSecond || !startingPoint || !cb ) return console.error('인수 모두 채워주세요');
     if(typeof endSecond !== 'number' || typeof startingPoint !== 'number' || typeof cb !== 'function' ) return console.error('인수 타입체크해주세요')
 
     const countPoint = endSecond - startingPoint //startingPoint = 몇초가 지났을때
- 
+
     setTimeout(() => {
         let down = startingPoint;
-        let time = setInterval(() => {
+        initialVariable = setInterval(() => {
             down -= 1
-            
             cb(down)
-            if(down <= 0) { clearInterval(time) }
-        }, 1000)
-    }, countPoint * 1000)
-}
-
-// ?????????????? 타이머는 왜 없고 얘는 있음?
-export const bb = (endSecond, startingPoint, cb) => {
-    console.log(this, 11)
-    if(!endSecond || !startingPoint || !cb ) return console.error('인수 모두 채워주세요');
-    if(typeof endSecond !== 'number' || typeof startingPoint !== 'number' || typeof cb !== 'function' ) return console.error('인수 타입체크해주세요')
-
-    const countPoint = endSecond - startingPoint //startingPoint = 몇초가 지났을때
- 
-    setTimeout(() => {
-        let down = startingPoint;
-        let time = setInterval(() => {
-            down -= 1
-            
-            cb(down)
-            if(down <= 0) { clearInterval(time) }
+            if(typeof down !== 'number') return console.error('타이머 타입체크')
+            if(down <= 0) { clearInterval(initialVariable); }
         }, 1000)
     }, countPoint * 1000)
 }
 
 
+
+/** 
+ * 초 단위로 계산해서 day hour minute second 으로 리턴
+ * @param {number} totalNumber - 총 시간(초)
+ * @param {string} viewTime - case: day, hour, minute, second
+ * @returns {string} 일 시간 분 초 
+ */
+export const changeDate = (totalNumber, viewTime) => {
+    if(typeof totalNumber !== 'number') return console.error('넘버로 넣어줭')
+    let day = Math.floor(Math.floor(Math.floor(totalNumber / 60) / 60) / 24);
+    let hour = Math.floor(Math.floor(totalNumber / 60) / 60) % 24;
+    let minute = Math.floor(totalNumber / 60) % 60
+    let second = totalNumber % 60
+
+    switch(viewTime) {
+        case 'day': return `${day}일 ${hour}시간 ${minute}분 ${second}초`
+        case 'hour': return `${hour}시간 ${minute}분 ${second}초`
+        case 'minute': return `${minute}분 ${second}초`
+        case 'second': return `${second}초`
+        default: return `${day}일 ${hour}시간 ${minute}분 ${second}초`
+    }
+}
+
+
+
+/** 
+ * 현재 시간 반환
+ * @returns {string} 년 월 일 시간 분 초 
+ */
 export const initTime = () => {
     const sampleTimestamp = Date.now();
      // const millis = Math.floor((Date.now() - start) / 1000); //경과시간
@@ -72,6 +90,8 @@ export const initTime = () => {
     const returnDate = year + "." + month + "." + day + ". " + hour + ":" + minute + ":" + second;
     return returnDate;
 }
+
+
 
 
 
