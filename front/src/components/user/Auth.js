@@ -31,7 +31,6 @@ const Auth = () => {
         authMail();
     }
 
-    // 0822 여기하다가 감
     
     const authMail = useMemo(() => _debounce(async e => {
         try {
@@ -76,8 +75,7 @@ const Auth = () => {
             </form>
             ) : (
             <div>
-                {`${authData.email}로 ${authData.message} `}<br />
-                메일로 가서 회원가입을 완료해주세요
+                {authData.email && (<span>{authData.email}</span>)} <span>{message}</span><br />
                 {authState && <Timer  
                     endSecond={180} 
                     startingPoint={180} 
@@ -87,7 +85,6 @@ const Auth = () => {
                 />}
             </div>
         )}
-             {message && message}
         </Fragment>
     )
 }

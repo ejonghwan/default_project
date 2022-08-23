@@ -93,10 +93,17 @@ export const initTime = () => {
 
 
 
-
-
-
-
+ /**
+     * 상태 코드 첫 숫자 확인하는 함수
+     * @param {Number} statusCode - 성공한 상태코드
+     * @param {Number} matched - 비교할 넘버. 상태코드 첫숫자만 
+     * @returns {boolean} - 비교 후 불리언 값 반환
+     */
+  export const statusCode = (statusCode, matched) => {
+    const code = (statusCode).toString();
+    const matchedNumber = (matched).toString();
+    return code[0] === matchedNumber ? true : false
+}
 
 
 

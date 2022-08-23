@@ -1,5 +1,9 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import _debounce from 'lodash.debounce';
+import Cookies from 'universal-cookie';
+ 
+
 
 // module
 import { useInput, useInputRadio } from '../components/common/hooks/index.js'
@@ -7,12 +11,15 @@ import { useInput, useInputRadio } from '../components/common/hooks/index.js'
 // components
 import Input from '../components/common/form/Input.js'
 import Label from '../components/common/form/Label.js'
-import LoginForm from '../components/user/LoginForm.js'
 import axios from 'axios';
 
 // context & request 
 import { signupUser } from '../reducers/UserRequest.js'
 import { UserContext } from '../context/UserContext.js'
+
+
+//util
+import { getCookie, deleteCookie } from '../utils/utils.js'
 
 
 // 회원가입 시 메일인증
@@ -42,6 +49,9 @@ import { UserContext } from '../context/UserContext.js'
 
 
 const Signup = () => {
+    
+    const cookies = new Cookies();
+    const successRoot = cookies.get('signup')
 
     const [userId, handleUserId] = useInput('') 
     const [userPassword, handlePassword] = useInput('') 
@@ -61,7 +71,6 @@ const Signup = () => {
 
     const [searchParams] = useSearchParams();
     const email = decodeURIComponent(searchParams.get('email'));
-
     
     const questionData = [
         { questionType: 0, question: '질문을 선택해주세요' },
@@ -74,6 +83,8 @@ const Signup = () => {
         { questionType: 7, question: '질문8' },
         { questionType: 8, question: '질문9' },
     ]
+
+    const navigate = useNavigate();
 
     const handleTerms = useCallback(e => {
         // setTerms({
@@ -89,11 +100,13 @@ const Signup = () => {
     }, [qeustionType, setQeustionType])
 
     
-  
     // 요청
-    const handleSubmit = useCallback(async e => {
+    const handleSubmit = e => {
+        e.preventDefault();
+        signup();
+    }
+    const signup = useMemo(() => _debounce(async() => {
         try {   
-            e.preventDefault();
             if(!userId && !userPassword && !userName && !passwordIsChecked && !terms && !qeustionType && !result && !phoneNumber && !gender && !birthday) return;
 
             await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
@@ -110,6 +123,10 @@ const Signup = () => {
             });
             dispatch({ type: "USER_SIGNUP_SUCCESS" })
             
+            if(user.status === 200) {
+                alert(user.data.message)
+                navigate('/')
+            }
             // 비밀번호 강화 로직 아직안함
 
 
@@ -117,16 +134,24 @@ const Signup = () => {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
             console.error(err)
         }
-    }, [userId, userPassword, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
+    }, 500), [userId, userPassword, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
+
+
+    useEffect(() => {
+        if(!successRoot) {
+            alert('잘못된 접근입니다. 다시 인증해주세요')
+            navigate('/')
+        }
+        cookies.remove('signup')
+    }, [])
 
 
     useEffect(() => {
         userPassword === userPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
     }, [userPasswordCheck])
 
-
     useEffect(() => {
-        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result &&phoneNumber && gender && birthday) setSubmitActive(true);
+        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result && phoneNumber && gender && birthday) setSubmitActive(true);
     }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday])
 
 
@@ -307,11 +332,7 @@ const Signup = () => {
                 </div>
                 <button type="submit" className={submitActive ? 'checked' : 'none'} disabled={submitActive ? false : true}>회원가입</button>
             </form>
-            <br />
-            <br />
-            <br />
-            test
-            <LoginForm />
+          
         </div>
     );
 };

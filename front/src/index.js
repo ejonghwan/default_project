@@ -13,7 +13,6 @@ import RoutesPage from './pages/index.js'
 
 
 
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
@@ -21,12 +20,12 @@ root.render(
   // </React.StrictMode>
 
   <BrowserRouter>
-    <ToastContainer />
-      <UserProvider>
-        <ImageProvider>
-         <App />
-        </ImageProvider>
-      </UserProvider>
+      <ToastContainer />
+        <UserProvider>
+          <ImageProvider>
+          <App />
+          </ImageProvider>
+        </UserProvider>
   </BrowserRouter>
 );
 

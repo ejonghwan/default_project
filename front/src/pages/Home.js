@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 // components
 import ImageUploadForm from '../components/image/ImageUploadForm.js'
 import Auth from '../components/user/Auth.js'
-
+import LoginForm from '../components/user/LoginForm.js'
 
 const Home = () => {
 
@@ -16,6 +16,10 @@ const Home = () => {
             <br />
             <ImageUploadForm />
             <Auth />
+            <br />
+            <br />
+            <br />
+            <LoginForm />
         </div>
     );
 };

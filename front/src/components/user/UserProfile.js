@@ -1,49 +1,50 @@
-import React, { Fragment, useState, useEffect, useCallback, useContext } from 'react';
+import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import _debounce from 'lodash.debounce';
 
 // module
-import { useInput } from '../common/hooks/index.js'
-import { timer, debounce, useDebounce } from '../../utils/utils.js'
+import { useInput } from '../common/hooks/index.js';
 
 // components
-import Input from '../common/form/Input.js'
-import Label from '../common/form/Label.js'
+import Input from '../common/form/Input.js';
+import Label from '../common/form/Label.js';
 
-// components
-// import LoginForm from '../components/user/LoginForm.js'
 
 // context & request 
-import  { nmaeEditUser, emailEditUser, memberAuthNumberRequest } from '../../reducers/UserRequest.js'
-import { UserContext } from '../../context/UserContext.js'
+import  { nmaeEditUser, emailEditUser, memberAuthNumberRequest } from '../../reducers/UserRequest.js';
+import { UserContext } from '../../context/UserContext.js';
+
 
 
 const UserProfile = () => {
-
-    const [editNameState, setEditNameState] = useState(false)
-    const [editEmailState, setEditEmailState] = useState(false)
-    const [editEmailAuthState, setEditEmailAuthState] = useState(false)
+    const [editNameState, setEditNameState] = useState(false);
+    const [editEmailState, setEditEmailState] = useState(false);
+    const [editEmailAuthState, setEditEmailAuthState] = useState(false);
     // const [submitActive, setSubmitActive] = useState(false);
     
-    const [userName, handleUserName] = useInput('') 
-    const [userEmail, handleUserEmail] = useInput('')
-    const [authNumber, handleAuthNumber] = useInput('')
+    const [userName, handleUserName] = useInput('') ;
+    const [userEmail, handleUserEmail] = useInput('');
+    const [authNumber, handleAuthNumber] = useInput('');
     
-    const {state, dispatch} = useContext(UserContext)
-    const [timerNumber, setTimerNumber] = useState(180)
+    const {state, dispatch} = useContext(UserContext);
+    const [timerNumber, setTimerNumber] = useState(180);
 
 
     const handleToggle = useCallback(e => {
         console.log(e.target.name)
         const { name } = e.target;
-        if(name === "name") return setEditNameState(!editNameState)
-        if(name === "email") return setEditEmailState(!editEmailState)
-        if(name === "emailAuth") return setEditEmailAuthState(!editEmailAuthState)
-    }, [editNameState, editEmailState, editEmailAuthState, setEditNameState, setEditEmailState, setEditEmailAuthState])
+        if(name === "name") return setEditNameState(!editNameState);
+        if(name === "email") return setEditEmailState(!editEmailState);
+        if(name === "emailAuth") return setEditEmailAuthState(!editEmailAuthState);
+    }, [editNameState, editEmailState, editEmailAuthState, setEditNameState, setEditEmailState, setEditEmailAuthState]);
 
 
-    // 이메일 수정 
-    const handleEmailEdit = useCallback( async e => {
+    // 이메일 수정 요청  
+    const handleEmailEdit = e => {
+        e.preventDefault();
+        emailEdit();
+    }
+    const emailEdit = useMemo(() => _debounce(async () => {
         try {
-            e.preventDefault();
             const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
             // 실패시
             if(res.status === 400) return dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: res.data.message })
@@ -55,25 +56,26 @@ const UserProfile = () => {
             console.log('catch res', err)
             console.error(err)
         }
-    }, [userEmail, authNumber])
+    },500), [userEmail, authNumber])
+    // 이메일 수정 요청  
 
+
+    const handleEmailAuth = e => {
+        e.preventDefault();
+        emailAuth()
+    } 
 
     // 이메일 수정 인증번호 요청 debounce
-    const handleEmailAuth = useCallback(async e => {
-        e.preventDefault();
+    const emailAuth = useMemo(() => _debounce(async e => {
         try {
             console.log(e)
             const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id })
             setEditEmailAuthState(true)
-            // 타이머
-            // timer(180, 180, count => {
-            //     if(count === 0) return setTimerNumber(null)
-            //     setTimerNumber(count)
-            // })
+           
         } catch(err) {
             console.error(err)
         }
-    }, [userEmail, timerNumber])
+    }, 500), [userEmail, timerNumber])
 
     
     // 이름 수정 요청
@@ -110,6 +112,7 @@ const UserProfile = () => {
                             value={userEmail} 
                             evt="onChange" 
                             onChange={handleUserEmail} 
+                            disabled={!editEmailState}
                         />
                         {!editEmailAuthState && timerNumber ? (
                              <button name="email">{timerNumber && timerNumber ? ("인증번호 보내기") : ("인증번호 다시 보내기")}</button>
@@ -120,7 +123,7 @@ const UserProfile = () => {
                     </form>
 
                     {/* 인증 메일 보냈을 시 */}
-                    {editEmailAuthState ? (
+                    {editEmailAuthState && (
                             <form onSubmit={handleEmailEdit}>
                                 <Label htmlFor="authNumber" content="인증번호 입력" classN="label_t1"/>
                                 <Input 
@@ -140,8 +143,6 @@ const UserProfile = () => {
                                 <br />
                                 {timerNumber && timerNumber ? (<p>{timerNumber}초 남음</p>) : (<p>인증시간이 만료되었습니다.</p>)}
                             </form>
-                        ) : (
-                            <div>asd</div>
                         )}
                    </Fragment>
                 ) : (

@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
                         delete user._doc.question;
 
                         res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
-                        res.status(201).json({ accToken, ...user._doc });
+                        res.status(200).json({ accToken, ...user._doc });
                     })
                 })
             });
@@ -120,7 +120,7 @@ router.post('/signup', async (req, res) => {
         if(!gender || typeof gender !== 'string') return res.status(400).json({ message: 'is not gender' }) 
         if(!birthday || typeof birthday !== 'string') return res.status(400).json({ message: 'is not birthday' }) 
 
-        const existingUser = await User.findOne(id)
+        const existingUser = await User.findOne({id: id})
         if(existingUser) return res.status(400).json({ err: '유저가 이미 존재합니다' }) 
 
         const user = await new User(req.body, { token: null })
@@ -134,9 +134,7 @@ router.post('/signup', async (req, res) => {
                 jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" }, (err, reftoken) => {
                     user.token = reftoken
                     user.save().then(user => {
-                        res.status(201).json({ 
-                            message: '회원가입성공'
-                        }) 
+                        res.status(200).json({message: '회원가입 성공'})
                     })
                 });
 

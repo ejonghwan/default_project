@@ -1,4 +1,5 @@
 export const UserIntialState = {
+    isLogged: false,
     error: '',
     loading: '',
     user: {},
@@ -18,10 +19,11 @@ const UserReducer = (state = UserIntialState, action) => {
                 error: '',
                 loading: '',
             }
+
             case "USER_SIGNUP_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data
+                error: action.data,
             }
 
 
@@ -30,11 +32,13 @@ const UserReducer = (state = UserIntialState, action) => {
                 error: '',
                 loading: '',
                 user: action.data,
+                isLogged: true,
             }
             case "USER_LOAD_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data
+                error: action.data,
+                isLogged: false,
             }
 
 
@@ -43,11 +47,13 @@ const UserReducer = (state = UserIntialState, action) => {
                 error: '',
                 loading: '',
                 user: action.data,
+                isLogged: true,
             }
             case "USER_LOGIN_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data
+                isLogged: false,
+                error: action.data,
             }
 
 
@@ -55,6 +61,7 @@ const UserReducer = (state = UserIntialState, action) => {
                 ...state, 
                 loading: '',
                 user: {},
+                isLogged: false,
             }
 
 
@@ -70,7 +77,7 @@ const UserReducer = (state = UserIntialState, action) => {
             case "USER_NAME_EDIT_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data
+                error: action.data,
             }
 
 
@@ -86,7 +93,7 @@ const UserReducer = (state = UserIntialState, action) => {
             case "USER_MAIL_EDIT_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data
+                error: action.data,
             }
           
 
@@ -98,7 +105,7 @@ const UserReducer = (state = UserIntialState, action) => {
             case "USER_PASSWORD_EDIT_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data
+                error: action.data,
             }
 
             
