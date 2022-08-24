@@ -22,7 +22,7 @@ const UserProfile = () => {
     // const [submitActive, setSubmitActive] = useState(false);
     
     const [userName, handleUserName] = useInput('') ;
-    const [userEmail, handleUserEmail] = useInput('');
+    const [userEmail, handleUserEmail, setUserEmail] = useInput('');
     const [authNumber, handleAuthNumber] = useInput('');
     
     const {state, dispatch} = useContext(UserContext);
@@ -33,9 +33,13 @@ const UserProfile = () => {
         console.log(e.target.name)
         const { name } = e.target;
         if(name === "name") return setEditNameState(!editNameState);
-        if(name === "email") return setEditEmailState(!editEmailState);
-        if(name === "emailAuth") return setEditEmailAuthState(!editEmailAuthState);
-    }, [editNameState, editEmailState, editEmailAuthState, setEditNameState, setEditEmailState, setEditEmailAuthState]);
+        if(name === "email") {setEditEmailState(!editEmailState);};
+        if(name === "emailAuth") {
+            setEditEmailAuthState(!editEmailAuthState)
+            setEditEmailState(!editEmailState);
+            setUserEmail('')
+        };
+    }, [editNameState, editEmailState, editEmailAuthState]);
 
 
     // 이메일 수정 요청  
@@ -98,59 +102,64 @@ const UserProfile = () => {
             <div>프로필</div>
             <ul>
             <li>
-                { editEmailState ? (
+                {editEmailState ? (
                     <Fragment>
-                    <form onSubmit={handleEmailAuth}>
-                        <Label htmlFor="userEmail" content="이메일 수정중" classN="label_t1"/>
-                        <Input 
-                            id="userEmail" 
-                            type="email" 
-                            required={true} 
-                            placeholder={state.user.email}
-                            classN="input_text_t1" 
-                            name="userEmail" 
-                            value={userEmail} 
-                            evt="onChange" 
-                            onChange={handleUserEmail} 
-                            disabled={!editEmailState}
-                        />
-                        {!editEmailAuthState && timerNumber ? (
-                             <button name="email">{timerNumber && timerNumber ? ("인증번호 보내기") : ("인증번호 다시 보내기")}</button>
-                        ): (
-                            <div>asd</div>
-                        )}
-                        <button type="button" name="email" onClick={handleToggle}>취소</button>
-                    </form>
+                        <form onSubmit={handleEmailAuth}>
+                            <Label htmlFor="userEmail" content="이메일 수정중" classN="label_t1"/>
+                            <Input 
+                                id="userEmail" 
+                                type="email" 
+                                required={true} 
+                                placeholder={state.user.email}
+                                classN="input_text_t1" 
+                                name="userEmail" 
+                                value={userEmail} 
+                                evt="onChange" 
+                                onChange={handleUserEmail} 
+                                disabled={editEmailAuthState && true}
+                            />
+                            {!editEmailAuthState ? (
+                                <Fragment>
+                                   <button name="email">이메일 인증하기</button>
+                                   <button type="button" name="email" onClick={handleToggle}>취소</button>
+                                 </Fragment>
+                            ) : (
+                                <Fragment>
+                                  <div>메일로 인증번호가 발송되었습니다</div>
+                                    <button type="button" name="emailAuth" onClick={handleToggle}>취소</button>
+                                </Fragment>
+                            )}
+                        </form>
 
-                    {/* 인증 메일 보냈을 시 */}
-                    {editEmailAuthState && (
-                            <form onSubmit={handleEmailEdit}>
-                                <Label htmlFor="authNumber" content="인증번호 입력" classN="label_t1"/>
-                                <Input 
-                                    id="authNumber" 
-                                    type="text" 
-                                    required={true} 
-                                    placeholder="인증번호 입력"
-                                    classN="input_text_t1" 
-                                    name="authNumber" 
-                                    value={authNumber} 
-                                    evt="onChange" 
-                                    onChange={handleAuthNumber} 
-                                    disabled={timerNumber ? false : true}
-                                />
-                                <button>확인</button>
-                                {state.error && <p>{state.error}</p>}
-                                <br />
-                                {timerNumber && timerNumber ? (<p>{timerNumber}초 남음</p>) : (<p>인증시간이 만료되었습니다.</p>)}
-                            </form>
-                        )}
-                   </Fragment>
-                ) : (
-                    <Fragment>
-                        이메일: {state.user.email} 
-                        <button type="button" name="email" onClick={handleToggle}>수정</button>
-                    </Fragment>
-                ) }
+                        {/* 인증 메일 보냈을 시 */}
+                        {editEmailAuthState && (
+                                <form onSubmit={handleEmailEdit}>
+                                    <Label htmlFor="authNumber" content="인증번호 입력" classN="label_t1"/>
+                                    <Input 
+                                        id="authNumber" 
+                                        type="text" 
+                                        required={true} 
+                                        placeholder="인증번호 입력"
+                                        classN="input_text_t1" 
+                                        name="authNumber" 
+                                        value={authNumber} 
+                                        evt="onChange" 
+                                        onChange={handleAuthNumber} 
+                                        disabled={timerNumber ? false : true}
+                                    />
+                                    <button>확인</button>
+                                    {state.error && <p>{state.error}</p>}
+                                    <br />
+                                    {timerNumber && timerNumber ? (<p>{timerNumber}초 남음</p>) : (<p>인증시간이 만료되었습니다.</p>)}
+                                </form>
+                            )}
+                       </Fragment>
+                    ) : (
+                        <Fragment>
+                            이메일: {state.user.email} 
+                            <button type="button" name="email" onClick={handleToggle}>수정</button>
+                        </Fragment>
+                    ) }
                 </li>
                 <li>
                     아이디: {state.user.id}
