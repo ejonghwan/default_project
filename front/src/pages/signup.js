@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation, createBrowserHistory } from 'react-router-dom';
 import _debounce from 'lodash.debounce';
 import Cookies from 'universal-cookie';
  
@@ -11,16 +11,10 @@ import { useInput, useInputRadio } from '../components/common/hooks/index.js'
 // components
 import Input from '../components/common/form/Input.js'
 import Label from '../components/common/form/Label.js'
-import axios from 'axios';
 
 // context & request 
 import { signupUser } from '../reducers/UserRequest.js'
 import { UserContext } from '../context/UserContext.js'
-
-
-//util
-import { getCookie, deleteCookie } from '../utils/utils.js'
-
 
 // 회원가입 시 메일인증
 // https://lakelouise.tistory.com/240
@@ -70,6 +64,9 @@ const Signup = () => {
     const { state, dispatch } = useContext(UserContext)
 
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const email = decodeURIComponent(searchParams.get('email'));
     
     const questionData = [
@@ -84,7 +81,7 @@ const Signup = () => {
         { questionType: 8, question: '질문9' },
     ]
 
-    const navigate = useNavigate();
+    
 
     const handleTerms = useCallback(e => {
         // setTerms({
@@ -140,7 +137,7 @@ const Signup = () => {
     useEffect(() => {
         if(!successRoot) {
             alert('잘못된 접근입니다. 다시 인증해주세요')
-            navigate('/')
+            navigate(-1)
         }
         cookies.remove('signup')
     }, [])

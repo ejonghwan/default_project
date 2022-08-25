@@ -242,6 +242,38 @@ router.post('/edit/password', auth, async (req, res) => {
 })
 
 
+
+//@ path    POST /api/users/find/password
+//@ doc     패스워드 찾기
+//@ access  private
+router.post('/find/password', async (req, res) => {
+    try {
+        const { _id, newPassword, newPasswordCheck } = req.body;
+        console.log('back body: ', req.body)
+        if(!_id && typeof _id !== 'string') return res.status(400).json({ message: 'is not _id' }) 
+        if(!newPassword && typeof newPassword !== 'string') return res.status(400).json({ message: 'is not checked password' }) 
+        if(newPassword !== newPasswordCheck) return res.status(400).json({ message: 'not password matched' })
+
+        const user = await User.findOne({id: _id})
+
+        if(!user) return res.status(400).json({ message: 'is not user' })
+
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(newPassword, salt, (err, hash) => {
+                console.log('back hashed', hash)
+                user.password = hash;
+                user.save();
+                res.status(201).json({ message: '비번 변경 성공!' })
+            })
+        })
+
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({ message: err.message })
+    }
+})
+
+
 /* 인증로직 간단하게 
 1. c: 인증번호 요청 
 2. s: 메일로 인증번호 날림. 

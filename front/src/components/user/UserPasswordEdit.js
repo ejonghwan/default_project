@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import _debounce from 'lodash.debounce';
 
 
@@ -10,7 +11,7 @@ import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
 
 // context & request 
-import { passwordEditUser } from '../../reducers/UserRequest.js'
+import { prevPasswordEditUser, findPasswordEditUser } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
@@ -20,7 +21,7 @@ import { statusCode } from '../../utils/utils.js'
 
 const UserPasswordEdit = props => {
 
-    const { prevPasswordCheck } = props;
+    const { prevPasswordCheck, userId } = props;
 
     const [prevPassword, handlePrevPassword, setPrevPassword] = useInput('') 
     const [newPassword, handleNewPassword, setNewPassword] = useInput('') 
@@ -30,11 +31,14 @@ const UserPasswordEdit = props => {
     const [submitActive, setSubmitActive] = useState(false);
 
     const { state, dispatch } = useContext(UserContext)
+    const navigate = useNavigate();
     
     useEffect(() => {
         newPassword === newPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
         if(prevPassword && newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)
-    }, [newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked])
+        if(!prevPasswordCheck && newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)
+        console.log(submitActive)
+    }, [prevPasswordCheck, newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked])
 
 
     //passwordIsChecked 이걸로 들어왔을 때 submit에 이전비번떔에 안됨 0825
@@ -42,14 +46,17 @@ const UserPasswordEdit = props => {
     // 요청
     const handlePasswordEditSubmit = useCallback(async e => {
         e.preventDefault();
-        passwordEdit()
+        prevPasswordCheck ? prevPasswordEdit() : newPasswordEdit();
+
     }, [prevPassword, newPassword, state, passwordIsChecked])
 
-    const passwordEdit = useMemo(() => _debounce(async() => {
+
+    // 기존 비번 바꾸기
+    const prevPasswordEdit = useMemo(() => _debounce(async() => {
         try {   
-            if(!prevPassword && !newPassword && !state, !passwordIsChecked) return console.error('정보 확인해주세요');
+            if(!prevPassword && !newPassword && !state && !passwordIsChecked) return console.error('정보 확인해주세요');
             dispatch({ type: "LOADING", loadingMessage: "비번 변경중.." })
-            const user = await passwordEditUser({
+            const user = await prevPasswordEditUser({
                 prevPassword, 
                 newPassword, 
                 newPasswordCheck,
@@ -62,7 +69,6 @@ const UserPasswordEdit = props => {
                 setNewPassword('')
                 setNewPasswordCheck('')
             }
-            
             // 비밀번호 강화 로직 아직안함
 
         } catch(err) {
@@ -72,12 +78,39 @@ const UserPasswordEdit = props => {
     }, 500), [prevPassword, newPassword, state, passwordIsChecked])
 
     
-    useEffect(() => {
-        if(!prevPasswordCheck) {if(newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)}
-        return () => {
-            passwordEdit.cancel();
+    // 비번 찾기
+    const newPasswordEdit = useMemo(() => _debounce(async() => {
+        try {   
+            if(!userId && !newPassword && !state && !passwordIsChecked) return console.error('정보 확인해주세요');
+            dispatch({ type: "LOADING", loadingMessage: "비번 변경중.." })
+            const user = await findPasswordEditUser({
+                newPassword, 
+                newPasswordCheck,
+                _id: userId
+            });
+
+            if(statusCode(user.status, 2)) { // 성공시
+                // 완료되면 로그인페이지로 
+                setNewPassword('')
+                setNewPasswordCheck('')
+                alert('비밀번호가 새로 설정되었습니다')
+                navigate('/')
+            }
+            // 비밀번호 강화 로직 아직안함
+
+        } catch(err) {
+            dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: err.err })
+            console.error(err)
         }
-    }, [newPassword, newPasswordCheck, passwordIsChecked])
+    }, 500), [newPassword, state, passwordIsChecked])
+
+
+    useEffect(() => {
+        return () => {
+            prevPasswordEdit.cancel();
+            newPasswordEdit.cancel();
+        }
+    }, [])
 
 
     return (
@@ -142,7 +175,7 @@ const UserPasswordEdit = props => {
                     )}
                 </div>
              
-                <button className={submitActive ? 'checked' : 'none'} disabled={!submitActive ? true: false}>비번변경</button>
+                <button className={submitActive ? 'checked' : 'none'} disabled={submitActive ? false : true}>비번변경</button>
             </form>
         </Fragment>
     )

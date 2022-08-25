@@ -156,7 +156,7 @@ const FindPassword = () => {
             )}
 
             <br /><br />
-            {authcom && <UserPasswordEdit prevPasswordCheck={false} />}
+            {authcom && <UserPasswordEdit prevPasswordCheck={false} userId={resMsg.id}/>}
             {resMsg && (<div>
                 
                 <p>{resMsg.id}</p>

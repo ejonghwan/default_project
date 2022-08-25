@@ -260,8 +260,8 @@ export const emailEditUser = async data => {
 }
   
   
-// 비번수정
-export const passwordEditUser = async data => {
+// 이전 비번을 알고 있는 경우 비번수정
+export const prevPasswordEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
@@ -281,6 +281,29 @@ export const passwordEditUser = async data => {
             withCredentials: true // 쿠키 cors 통신 설정
         }
         const user = await axios.post(`${host}/api/users/edit/password`, data, config);
+        return user;
+
+    } catch(err) {
+        console.error(err)
+        return err.response
+    }
+}
+
+// 이전 비번을 모르고 있는 경우 비번수정
+export const findPasswordEditUser = async data => {
+    try {
+        const { newPassword, _id, newPasswordCheck } = data;
+        if(!newPassword && typeof newPassword !== 'string') return;
+        if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return;
+        if(!_id && typeof _id !== 'string') return;
+
+        const config = {
+            headers: { 
+                "Content-Type": "application/json", 
+            },
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+        const user = await axios.post(`${host}/api/users/find/password`, data, config);
         return user;
 
     } catch(err) {
