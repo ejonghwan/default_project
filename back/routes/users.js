@@ -23,12 +23,12 @@ router.get('/load', auth, async (req, res) => {
                 bcrypt.hash(req.reftoken, salt,(err, hash) => {
                     // res
                     res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
-                    res.status(201).json(req.user)
+                    res.status(200).json(req.user)
                 })
             })
         } else {
             console.log('디비 토큰 만료안돼서 이거넘김')
-            res.status(201).json(req.user)
+            res.status(200).json(req.user)
         }
             
     } catch(err) {
@@ -100,7 +100,7 @@ router.post('/login', async (req, res) => {
 //@ doc     로그아웃
 //@ access  public
 router.get('/logout', (req, res) => {
-    res.status(201).clearCookie('X-refresh-token').json({message: "로그아웃 되었습니다"})
+    res.status(200).clearCookie('X-refresh-token').json({message: "로그아웃 되었습니다"})
 })
 
 
@@ -120,10 +120,10 @@ router.post('/signup', async (req, res) => {
         if(!gender || typeof gender !== 'string') return res.status(400).json({ message: 'is not gender' }) 
         if(!birthday || typeof birthday !== 'string') return res.status(400).json({ message: 'is not birthday' }) 
 
-        const existingUser = await User.findOne({id: id})
-        if(existingUser) return res.status(400).json({ err: '유저가 이미 존재합니다' }) 
-
-        const user = await new User(req.body, { token: null })
+        const existingUser = await User.findOne({$or: [{id: id}, {phoneNumber: phoneNumber}] });
+        if(existingUser) return res.status(400).json({ message: '유저가 이미 존재합니다' });
+      
+        const user = await new User(req.body, { token: null });
 
         await bcrypt.genSalt(10, async (err, salt) => {
             // password hash
@@ -132,33 +132,39 @@ router.post('/signup', async (req, res) => {
                 user.password = hash;
 
                 jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" }, (err, reftoken) => {
-                    user.token = reftoken
+                    user.token = reftoken;
                     user.save().then(user => {
-                        res.status(200).json({message: '회원가입 성공'})
-                    })
+                        res.status(200).json({message: '회원가입 성공'});
+                    });
                 });
-
-            })
-        })
+            });
+        });
 
     } catch(err) {
-        console.error(err)
-        res.status(500).json({ message: err.message }) 
+        console.error(err);
+        res.status(500).json({ message: err.message });
     }
 })
 
 
-//@ path    PATCH /api/users/edit/name
+//@ path    PATCH /api/users/edit/userInfo
 //@ doc     이름 변경
 //@ access  private
-router.patch('/edit/name', auth, async(req, res) => {
+router.patch('/edit/userInfo', auth, async(req, res) => {
     try {
-        const { name, _id } = req.body;
-        if(!name || typeof name !== 'string') return res.status(400).json({ message: 'is not name' }) 
-        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ message: 'is not id' }) 
+        const { name, gender, birthday, phoneNumber, _id } = req.body;
+        if(!name || typeof name !== 'string') return res.status(400).json({ message: '이름이 잘못되었습니다' }) 
+        if(!gender || typeof gender !== 'string') return res.status(400).json({ message: '성별이 잘못되었습니다' }) 
+        if(!birthday || typeof birthday !== 'string') return res.status(400).json({ message: '생일이 잘못되었습니다' }) 
+        if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({ message: '번호가 잘못되었습니다' }) 
+        if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ message: '_아이디가 잘못되었습니다' }) 
 
-        const user = await User.findOneAndUpdate({ _id: _id }, { $set: {name: name} }, { new: true })
-        res.status(201).json(user.name)
+
+        // 한번 find하고 비교해서 바뀐거만 할지... 아니면 몇개안되니 find update 한번에 할지 ..고민
+        // const newUserInfo = {}
+
+        const user = await User.findOneAndUpdate({ _id: _id }, { $set: {name, gender, birthday, phoneNumber} }, { new: true })
+        res.status(201).json(user)
 
     } catch(err) {
         console.error(err)
@@ -225,7 +231,7 @@ router.post('/edit/password', auth, async (req, res) => {
                     console.log('back hashed', hash)
                     user.password = hash;
                     user.save();
-                    res.status(200).json({ message: '비번 변경 성공!' })
+                    res.status(201).json({ message: '비번 변경 성공!' })
                 })
             })
         }

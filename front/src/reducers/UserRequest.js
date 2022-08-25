@@ -136,14 +136,17 @@ export const logoutUser = async () => {
 
 // edit
 // 이름 수정
-export const nmaeEditUser = async data => {
+export const userInfoEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
-        if(!accToken) return;
+        if(!accToken) return console.error('user request error. is not acc token');;
 
-        const { name, _id } = data
-        if(!name && typeof name !== 'string') return;
-        if(!_id && typeof _id !== 'string') return;
+        const { name, gender, birthday, phoneNumber, _id } = data;
+        if(!name && typeof name !== 'string') return console.error('user request error. is not name');
+        if(!gender && typeof gender !== 'string') return console.error('user request error. is not gender');
+        if(!birthday && typeof birthday !== 'string') return console.error('user request error. is not birthday');
+        if(!phoneNumber && typeof phoneNumber !== 'string') return console.error('user request error. is not  phoneNumber');
+        if(!_id && typeof _id !== 'string') return console.error('user request error. is not _id');
 
         const config = {
             headers: { 
@@ -152,7 +155,7 @@ export const nmaeEditUser = async data => {
             },
             withCredentials: true,
         }
-        const user = await axios.patch(`${host}/api/users/edit/name`, data, config);
+        const user = await axios.patch(`${host}/api/users/edit/userInfo`, data, config);
         return user;
 
     } catch(err) {

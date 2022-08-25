@@ -1,4 +1,6 @@
-import React, { Fragment, useState, useEffect, useCallback, useContext } from 'react';
+import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import _debounce from 'lodash.debounce';
+
 
 // module
 import { useInput } from '../common/hooks/index.js'
@@ -12,12 +14,17 @@ import { passwordEditUser } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
+// util
+import { statusCode } from '../../utils/utils.js'
 
-const UserPasswordEdit = () => {
 
-    const [prevPassword, handlePrevPassword] = useInput('') 
-    const [newPassword, handleNewPassword] = useInput('') 
-    const [newPasswordCheck, handleNewPasswordCheck] = useInput('') 
+const UserPasswordEdit = props => {
+
+    const { prevPasswordCheck } = props;
+
+    const [prevPassword, handlePrevPassword, setPrevPassword] = useInput('') 
+    const [newPassword, handleNewPassword, setNewPassword] = useInput('') 
+    const [newPasswordCheck, handleNewPasswordCheck, setNewPasswordCheck] = useInput('') 
     const [passwordIsChecked, setPasswordIsChecked] = useState(false) 
 
     const [submitActive, setSubmitActive] = useState(false);
@@ -30,20 +37,31 @@ const UserPasswordEdit = () => {
     }, [newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked])
 
 
-    // 요청
-    const handleSubmit = useCallback(async e => {
-        try {   
-            e.preventDefault();
-            if(!prevPassword && !newPassword && !state, !passwordIsChecked) return;
+    //passwordIsChecked 이걸로 들어왔을 때 submit에 이전비번떔에 안됨 0825
 
-            await dispatch({ type: "LOADING", loadingMessage: "비번 변경중.." })
+    // 요청
+    const handlePasswordEditSubmit = useCallback(async e => {
+        e.preventDefault();
+        passwordEdit()
+    }, [prevPassword, newPassword, state, passwordIsChecked])
+
+    const passwordEdit = useMemo(() => _debounce(async() => {
+        try {   
+            if(!prevPassword && !newPassword && !state, !passwordIsChecked) return console.error('정보 확인해주세요');
+            dispatch({ type: "LOADING", loadingMessage: "비번 변경중.." })
             const user = await passwordEditUser({
                 prevPassword, 
                 newPassword, 
                 newPasswordCheck,
                 _id: state.user._id
             });
-            dispatch({ type: "USER_PASSWORD_EDIT_SUCCESS", data: user.message })
+
+            if(statusCode(user.status, 2)) { // 성공시
+                dispatch({ type: "USER_PASSWORD_EDIT_SUCCESS", data: user.message })
+                setPrevPassword('')
+                setNewPassword('')
+                setNewPasswordCheck('')
+            }
             
             // 비밀번호 강화 로직 아직안함
 
@@ -51,34 +69,42 @@ const UserPasswordEdit = () => {
             dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: err.err })
             console.error(err)
         }
-    }, [prevPassword, newPassword, state, passwordIsChecked])
+    }, 500), [prevPassword, newPassword, state, passwordIsChecked])
+
+    
+    useEffect(() => {
+        if(!prevPasswordCheck) {if(newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)}
+        return () => {
+            passwordEdit.cancel();
+        }
+    }, [newPassword, newPasswordCheck, passwordIsChecked])
 
 
     return (
-
         <Fragment>
             <br />
             <br />
             <br />
             password change 
-             <form onSubmit={handleSubmit}>
-
-                <div>
-                    <Label htmlFor="prevPassword" content="이전 비밀번호" classN="label_t1"/>
-                    <Input  
-                        id="prevPassword" 
-                        type="password" 
-                        required={true} 
-                        placeholder="prevPassword" 
-                        classN="input_text_t1"
-                        name="prevPassword" 
-                        value={prevPassword} 
-                        evt="onChange" 
-                        onChange={handlePrevPassword} 
-                    />
-                    <button>view</button>
-
-                </div>
+             <form onSubmit={handlePasswordEditSubmit}>
+                {prevPasswordCheck && (
+                    // props prevPassword가 true여야 얘 보임
+                     <div>
+                        <Label htmlFor="prevPassword" content="이전 비밀번호" classN="label_t1"/>
+                        <Input  
+                            id="prevPassword" 
+                            type="password" 
+                            required={true} 
+                            placeholder="prevPassword" 
+                            classN="input_text_t1"
+                            name="prevPassword" 
+                            value={prevPassword} 
+                            evt="onChange" 
+                            onChange={handlePrevPassword} 
+                        />
+                        <button>view</button>
+                    </div>
+                )}
                 <div>
                     <Label htmlFor="newPassword" content="비밀번호" classN="label_t1"/>
                     <Input  
@@ -109,11 +135,11 @@ const UserPasswordEdit = () => {
                         onChange={handleNewPasswordCheck} 
                     />
                     <button>view</button>
-                    { newPasswordCheck && (
+                    {newPasswordCheck && (
                         <div>
                             {passwordIsChecked ? (<span>같음!!</span>) : (<span>같지아너!!</span>)}
                         </div>
-                    ) }
+                    )}
                 </div>
              
                 <button className={submitActive ? 'checked' : 'none'} disabled={!submitActive ? true: false}>비번변경</button>

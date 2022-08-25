@@ -19,7 +19,10 @@ const Home = () => {
             <br />
             <br />
             <br />
+            longinform
             <LoginForm />
+            <br />
+            <br />
         </div>
     );
 };

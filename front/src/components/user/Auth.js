@@ -14,6 +14,8 @@ import Timer from '../../components/common/utils/Timer.js'
 import { UserContext } from '../../context/UserContext.js'
 import { emailAuth } from '../../reducers/UserRequest.js'
 
+// util
+import { statusCode } from '../../utils/utils.js'
 
 
 const Auth = () => {
@@ -30,8 +32,6 @@ const Auth = () => {
         e.preventDefault();
         authMail();
     }
-
-    
     const authMail = useMemo(() => _debounce(async e => {
         try {
             await dispatch({ type: "LOADING", loadingMessage: "인증메일 보내는 중.." })
@@ -39,10 +39,13 @@ const Auth = () => {
             setAuthData(res.data)
             console.log('홈어스 resdata:', res)
             setMessage(res.data.message)
+
+            if(statusCode(res.status, 2)) return setAuthState(true)
         } catch(err) {
             console.error(err)
         }
     }, 500), [email])
+
 
 
     useEffect(() => {
@@ -54,7 +57,7 @@ const Auth = () => {
 
     return (
         <Fragment>
-            {!authData ? (
+            {!authState ? (
                 <form onSubmit={handleAuthMailSubmit}>
                 <div>
                     <Label htmlFor="email" content="email" classN="label_t1"/>
@@ -70,8 +73,8 @@ const Auth = () => {
                         onChange={handleEmail} 
                     />
                 </div>
-                
-                <button type="submit">인증</button>
+                {authData && (<span>{authData.email}</span>)} <span>{message}</span><br />
+                <button>인증</button>
             </form>
             ) : (
             <div>

@@ -14,10 +14,11 @@ const Profile = () => {
             <UserProfile />
             <br />
             UserPasswordEdit
-            <UserPasswordEdit />
+            <UserPasswordEdit prevPasswordCheck={true}/>
             <br />
             FindId
             <FindId />
+            <br />
             <br />
             FindPassword
             <FindPassword />
