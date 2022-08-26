@@ -96,14 +96,54 @@ export const initTime = () => {
  /**
      * 상태 코드 첫 숫자 확인하는 함수
      * @param {Number} statusCode - 성공한 상태코드
-     * @param {Number} matched - 비교할 넘버. 상태코드 첫숫자만 
-     * @returns {boolean} - 비교 후 불리언 값 반환
+     * @param {Number, [Number]} matched - 비교할 넘버. 상태코드 첫숫자
+     * @returns {Boolean} - 비교 후 불리언 값 반환
      */
-  export const statusCode = (statusCode, matched) => {
+export const statusCode = (statusCode, matched) => {
     const code = (statusCode).toString();
-    const matchedNumber = (matched).toString();
-    return code[0] === matchedNumber ? true : false
+    if(matched instanceof Array) {
+        for(let i = 0; i < matched.length; i++) {
+            if(code[0] == matched[i]) return true;
+        }
+    }
+    if(typeof matched === 'number') { return code[0] == matched ? true : false; }
+    return false;
 }
+
+
+ /**
+ * 비번 체크 (8~ 16글자 + 1개 이상의 숫자 + 1개 이상의 특수문자 + 온니 영문) 
+ * @param {String} password - 비번
+ * @returns {Boolean} - 정규식 체크 후 불리언값 리턴
+ */
+export const passwordChecked = (password) => {
+   if(typeof password !== 'string') return console.error('문자열 아님')
+   console.log('ufn', password)
+   const regexp = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+])(?!.*[^a-zA-z0-9$`~!@$!%*#^?&\\(\\)\-_=+]).{8,16}$/g;
+   return password.match(regexp) ? true : false;
+}
+
+
+/**
+ * 영문 체크 (온니 영문만) 
+ * @param {String} str - 비번
+ * @returns {Boolean} - 정규식 체크 후 불리언값 리턴
+ */
+export const englishChecked = str => {
+    if(typeof str !== 'string') return console.error('문자열 아님')
+   const regexp = /[^a-zA-Z]/;  
+   return str.match(regexp) ? false : true;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

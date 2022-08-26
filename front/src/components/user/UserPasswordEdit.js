@@ -40,9 +40,6 @@ const UserPasswordEdit = props => {
         console.log(submitActive)
     }, [prevPasswordCheck, newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked])
 
-
-    //passwordIsChecked 이걸로 들어왔을 때 submit에 이전비번떔에 안됨 0825
-
     // 요청
     const handlePasswordEditSubmit = useCallback(async e => {
         e.preventDefault();
@@ -64,15 +61,18 @@ const UserPasswordEdit = props => {
             });
 
             if(statusCode(user.status, 2)) { // 성공시
-                dispatch({ type: "USER_PASSWORD_EDIT_SUCCESS", data: user.message })
+                dispatch({ type: "USER_PASSWORD_EDIT_SUCCESS", data: user.data.message })
                 setPrevPassword('')
                 setNewPassword('')
                 setNewPasswordCheck('')
+                return;
             }
             // 비밀번호 강화 로직 아직안함
+            //실패시 
+            console.log(user)
+            dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: user.data.message })
 
         } catch(err) {
-            dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: err.err })
             console.error(err)
         }
     }, 500), [prevPassword, newPassword, state, passwordIsChecked])
@@ -177,6 +177,7 @@ const UserPasswordEdit = props => {
              
                 <button className={submitActive ? 'checked' : 'none'} disabled={submitActive ? false : true}>비번변경</button>
             </form>
+            <p>{state.error && state.error}</p>
         </Fragment>
     )
 }

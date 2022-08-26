@@ -34,13 +34,20 @@ const Auth = () => {
     }
     const authMail = useMemo(() => _debounce(async e => {
         try {
-            await dispatch({ type: "LOADING", loadingMessage: "인증메일 보내는 중.." })
+            dispatch({ type: "LOADING", loadingMessage: "인증메일 보내는 중.." })
             const res = await emailAuth({ email: email })
             setAuthData(res.data)
-            console.log('홈어스 resdata:', res)
-            setMessage(res.data.message)
 
-            if(statusCode(res.status, 2)) return setAuthState(true)
+            console.log('홈어스 resdata:', res)
+            setMessage(res.data)
+
+            if(statusCode(res.status, 2)) {
+                dispatch({ type: "USER_MAIL_AUTH_SUCCESS", data: '인증메일이 발송되었습니다' })
+                setAuthState(true);
+            } else {
+                dispatch({ type: "USER_MAIL_AUTH_FAILUE", data: res.data.message })
+            }
+
         } catch(err) {
             console.error(err)
         }
@@ -48,11 +55,13 @@ const Auth = () => {
 
 
 
+
     useEffect(() => {
+        
         return () => {
             authMail.cancel();
         }
-    }, [email])
+    }, [authData])
 
 
     return (
@@ -73,12 +82,12 @@ const Auth = () => {
                         onChange={handleEmail} 
                     />
                 </div>
-                {authData && (<span>{authData.email}</span>)} <span>{message}</span><br />
                 <button>인증</button>
+                {state.error && (<span>{authData.email}</span>)} <span>{state.error}</span><br />
             </form>
             ) : (
             <div>
-                {authData.email && (<span>{authData.email}</span>)} <span>{message}</span><br />
+                {authData.email && (<span>{authData.email}</span>)} <span>{state.successMessage}</span><br />
                 {authState && <Timer  
                     endSecond={180} 
                     startingPoint={180} 

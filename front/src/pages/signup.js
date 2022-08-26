@@ -16,6 +16,10 @@ import Label from '../components/common/form/Label.js'
 import { signupUser } from '../reducers/UserRequest.js'
 import { UserContext } from '../context/UserContext.js'
 
+// util
+import { statusCode, passwordChecked, englishChecked } from '../utils/utils.js'
+
+
 // 회원가입 시 메일인증
 // https://lakelouise.tistory.com/240
 // (https://nodemailer.com/about/)
@@ -44,13 +48,17 @@ import { UserContext } from '../context/UserContext.js'
 
 const Signup = () => {
     
+
+    //여기에러ㅏ
     const cookies = new Cookies();
     const successRoot = cookies.get('signup')
 
     const [userId, handleUserId] = useInput('') 
     const [userPassword, handlePassword] = useInput('') 
     const [userPasswordCheck, handlePasswordCheck] = useInput('') 
-    const [passwordIsChecked, setPasswordIsChecked] = useState(false) 
+    const [passwordIsChecked, setPasswordIsChecked] = useState(false);
+    const [passwordProtected, setPasswordProtected] = useState(false);
+    const [englishCheckedState, setEnglishCheckedState] = useState(false);
     // const [userEmail, handleUserEmail] = useInput('') 
     const [userName, handleUserName] = useInput('') 
     const [qeustionType, setQeustionType] = useState(null)
@@ -120,12 +128,12 @@ const Signup = () => {
             });
             dispatch({ type: "USER_SIGNUP_SUCCESS" })
             
-            if(user.status === 200) {
-                alert(user.data.message)
+            if(statusCode(user.status, 2)) {
+                alert('회원가입이 완료되었습니다')
+                // 로그인 페이지 만들면 로그인으로 
                 navigate('/')
             }
             // 비밀번호 강화 로직 아직안함
-
 
         } catch(err) {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
@@ -136,11 +144,20 @@ const Signup = () => {
 
     useEffect(() => {
         if(!successRoot) {
-            alert('잘못된 접근입니다. 다시 인증해주세요')
-            navigate(-1)
+            // alert('잘못된 접근입니다. 다시 인증해주세요')
+            // navigate(-1)
         }
         cookies.remove('signup')
     }, [])
+
+    useEffect(() => { //비번 강화 체크 
+        passwordChecked(userPassword) ? setPasswordProtected(true) : setPasswordProtected(false)
+    }, [userPassword])
+
+
+    useEffect(() => { //de 
+        englishChecked(userId) ? setEnglishCheckedState(false) : setEnglishCheckedState(true)
+    }, [userId])
 
 
     useEffect(() => {
@@ -157,21 +174,25 @@ const Signup = () => {
     return (
         // id, password, email, name
         // 이메일은 먼저 인증하고 시작함(임시로 홈에있음)
+
+        /*
+            비번 조건 
+            1. 8자 이상 14자 이하 
+            2. 1개 이상의 숫자 + 1개 이상의 특수문자 
+            3. 아뒤랑 같게 안됨 
+            4. 이메일이랑 같게 안됨 
+            5. 이름이랑 같게 안됨 
+
+            비번 수정 조건 
+            위에 + 
+            6. 이전비번이랑 동일한지 
+            
+        */
         <div>
             <form onSubmit={handleSubmit}>
                 <div>
                     <Label htmlFor="userEmail" content="이메일" classN="label_t1"/>
                     <span>{email} / 인증완료</span>
-                    {/* <Input 
-                        id="userEmail" 
-                        type="email" 
-                        required={true} 
-                        placeholder="userEmail" 
-                        classN="input_text_t1" 
-                        name="userEmail" 
-                        value={userEmail} 
-                        
-                    /> */}
                 </div>
                 <div>
                     <Label htmlFor="userId" content="아이디" classN="label_t1"/>
@@ -186,6 +207,7 @@ const Signup = () => {
                         evt="onChange" 
                         onChange={handleUserId} 
                     />
+                    {englishCheckedState && (<span style={{color: "red"}}>영문으로만 작성해주세요</span>)}
                 </div>
                 <div>
                     <Label htmlFor="userPassword" content="비밀번호" classN="label_t1"/>
@@ -201,6 +223,11 @@ const Signup = () => {
                         onChange={handlePassword} 
                     />
                     <button type="button">view password</button>
+                    {passwordProtected ? (
+                        <p style={{color: "blue"}}>8~ 16글자 + 1개 이상의 숫자 + 1개 이상의 특수문자 + 온니 영문[o]</p>
+                    ) : (
+                        <p style={{color: "red"}}>8~ 16글자 + 1개 이상의 숫자 + 1개 이상의 특수문자 + 온니 영문 [x]</p>
+                    )}
                 </div>
                 <div>
                     <Label htmlFor="userPasswordCheck" content="비밀번호 체크" classN="label_t1"/>

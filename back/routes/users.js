@@ -100,7 +100,7 @@ router.post('/login', async (req, res) => {
 //@ doc     로그아웃
 //@ access  public
 router.get('/logout', (req, res) => {
-    res.status(200).clearCookie('X-refresh-token').json({message: "로그아웃 되었습니다"})
+    res.status(200).clearCookie('X-refresh-token').end();
 })
 
 
@@ -134,7 +134,7 @@ router.post('/signup', async (req, res) => {
                 jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" }, (err, reftoken) => {
                     user.token = reftoken;
                     user.save().then(user => {
-                        res.status(200).json({message: '회원가입 성공'});
+                        res.status(201).end();
                     });
                 });
             });
@@ -196,7 +196,7 @@ router.patch('/edit/email', auth, async(req, res) => {
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {email: email} }, { new: true });
         if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
       
-        res.status(200).json({ message: '이메일이 정상적으로 변경되었습니다.', email: user.email });
+        res.status(200).json({ email: user.email });
 
 
     } catch(err) {
@@ -231,7 +231,8 @@ router.post('/edit/password', auth, async (req, res) => {
                     console.log('back hashed', hash)
                     user.password = hash;
                     user.save();
-                    res.status(201).json({ message: '비번 변경 성공!' })
+                    // res.status(201).json({ message: '비번 변경 성공!' })
+                    res.status(201).end()
                 })
             })
         }
@@ -263,7 +264,7 @@ router.post('/find/password', async (req, res) => {
                 console.log('back hashed', hash)
                 user.password = hash;
                 user.save();
-                res.status(201).json({ message: '비번 변경 성공!' })
+                res.status(201).end();
             })
         })
 
@@ -305,7 +306,7 @@ router.post('/find/id', async (req, res) => {
         const user = await User.findById(get_id)
         if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
 
-        res.status(200).json({message: `id는 ${user.id}입니다`, id: user.id})
+        res.status(200).json({id: user.id})
 
 
     } catch(err) {

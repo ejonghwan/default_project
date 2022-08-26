@@ -19,15 +19,6 @@ import { UserContext } from '../../context/UserContext.js'
 
 const FindPassword = () => {
 
-     /*
-        1. 비번찾기 클릭
-        2. 찾을 아이디 입력받음  
-        3. 이메일 보냄 
-        4. 이메일 인증번호 입력받음 
-        5. 백엔드에서 입력받은거 매칭 시키고 참이면 
-        6. 비번 재설정 페이지로 리디렉션
-        
-    */
         const [authNumber, handleAuthNumber, setAutnNumber] = useInput('');
         const [authToggle, setAuthToggle] = useState(false);
         const [name, handleName, setName] = useInput('');

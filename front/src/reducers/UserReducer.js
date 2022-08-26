@@ -1,5 +1,6 @@
 export const UserIntialState = {
     isLogged: false,
+    successMessage: '',
     error: '',
     loading: '',
     user: {},
@@ -98,6 +99,20 @@ const UserReducer = (state = UserIntialState, action) => {
                 loading: '',
                 error: action.data,
             }
+
+
+            case "USER_MAIL_AUTH_SUCCESS": return {
+                ...state,
+                error: '',
+                loading: '',
+                successMessage: action.data,
+            }
+            case "USER_MAIL_AUTH_FAILUE" : return {
+                ...state,
+                loading: '',
+                error: action.data,
+            }
+          
           
 
             case "USER_PASSWORD_EDIT_SUCCESS": return {

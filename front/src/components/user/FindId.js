@@ -16,12 +16,11 @@ import Timer from '../../components/common/utils/Timer.js'
 import { nmaeEditUser, emailEditUser } from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
+// util
+import { statusCode } from '../../utils/utils.js'
+
 
 const FindId = () => {
-    /*
-        1. 이름 이메일인증으로 찾기
-        2. 이름 생년월일 성별 메일주소로 찾기
-    */
     const [authNumber, handleAuthNumber, setAutnNumber] = useInput('');
     const [authToggle, setAuthToggle] = useState(false);
     const [name, handleName, setName] = useInput('');
@@ -39,7 +38,7 @@ const FindId = () => {
         try {
             const number = await nonLoginMemberAuthNumberRequest({ name, email }); 
             setResMsg({ ...resMsg, ...number.data })
-            if(number.status === 400) return;
+            if(statusCode(number.status, [4, 5])) return;
 
             setAuthToggle(true) //성공 시 
         } catch(err) {
@@ -60,7 +59,7 @@ const FindId = () => {
             // 여기선 쿠키 2개 보냄
 
             setResMsg({ ...resMsg, ...findId.data })
-            if(findId.status === 200) { 
+            if(statusCode(findId.status, 2)) { 
                 setAuthToggle(false);
                 setName('');
                 setEmail(''); 
@@ -147,8 +146,7 @@ const FindId = () => {
 
             <br /><br />
             {resMsg && (<div>
-                <p>{resMsg.id}</p>
-                <p>{resMsg.message}</p>
+                <p>아이디 {resMsg.id}</p>
             </div>)}
         </Fragment>
     )
