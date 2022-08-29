@@ -170,8 +170,8 @@ export const memberAuthNumberRequest = async data => {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
         const { email, _id } = data;
-        if(!email && typeof email !== 'string') return;
-        if(!_id && typeof _id !== 'string') return;
+        if(!email && typeof email !== 'string') return console.error('user request error. is not email');
+        if(!_id && typeof _id !== 'string') return console.error('user request error. is not _id');
 
         const config = {
             headers: { 
@@ -193,8 +193,8 @@ export const memberAuthNumberRequest = async data => {
 export const nonMemberAuthNumberRequest = async data => {
     try {
         const { email, name } = data;
-        if(!email && typeof email !== 'string') return;
-        if(!name && typeof name !== 'string') return;
+        if(!email && typeof email !== 'string') return console.error('user request error. is not email');
+        if(!name && typeof name !== 'string') return console.error('user request error. is not name');
 
         const config = {
             headers: { "Content-Type": "application/json", },
@@ -214,8 +214,8 @@ export const nonMemberAuthNumberRequest = async data => {
 export const nonLoginMemberAuthNumberRequest = async data => {
     try {
         const { email, name } = data;
-        if(!email && typeof email !== 'string') return;
-        if(!name && typeof name !== 'string') return;
+        if(!email && typeof email !== 'string') return console.error('user request error. is not email');
+        if(!name && typeof name !== 'string') return console.error('user request error. is not name');
 
         const config = {
             headers: { "Content-Type": "application/json", },
@@ -240,8 +240,8 @@ export const emailEditUser = async data => {
         const accToken = localStorage.getItem('X-access-token')
         if(!accToken) return;
         const { email, _id } = data;
-        if(!email && typeof email !== 'string') return;
-        if(!_id && typeof _id !== 'string') return;
+        if(!email && typeof email !== 'string') return console.error('user request error. is not email');
+        if(!_id && typeof _id !== 'string') return console.error('user request error. is not _id');
 
         const config = {
             headers: { 
@@ -264,14 +264,13 @@ export const emailEditUser = async data => {
 export const prevPasswordEditUser = async data => {
     try {
         const accToken = localStorage.getItem('X-access-token')
-        if(!accToken) return;
+        if(!accToken) return console.error('user request error. is not accToken');
+    
         const { prevPassword, newPassword, _id, newPasswordCheck } = data;
-        if(!prevPassword && typeof prevPassword !== 'string') return;
-        if(!newPassword && typeof newPassword !== 'string') return;
-        if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return;
-        if(!_id && typeof _id !== 'string') return;
-
-        console.log('request data', data)
+        if(!prevPassword && typeof prevPassword !== 'string') return console.error('user request error. is not prevPassword');
+        if(!newPassword && typeof newPassword !== 'string') return console.error('user request error. is not newPassword');
+        if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return console.error('user request error. is not newPasswordCheck');
+        if(!_id && typeof _id !== 'string') return console.error('user request error. is not _id');
 
         const config = {
             headers: { 
@@ -293,9 +292,9 @@ export const prevPasswordEditUser = async data => {
 export const findPasswordEditUser = async data => {
     try {
         const { newPassword, _id, newPasswordCheck } = data;
-        if(!newPassword && typeof newPassword !== 'string') return;
-        if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return;
-        if(!_id && typeof _id !== 'string') return;
+        if(!newPassword && typeof newPassword !== 'string') return console.error('user request error. is not newPassword');
+        if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return console.error('user request error. is not newPasswordCheck');
+        if(!_id && typeof _id !== 'string') return console.error('user request error. is not _id');
 
         const config = {
             headers: { 
@@ -317,9 +316,7 @@ export const findPasswordEditUser = async data => {
 export const findUserId = async data => {
     try {
         const { authNumber } = data;
-        if(!authNumber && typeof authNumber !== 'string') return;
-
-        console.log('request data', data)
+        if(!authNumber && typeof authNumber !== 'string') return console.error('user request error. is not authNumber');
 
         const config = {
             headers: { "Content-Type": "application/json", },
@@ -327,6 +324,30 @@ export const findUserId = async data => {
         }
 
         const findId = await axios.post(`${host}/api/users/find/id`, data, config);
+        return findId;
+
+    } catch(err) {
+        console.error(err)
+        return err.response
+    }
+}
+
+
+// 질답으로 아이디 찾기  
+export const findUserIdQuestion = async data => {
+    try {
+        const { name, email, qeustionType, result } = data;
+        if(!name && typeof name !== 'string') return console.error('user request error. is not name');
+        if(!email && typeof email !== 'string') return console.error('user request error. is not email');
+        if(!qeustionType && typeof qeustionType !== 'string') return console.error('user request error. is not qeustionType');
+        if(!result && typeof result !== 'string') return console.error('user request error. is not result');
+
+        const config = {
+            headers: { "Content-Type": "application/json"},
+            withCredentials: true // 쿠키 cors 통신 설정
+        }
+
+        const findId = await axios.post(`${host}/api/users/find/id/question`, data, config);
         return findId;
 
     } catch(err) {

@@ -27,13 +27,15 @@ router.get('/load', auth, async (req, res) => {
                 })
             })
         } else {
+            // 쿠키랑 로컬저장소에 정보남고 못불러오는 에러 있는데 어떤 경우인지 못찾음
             console.log('디비 토큰 만료안돼서 이거넘김')
             res.status(200).json(req.user)
         }
             
     } catch(err) {
         console.error(err)
-        res.status(500).json({ message: err.message })
+        res.status(501).clearCookie('X-refresh-token').end();
+        // res.status(500).json({ message: err.message })
     }
 
 })
@@ -256,12 +258,13 @@ router.post('/find/password', async (req, res) => {
         if(newPassword !== newPasswordCheck) return res.status(400).json({ message: 'not password matched' })
 
         const user = await User.findOne({id: _id})
-
         if(!user) return res.status(400).json({ message: 'is not user' })
-
+        const prevPasswordMatched = await bcrypt.compare(newPassword, user.password)
+        if(prevPasswordMatched) return res.status(401).json({ message: '이전비밀번호랑 같습니다', matched: true })
+      
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newPassword, salt, (err, hash) => {
-                console.log('back hashed', hash)
+                // console.log('back hashed', hash)
                 user.password = hash;
                 user.save();
                 res.status(201).end();
@@ -284,6 +287,7 @@ router.post('/find/password', async (req, res) => {
 4. s: c에서 넘어온 쿠키 유효기간 체크하고..지났으면 에러를 안지났으면 bcript로 비교 후 
 */
 
+
 //@ path    POST /api/users/find/id
 //@ doc     아이디 찾기
 //@ access  public
@@ -305,6 +309,36 @@ router.post('/find/id', async (req, res) => {
 
         const user = await User.findById(get_id)
         if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
+
+        res.status(200).json({id: user.id})
+
+
+    } catch(err) {
+        console.error(err)
+        res.status(500).json({ message: err.message })
+    }
+})
+
+
+
+//@ path    POST /api/users/find/id/question
+//@ doc     질답으로 아이디 찾기
+//@ access  public
+router.post('/find/id/question', async (req, res) => {
+    try {
+        const { name, email, qeustionType, result } = req.body;
+        if(!name) return res.status(400).json({ message: 'is not name' });
+        if(!email) return res.status(400).json({ message: 'is not email' });
+        if(!qeustionType) return res.status(400).json({ message: 'is not qeustionType' });
+        if(!result) return res.status(400).json({ message: 'is not result' });
+
+        const user = await User.findOne({email: email});
+        if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
+        
+        if(user.name !== name) return  res.status(500).json({ message: '이름이 등록된 정보와 다릅니다' });
+        if(user.email !== email) return  res.status(500).json({ message: '이메일이 등록된 정보와 다릅니다' });
+        if(user.qeustion.qeustionType !== qeustionType) return  res.status(500).json({ message: '질문이 등록된 정보와 다릅니다' });
+        if(user.qeustion.result !== result) return  res.status(500).json({ message: '질문의 답이 등록된 정보와 다릅니다' });
 
         res.status(200).json({id: user.id})
 

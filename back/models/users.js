@@ -12,7 +12,7 @@ const UserSchema = mongoose.Schema({
     birthday: { type: String, trim: true, maxlength: 8},
     token: { type: String, unique: true, require: true, },
     qeustion: { 
-        qeustionType: { type: Number, require: true },
+        qeustionType: { type: String, require: true },
         result: { type: String, require: true, }, /* minlength: 1, maxlength: 15, trim: true, lowercase: true,  */  /* 소문자 1 ~ 15공백제거  */
      },
 }, {

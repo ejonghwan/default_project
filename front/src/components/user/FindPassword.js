@@ -26,6 +26,8 @@ const FindPassword = () => {
         const [resMsg, setResMsg] = useState({});
         const [authTimeout, setAuthTimeout] = useState(false);
         const [authcom, setAuthcom] = useState(false)
+
+        
     
     
         /** 이메일인증 서브밋 */

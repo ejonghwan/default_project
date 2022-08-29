@@ -37,9 +37,8 @@ const FindId = () => {
     const authSubmit = useMemo(() => _debounce(async() => {
         try {
             const number = await nonLoginMemberAuthNumberRequest({ name, email }); 
-            setResMsg({ ...resMsg, ...number.data })
-            if(statusCode(number.status, [4, 5])) return;
-
+            console.log(number, '?????????')
+            if(statusCode(number.status, [4, 5])) return setResMsg({ ...resMsg, message: number.data.message })
             setAuthToggle(true) //성공 시 
         } catch(err) {
             console.error(err)
@@ -57,13 +56,14 @@ const FindId = () => {
         try {
             const findId = await findUserId({ authNumber }); 
             // 여기선 쿠키 2개 보냄
-
-            setResMsg({ ...resMsg, ...findId.data })
+            
+            if(statusCode(findId.status, [4, 5])) return setResMsg({...resMsg, message: findId.data.message});
             if(statusCode(findId.status, 2)) { 
                 setAuthToggle(false);
                 setName('');
                 setEmail(''); 
                 setAutnNumber('');
+                setResMsg({id: findId.data.id, message: ''});
             }
         } catch(err) {
             console.error(err)
@@ -113,8 +113,10 @@ const FindId = () => {
                         disabled={authToggle && true}
                     />
                 </div>
+                <p style={{color: "red"}}>{resMsg.message && resMsg.message}</p>
                 <button disabled={authToggle && true}>인증번호 보내기</button>
             </form>
+            {/* 829 여기 하다가 감. 인증 만료 시 다시찾기 클릭버튼  */}
 
             {authToggle && (
                 <form onSubmit={handleFindIdSubmit}>
@@ -140,12 +142,13 @@ const FindId = () => {
                         callback={() => setAuthTimeout(true)}
                     />
                  </div>
+                 <p style={{color: "red"}}>{resMsg.message && resMsg.message}</p>
                  <button disabled={authTimeout}>아이디 찾기</button>
              </form>
             )}
 
             <br /><br />
-            {resMsg && (<div>
+            {resMsg.id && (<div>
                 <p>아이디 {resMsg.id}</p>
             </div>)}
         </Fragment>

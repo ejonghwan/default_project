@@ -16,7 +16,7 @@ import { UserContext } from '../../context/UserContext.js'
 
 
 // util
-import { statusCode } from '../../utils/utils.js'
+import { statusCode, passwordChecked } from '../../utils/utils.js'
 
 
 const UserPasswordEdit = props => {
@@ -27,18 +27,23 @@ const UserPasswordEdit = props => {
     const [newPassword, handleNewPassword, setNewPassword] = useInput('') 
     const [newPasswordCheck, handleNewPasswordCheck, setNewPasswordCheck] = useInput('') 
     const [passwordIsChecked, setPasswordIsChecked] = useState(false) 
+    
+    // 유효성 검사
+    const [passwordProtected, setPasswordProtected] = useState(null)
+    const [prevPasswordMatched, setPrevPasswordMatched] = useState(null)
 
     const [submitActive, setSubmitActive] = useState(false);
 
     const { state, dispatch } = useContext(UserContext)
     const navigate = useNavigate();
     
+    // 인증이 모두 true인지
     useEffect(() => {
         newPassword === newPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
-        if(prevPassword && newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)
-        if(!prevPasswordCheck && newPassword && newPasswordCheck && passwordIsChecked) setSubmitActive(true)
+        if(prevPassword && newPassword && newPasswordCheck && passwordIsChecked && passwordProtected) setSubmitActive(true)
+        if(!prevPasswordCheck && newPassword && newPasswordCheck && passwordIsChecked && passwordProtected) setSubmitActive(true)
         console.log(submitActive)
-    }, [prevPasswordCheck, newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked])
+    }, [prevPasswordCheck, newPasswordCheck, prevPassword, newPassword, newPasswordCheck, passwordIsChecked, passwordProtected])
 
     // 요청
     const handlePasswordEditSubmit = useCallback(async e => {
@@ -88,7 +93,7 @@ const UserPasswordEdit = props => {
                 newPasswordCheck,
                 _id: userId
             });
-
+            if(user.data.matched) return setPrevPasswordMatched(true);
             if(statusCode(user.status, 2)) { // 성공시
                 // 완료되면 로그인페이지로 
                 setNewPassword('')
@@ -96,7 +101,6 @@ const UserPasswordEdit = props => {
                 alert('비밀번호가 새로 설정되었습니다')
                 navigate('/')
             }
-            // 비밀번호 강화 로직 아직안함
 
         } catch(err) {
             dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: err.err })
@@ -111,6 +115,11 @@ const UserPasswordEdit = props => {
             newPasswordEdit.cancel();
         }
     }, [])
+
+    useEffect(() => {
+        passwordChecked(newPassword) === true ? setPasswordProtected(true) : setPasswordProtected(false);
+        prevPassword && prevPassword === newPassword ? setPrevPasswordMatched(true) : setPrevPasswordMatched(false);
+    }, [newPassword])
 
 
     return (
@@ -152,6 +161,14 @@ const UserPasswordEdit = props => {
                         onChange={handleNewPassword} 
                     />
                     <button>view</button>
+                    {passwordProtected ? (
+                        <p style={{color: "blue"}}>8~ 16글자 + 1개 이상의 숫자 + 1개 이상의 특수문자 + 온니 영문[o]</p>
+                    ) : (
+                        <p style={{color: "red"}}>8~ 16글자 + 1개 이상의 숫자 + 1개 이상의 특수문자 + 온니 영문 [x]</p>
+                    )}
+                      {prevPasswordMatched && (
+                        <p style={{color: "red"}}>이전 비밀번호와 같습니다[x]</p>
+                    )}
                 </div>
               
                 <div>

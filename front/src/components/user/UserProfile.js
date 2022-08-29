@@ -7,12 +7,14 @@ import { useInput } from '../common/hooks/index.js';
 // components
 import Input from '../common/form/Input.js';
 import Label from '../common/form/Label.js';
-import Timer from '../common/utils/Timer.js'
-
+import Timer from '../common/utils/Timer.js';
 
 // context & request 
 import  { userInfoEditUser, emailEditUser, memberAuthNumberRequest } from '../../reducers/UserRequest.js';
 import { UserContext } from '../../context/UserContext.js';
+
+// util
+import { stringLengthChecked  } from '../../utils/utils.js';
 
 
 
@@ -24,7 +26,9 @@ const UserProfile = () => {
     const [userName, handleUserName, setUserName] = useInput('') ;
     const [userGender, handleUserGender, setUserGender] = useInput('') ;
     const [userBirthday, handleUserBirthday, setUserBirthday] = useInput('');
+    const [birthdayLengthChecked, setBirthdayLengthChecked] = useState(false)
     const [userPhoneNumber, handleUserPhoneNumber] = useInput('') ;
+    const [phoneNumberLengthChecked, setPhoneNumberLengthChecked] = useState(false)
     const [userEmail, handleUserEmail, setUserEmail] = useInput('');
     const [authNumber, handleAuthNumber, setAuthNumber] = useInput('');
     
@@ -111,6 +115,13 @@ const UserProfile = () => {
     }), [userName, userGender, userBirthday, userPhoneNumber])
     // 이름 수정 요청
 
+    useEffect(() => {
+        userPhoneNumber && stringLengthChecked(userPhoneNumber, 11) ? setPhoneNumberLengthChecked(false) : setPhoneNumberLengthChecked(true)
+    }, [userPhoneNumber]) 
+
+    useEffect(() => {
+        userBirthday && stringLengthChecked(userBirthday, 8) ? setBirthdayLengthChecked(false) : setBirthdayLengthChecked(true)
+    }, [userBirthday]) 
 
     useEffect(() => {
         state.user.gender === '남'? 
@@ -253,6 +264,9 @@ const UserProfile = () => {
                                     evt="onChange" 
                                     onChange={handleUserBirthday} 
                                 />
+                                {birthdayLengthChecked && (
+                                    <p style={{color: "red"}}>생일 8자리로 입력해주세요 [x]</p>
+                                )}
                             </li>
                             <li>
                                 <Label htmlFor="phoneNumber" content="휴대폰번호 수정중" classN="label_t1"/>
@@ -267,6 +281,9 @@ const UserProfile = () => {
                                     evt="onChange" 
                                     onChange={handleUserPhoneNumber} 
                                 />
+                                {phoneNumberLengthChecked && (
+                                    <p style={{color: "red"}}>휴대폰 번호 11자리로 입력해주세요 [x]</p>
+                                )}
                             </li>
                             <button>개인정보 변경하기</button>
                             <button type="button" name="userInfo" onClick={handleToggle}>취소</button>

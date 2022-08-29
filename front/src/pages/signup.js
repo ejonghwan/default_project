@@ -17,7 +17,7 @@ import { signupUser } from '../reducers/UserRequest.js'
 import { UserContext } from '../context/UserContext.js'
 
 // util
-import { statusCode, passwordChecked, englishChecked } from '../utils/utils.js'
+import { questionData, statusCode, passwordChecked, englishChecked, stringLengthChecked } from '../utils/utils.js'
 
 
 // 회원가입 시 메일인증
@@ -48,8 +48,6 @@ import { statusCode, passwordChecked, englishChecked } from '../utils/utils.js'
 
 const Signup = () => {
     
-
-    //여기에러ㅏ
     const cookies = new Cookies();
     const successRoot = cookies.get('signup')
 
@@ -66,8 +64,10 @@ const Signup = () => {
     const [terms, setTerms] = useState(false) ;
     const [submitActive, setSubmitActive] = useState(false);
     const [phoneNumber, handlePhoneNumber] = useInput('') 
-    const [gender, handleGender] = useInput('') 
+    const [phoneNumberLengthChecked, setPhoneNumberLengthChecked] = useState(false)
+    const [gender, handleGender] = useInput('남') 
     const [birthday, handleBirthday] = useInput('')
+    const [birthdayLengthChecked, setBirthdayLengthChecked] = useState(false)
   
     const { state, dispatch } = useContext(UserContext)
 
@@ -76,20 +76,7 @@ const Signup = () => {
     const location = useLocation();
 
     const email = decodeURIComponent(searchParams.get('email'));
-    
-    const questionData = [
-        { questionType: 0, question: '질문을 선택해주세요' },
-        { questionType: 1, question: '질문2' },
-        { questionType: 2, question: '질문3' },
-        { questionType: 3, question: '질문4' },
-        { questionType: 4, question: '질문5' },
-        { questionType: 5, question: '질문6' },
-        { questionType: 6, question: '질문7' },
-        { questionType: 7, question: '질문8' },
-        { questionType: 8, question: '질문9' },
-    ]
-
-    
+ 
 
     const handleTerms = useCallback(e => {
         // setTerms({
@@ -133,40 +120,51 @@ const Signup = () => {
                 // 로그인 페이지 만들면 로그인으로 
                 navigate('/')
             }
-            // 비밀번호 강화 로직 아직안함
 
         } catch(err) {
             dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
             console.error(err)
+
         }
     }, 500), [userId, userPassword, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
 
 
     useEffect(() => {
         if(!successRoot) {
-            // alert('잘못된 접근입니다. 다시 인증해주세요')
-            // navigate(-1)
+            alert('잘못된 접근입니다. 다시 인증해주세요')
+            navigate(-1)
         }
         cookies.remove('signup')
     }, [])
 
     useEffect(() => { //비번 강화 체크 
-        passwordChecked(userPassword) ? setPasswordProtected(true) : setPasswordProtected(false)
+        userPassword && passwordChecked(userPassword) ? setPasswordProtected(true) : setPasswordProtected(false)
     }, [userPassword])
 
-
     useEffect(() => { //de 
-        englishChecked(userId) ? setEnglishCheckedState(false) : setEnglishCheckedState(true)
+        userId && englishChecked(userId) ? setEnglishCheckedState(false) : setEnglishCheckedState(true)
     }, [userId])
 
+    useEffect(() => {
+        phoneNumber && stringLengthChecked(phoneNumber, 11) ? setPhoneNumberLengthChecked(false) : setPhoneNumberLengthChecked(true)
+    }, [phoneNumber]) 
 
     useEffect(() => {
-        userPassword === userPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
+        birthday && stringLengthChecked(birthday, 8) ? setBirthdayLengthChecked(false) : setBirthdayLengthChecked(true)
+    }, [birthday]) 
+
+    useEffect(() => {
+        userPassword && userPassword === userPasswordCheck ? setPasswordIsChecked(true) : setPasswordIsChecked(false);
     }, [userPasswordCheck])
 
+
     useEffect(() => {
-        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result && phoneNumber && gender && birthday) setSubmitActive(true);
-    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday])
+        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result && phoneNumber && gender && birthday && passwordProtected) {
+            setSubmitActive(true)
+        } else {
+            setSubmitActive(false)
+        };
+    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday, passwordProtected])
 
 
 
@@ -207,7 +205,7 @@ const Signup = () => {
                         evt="onChange" 
                         onChange={handleUserId} 
                     />
-                    {englishCheckedState && (<span style={{color: "red"}}>영문으로만 작성해주세요</span>)}
+                    {englishCheckedState && (<span style={{color: "red"}}>영문, 숫자 조합으로만 작성해주세요</span>)}
                 </div>
                 <div>
                     <Label htmlFor="userPassword" content="비밀번호" classN="label_t1"/>
@@ -267,7 +265,7 @@ const Signup = () => {
                     <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
                     <Input 
                         id="phoneNumber" 
-                        type="text" 
+                        type="number" 
                         required={true} 
                         placeholder="phoneNumber" 
                         classN="input_text_t1" 
@@ -276,6 +274,9 @@ const Signup = () => {
                         evt="onChange" 
                         onChange={handlePhoneNumber} 
                     />
+                    {phoneNumberLengthChecked && (
+                        <p style={{color: "red"}}>휴대폰 번호 11자리로 입력해주세요 [x]</p>
+                    )}
                 </div>
                 <div>
                     성별:
@@ -290,6 +291,7 @@ const Signup = () => {
                             value="남" 
                             evt="onChange" 
                             onChange={handleGender} 
+                            checked={true}
                         />
                     </span>
                     <span>
@@ -310,7 +312,7 @@ const Signup = () => {
                     <Label htmlFor="birthday" content="생년월일" classN="label_t1"/>
                     <Input 
                         id="birthday" 
-                        type="text" 
+                        type="number" 
                         required={true} 
                         placeholder="19870907 8자리" 
                         classN="input_text_t1" 
@@ -319,6 +321,9 @@ const Signup = () => {
                         evt="onChange" 
                         onChange={handleBirthday} 
                     />
+                    {birthdayLengthChecked && (
+                        <p style={{color: "red"}}>생일 8자리로 입력해주세요 [x]</p>
+                    )}
                 </div>
                 <div>
                     <Label htmlFor="qeustion" content="질문" classN="label_t1"/>

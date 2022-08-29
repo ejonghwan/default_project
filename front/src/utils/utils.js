@@ -3,6 +3,20 @@ import axios from 'axios';
 import _debounce from 'lodash.debounce'
 
 
+
+export const questionData = [
+    { questionType: 0, question: '질문을 선택해주세요' },
+    { questionType: 1, question: '질문2' },
+    { questionType: 2, question: '질문3' },
+    { questionType: 3, question: '질문4' },
+    { questionType: 4, question: '질문5' },
+    { questionType: 5, question: '질문6' },
+    { questionType: 6, question: '질문7' },
+    { questionType: 7, question: '질문8' },
+    { questionType: 8, question: '질문9' },
+]
+
+
 /** 
  * 딜레이 함수
  * @param {number} endSecond - 몇초 지연 후 실행할건지
@@ -126,13 +140,28 @@ export const passwordChecked = (password) => {
 
 /**
  * 영문 체크 (온니 영문만) 
- * @param {String} str - 비번
+ * @param {String} str - 체크할 문자열
  * @returns {Boolean} - 정규식 체크 후 불리언값 리턴
  */
 export const englishChecked = str => {
     if(typeof str !== 'string') return console.error('문자열 아님')
-   const regexp = /[^a-zA-Z]/;  
-   return str.match(regexp) ? false : true;
+//    const regexp = /[^a-zA-Z]/;   
+   const regexp = /^[a-zA-Z0-9]*$/;   
+   return str.match(regexp) ? true : false;
+}
+
+
+/**
+ * 영문 체크 (온니 영문만) 
+ * @param {String Number} arg - 체크할 인자
+ * @param {Number} length - 최대 몇글자
+ * @param {String} type - 문자 or 숫자
+ * @returns {Boolean} - 체크 후 불리언값 리턴
+ */
+ export const stringLengthChecked = (arg, len) => {
+    if(!arg && typeof arg !== 'string' || 
+       !arg && typeof arg !== 'number' ) return console.error('타입 확인')
+    return arg.length === len ? true : false;
 }
 
 
