@@ -10,14 +10,16 @@ import './assets/css/global.css'
 
 import { ImageProvider } from './context/ImageContext.js'
 import { UserProvider, UserContext } from './context/UserContext.js'
-import { getUser } from './reducers/UserRequest.js'
 import RoutesPage from './pages/index.js'
-
 import { getQueryString } from './utils/utils.js'
+
+import UserRequest from './reducers/UserRequest.js'
+// import { getUser } from './reducers/UserRequest.js'
 
 
 const App = () => {
 
+  const { getUser } = UserRequest();
   const {state, dispatch} = useContext(UserContext);
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -36,8 +38,8 @@ const App = () => {
       dispatch({type: "USER_LOAD_SUCCESS", data})
 
     } catch(err) {
-      dispatch({ type: "USER_LOAD_FAILUE" })
-      console.error(err)
+      dispatch({ type: "USER_LOAD_FAILUE", data: err.message })
+      console.error('catch?', err)
     }
   }
 
@@ -85,6 +87,7 @@ const App = () => {
   useEffect(() => {
     userLoad()
     userEmailLoad()
+    dispatch({type: "ERROR_LOADING_CLEAR"})
 
   }, [])
 

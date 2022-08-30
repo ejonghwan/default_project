@@ -6,7 +6,7 @@ import _debounce from 'lodash.debounce'
 import { useInput } from '../common/hooks/index.js'
 
 // util
-import { statusCode } from '../../utils/utils.js'
+import { statusCode, useDebounce } from '../../utils/utils.js'
 
 // components
 import Input from '../common/form/Input.js'
@@ -15,13 +15,16 @@ import LoginUserInfo from './LoginUserInfo.js';
 
 // context
 import { UserContext } from '../../context/UserContext.js'
-import { loginUser, logoutUser } from '../../reducers/UserRequest.js'
+// import { loginUser, logoutUser } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 
 
 const LoginForm = () => {
 
     const [userId, handleUserId, setUserId] = useInput('')
     const [userPassword, handlePassword, setUserPassword] = useInput('')
+
+    const { loginUser, logoutUser } = UserRequest();
     const {state, dispatch} = useContext(UserContext)
 
 
@@ -45,12 +48,13 @@ const LoginForm = () => {
             }
 
         } catch(err) {
-            console.error(err)
+            console.error('catch?', err)
             dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
         }
     }, 500), [userId, userPassword])
 
 
+ 
     useEffect(() => {
         return () => {
          submit.cancel();

@@ -1,7 +1,14 @@
 export const UserIntialState = {
     isLogged: false,
     successMessage: '',
-    error: '',
+    authErrorMessage: '',
+    loginErrorMessage: '',
+    signupErrorMessage: '',
+    findIdErrorMessage: '',
+    findPasswordErrorMessage: '',
+    infoEditErrorMessage: '',
+    mailEditErrorMessage: '',
+    passwordEditErrorMessage: '',
     loading: '',
     user: {},
 }
@@ -13,24 +20,28 @@ const UserReducer = (state = UserIntialState, action) => {
                 ...state,
                 loading: action.loadingMessage,
             }
+            case "ERROR_LOADING_CLEAR" : return {
+                ...state,
+                loading: '',
+                error: '',
+            }
 
             
             case "USER_SIGNUP_SUCCESS": return {
                 ...state,
-                error: '',
+                signupErrorMessage: '',
                 loading: '',
             }
 
             case "USER_SIGNUP_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data,
+                signupErrorMessage: action.data,
             }
 
 
             case "USER_LOAD_SUCCESS": return {
                 ...state,
-                error: '',
                 loading: '',
                 user: action.data,
                 isLogged: true,
@@ -38,14 +49,13 @@ const UserReducer = (state = UserIntialState, action) => {
             case "USER_LOAD_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data,
                 isLogged: false,
             }
 
 
             case "USER_LOGIN_SUCCESS": return {
                 ...state,
-                error: '',
+                loginErrorMessage: '',
                 loading: '',
                 user: action.data,
                 isLogged: true,
@@ -54,7 +64,7 @@ const UserReducer = (state = UserIntialState, action) => {
                 ...state,
                 loading: '',
                 isLogged: false,
-                error: action.data,
+                loginErrorMessage: action.data,
             }
 
 
@@ -68,7 +78,7 @@ const UserReducer = (state = UserIntialState, action) => {
 
             case "USER_USER_INFO_EDIT_SUCCESS": return {
                 ...state,
-                error: '',
+                infoEditErrorMessage: '',
                 loading: '',
                 user: {
                     ...state.user,
@@ -81,13 +91,13 @@ const UserReducer = (state = UserIntialState, action) => {
             case "USER_USER_INFO_EDIT_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data,
+                infoEditErrorMessage: action.data,
             }
 
 
             case "USER_MAIL_EDIT_SUCCESS": return {
                 ...state,
-                error: '',
+                mailEditErrorMessage: '',
                 loading: '',
                 user: {
                     ...state.user,
@@ -97,33 +107,33 @@ const UserReducer = (state = UserIntialState, action) => {
             case "USER_MAIL_EDIT_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data,
+                mailEditErrorMessage: action.data,
             }
 
 
             case "USER_MAIL_AUTH_SUCCESS": return {
                 ...state,
-                error: '',
+                authErrorMessage: '',
                 loading: '',
                 successMessage: action.data,
             }
             case "USER_MAIL_AUTH_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data,
+                authErrorMessage: action.data,
             }
           
           
 
             case "USER_PASSWORD_EDIT_SUCCESS": return {
                 ...state,
-                error: '',
+                passwordEditErrorMessage: '',
                 loading: '',
             }
             case "USER_PASSWORD_EDIT_FAILUE" : return {
                 ...state,
                 loading: '',
-                error: action.data,
+                passwordEditErrorMessage: action.data,
             }
 
             

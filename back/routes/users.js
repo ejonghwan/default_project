@@ -113,24 +113,24 @@ router.get('/logout', (req, res) => {
 router.post('/signup', async (req, res) => {
     try {
         const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = req.body;
-        if(!id || typeof id !== 'string') return res.status(400).json({ message: 'is not id' }) 
-        if(!password ) return res.status(400).json({ message: 'is not password' }) 
-        if(!email || typeof email !== 'string') return res.status(400).json({ message: 'is not email' }) 
-        if(!name || typeof name !== 'string') return res.status(400).json({ message: 'is not name' }) 
-        if(!qeustion || typeof qeustion !== 'object') return res.status(400).json({ message: 'is not qeustion' }) 
-        if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({ message: 'is not phoneNumber' }) 
-        if(!gender || typeof gender !== 'string') return res.status(400).json({ message: 'is not gender' }) 
-        if(!birthday || typeof birthday !== 'string') return res.status(400).json({ message: 'is not birthday' }) 
+        if(!id || typeof id !== 'string') throw Error( 'is not id' ) 
+        if(!password ) throw Error( 'is not password' ) 
+        if(!email || typeof email !== 'string') throw Error( 'is not email' ) 
+        if(!name || typeof name !== 'string') throw Error( 'is not name' ) 
+        if(!qeustion || typeof qeustion !== 'object') throw Error( 'is not qeustion' ) 
+        if(!phoneNumber || typeof phoneNumber !== 'string') throw Error( 'is not phoneNumber' ) 
+        if(!gender || typeof gender !== 'string') throw Error( 'is not gender' ) 
+        if(!birthday || typeof birthday !== 'string') throw Error( 'is not birthday' ) 
 
         const existingUser = await User.findOne({$or: [{id: id}, {phoneNumber: phoneNumber}] });
-        if(existingUser) return res.status(400).json({ message: '유저가 이미 존재합니다' });
+        if(existingUser) throw Error( '유저나 휴대폰번호가 이미 존재합니다' );
       
         const user = await new User(req.body, { token: null });
 
         await bcrypt.genSalt(10, async (err, salt) => {
             // password hash
             await bcrypt.hash(user.password, salt, async (err, hash) => {
-                if(err) throw new Error(err);
+                if(err) throw Error(err);
                 user.password = hash;
 
                 jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" }, (err, reftoken) => {
@@ -143,7 +143,7 @@ router.post('/signup', async (req, res) => {
         });
 
     } catch(err) {
-        console.error(err);
+        console.error('server:', err);
         res.status(500).json({ message: err.message });
     }
 })

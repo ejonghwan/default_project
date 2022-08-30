@@ -11,7 +11,8 @@ import Input from '../common/form/Input.js'
 import Label from '../common/form/Label.js'
 
 // context & request 
-import { prevPasswordEditUser, findPasswordEditUser } from '../../reducers/UserRequest.js'
+// import { prevPasswordEditUser, findPasswordEditUser } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 
@@ -21,8 +22,12 @@ import { statusCode, passwordChecked } from '../../utils/utils.js'
 
 const UserPasswordEdit = props => {
 
-    const { prevPasswordCheck, userId } = props;
 
+    const { prevPasswordEditUser, findPasswordEditUser } = UserRequest();
+    const { state, dispatch } = useContext(UserContext)
+    const navigate = useNavigate();
+
+    const { prevPasswordCheck, userId } = props;
     const [prevPassword, handlePrevPassword, setPrevPassword] = useInput('') 
     const [newPassword, handleNewPassword, setNewPassword] = useInput('') 
     const [newPasswordCheck, handleNewPasswordCheck, setNewPasswordCheck] = useInput('') 
@@ -34,8 +39,7 @@ const UserPasswordEdit = props => {
 
     const [submitActive, setSubmitActive] = useState(false);
 
-    const { state, dispatch } = useContext(UserContext)
-    const navigate = useNavigate();
+   
     
     // 인증이 모두 true인지
     useEffect(() => {

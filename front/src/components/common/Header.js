@@ -2,14 +2,16 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom'
 import './Header.css'
 
-import { logoutUser } from '../../reducers/UserRequest.js'
+// import { logoutUser } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 
 //context 
-import {UserContext} from '../../context/UserContext.js'
+import { UserContext } from '../../context/UserContext.js'
 import axios from 'axios';
 
 
 const Header = () => {
+    const { logoutUser } = UserRequest();
     const { state, dispatch } = useContext(UserContext)
     
     const handleLogout = async () => {

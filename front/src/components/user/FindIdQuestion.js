@@ -3,7 +3,6 @@ import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo,
 
 // module
 import { useInput } from '../common/hooks/index.js'
-import { findUserIdQuestion } from '../../reducers/UserRequest.js'
 import _debounce from 'lodash.debounce'
 
 // components
@@ -12,7 +11,8 @@ import Label from '../common/form/Label.js'
 
 
 // context & request 
-import { nmaeEditUser, emailEditUser } from '../../reducers/UserRequest.js'
+// import { nmaeEditUser, emailEditUser, findUserIdQuestion } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 // util
@@ -20,6 +20,8 @@ import { statusCode, questionData } from '../../utils/utils.js'
 
 
 const FindIdQuestion = () => {
+    const { nmaeEditUser, emailEditUser, findUserIdQuestion } = UserRequest();
+
     const [authToggle, setAuthToggle] = useState(false);
     const [name, handleName, setName] = useInput('');
     const [email, handleEmail, setEmail] = useInput(''); 

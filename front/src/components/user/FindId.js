@@ -3,7 +3,8 @@ import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo 
 
 // module
 import { useInput } from '../common/hooks/index.js'
-import { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
+// import { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 import _debounce from 'lodash.debounce'
 
 // components
@@ -21,6 +22,8 @@ import { statusCode } from '../../utils/utils.js'
 
 
 const FindId = () => {
+    const { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } = UserRequest();
+
     const [authNumber, handleAuthNumber, setAutnNumber] = useInput('');
     const [authToggle, setAuthToggle] = useState(false);
     const [name, handleName, setName] = useInput('');

@@ -13,7 +13,8 @@ import Input from '../components/common/form/Input.js'
 import Label from '../components/common/form/Label.js'
 
 // context & request 
-import { signupUser } from '../reducers/UserRequest.js'
+// import { signupUser } from '../reducers/UserRequest.js'
+import UserRequest from '../reducers/UserRequest.js'
 import { UserContext } from '../context/UserContext.js'
 
 // util
@@ -48,8 +49,15 @@ import { questionData, statusCode, passwordChecked, englishChecked, stringLength
 
 const Signup = () => {
     
+    const { signupUser } = UserRequest();
+    const { state, dispatch } = useContext(UserContext)
     const cookies = new Cookies();
     const successRoot = cookies.get('signup')
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const email = decodeURIComponent(searchParams.get('email'));
+
 
     const [userId, handleUserId] = useInput('') 
     const [userPassword, handlePassword] = useInput('') 
@@ -69,13 +77,7 @@ const Signup = () => {
     const [birthday, handleBirthday] = useInput('')
     const [birthdayLengthChecked, setBirthdayLengthChecked] = useState(false)
   
-    const { state, dispatch } = useContext(UserContext)
-
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const email = decodeURIComponent(searchParams.get('email'));
+   
  
 
     const handleTerms = useCallback(e => {
@@ -101,7 +103,7 @@ const Signup = () => {
         try {   
             if(!userId && !userPassword && !userName && !passwordIsChecked && !terms && !qeustionType && !result && !phoneNumber && !gender && !birthday) return;
 
-            await dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
+            dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
             const user = await signupUser({
                 id: userId, 
                 password: userPassword, 
@@ -113,18 +115,15 @@ const Signup = () => {
                 birthday,
        
             });
-            dispatch({ type: "USER_SIGNUP_SUCCESS" })
-            
+
             if(statusCode(user.status, 2)) {
                 alert('회원가입이 완료되었습니다')
                 // 로그인 페이지 만들면 로그인으로 
                 navigate('/')
             }
-
+            // try 에러나면 catch로 가긴함
         } catch(err) {
-            dispatch({ type: "USER_SIGNUP_FAILUE", data: err.err })
-            console.error(err)
-
+            console.error('view ', err)
         }
     }, 500), [userId, userPassword, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
 
@@ -159,12 +158,12 @@ const Signup = () => {
 
 
     useEffect(() => {
-        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result && phoneNumber && gender && birthday && passwordProtected) {
+        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result && phoneNumber && gender && birthday && passwordProtected && !phoneNumberLengthChecked && !birthdayLengthChecked) {
             setSubmitActive(true)
         } else {
             setSubmitActive(false)
         };
-    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday, passwordProtected])
+    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday, passwordProtected, phoneNumberLengthChecked, birthdayLengthChecked])
 
 
 
@@ -361,7 +360,7 @@ const Signup = () => {
                 </div>
                 <button type="submit" className={submitActive ? 'checked' : 'none'} disabled={submitActive ? false : true}>회원가입</button>
             </form>
-          
+            {state.signupErrorMessage && <p style={{color: "red"}}>{state.signupErrorMessage}</p>}
         </div>
     );
 };

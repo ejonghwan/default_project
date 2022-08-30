@@ -10,7 +10,8 @@ import Label from '../common/form/Label.js';
 import Timer from '../common/utils/Timer.js';
 
 // context & request 
-import  { userInfoEditUser, emailEditUser, memberAuthNumberRequest } from '../../reducers/UserRequest.js';
+// import  { userInfoEditUser, emailEditUser, memberAuthNumberRequest } from '../../reducers/UserRequest.js';
+import UserRequest from '../../reducers/UserRequest.js';
 import { UserContext } from '../../context/UserContext.js';
 
 // util
@@ -32,7 +33,9 @@ const UserProfile = () => {
     const [userEmail, handleUserEmail, setUserEmail] = useInput('');
     const [authNumber, handleAuthNumber, setAuthNumber] = useInput('');
     
+    const { userInfoEditUser, emailEditUser, memberAuthNumberRequest } = UserRequest();
     const {state, dispatch} = useContext(UserContext);
+
     const [timerNumber, setTimerNumber] = useState(false);
 
     const womanRef = useRef(null) 

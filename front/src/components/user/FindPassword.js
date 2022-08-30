@@ -3,7 +3,6 @@ import React, { Fragment, useState, useEffect, useCallback, useContext, useMemo 
 
 // module
 import { useInput } from '../common/hooks/index.js'
-import { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
 import _debounce from 'lodash.debounce'
 
 // components
@@ -14,10 +13,13 @@ import UserPasswordEdit from './UserPasswordEdit.js'
 
 
 // context & request 
-import { nmaeEditUser, emailEditUser } from '../../reducers/UserRequest.js'
+// import { findUserId, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
 const FindPassword = () => {
+
+        const { findUserId, nonLoginMemberAuthNumberRequest } = UserRequest()
 
         const [authNumber, handleAuthNumber, setAutnNumber] = useInput('');
         const [authToggle, setAuthToggle] = useState(false);
@@ -25,7 +27,7 @@ const FindPassword = () => {
         const [email, handleEmail, setEmail] = useInput(''); 
         const [resMsg, setResMsg] = useState({});
         const [authTimeout, setAuthTimeout] = useState(false);
-        const [authcom, setAuthcom] = useState(false)
+        const [authcom, setAuthcom] = useState(false);
 
         
     

@@ -12,7 +12,8 @@ import Timer from '../../components/common/utils/Timer.js'
 
 // context
 import { UserContext } from '../../context/UserContext.js'
-import { emailAuth } from '../../reducers/UserRequest.js'
+// import { emailAuth } from '../../reducers/UserRequest.js'
+import UserRequest from '../../reducers/UserRequest.js'
 
 // util
 import { statusCode } from '../../utils/utils.js'
@@ -20,9 +21,11 @@ import { statusCode } from '../../utils/utils.js'
 
 const Auth = () => {
 
+    const { emailAuth } = UserRequest();
+    const {state, dispatch} = useContext(UserContext);
+
     const [email, handleEmail] = useInput('');
     const [authData, setAuthData] = useState(null);
-    const {state, dispatch} = useContext(UserContext);
 
     const [authState, setAuthState] = useState(false);
     const [message, setMessage] = useState('');
@@ -83,11 +86,11 @@ const Auth = () => {
                     />
                 </div>
                 <button>인증</button>
-                {state.error && (<span>{authData.email}</span>)} <span>{state.error}</span><br />
+                {state.authErrorMessage && <span>{state.authErrorMessage}</span>}<br />
             </form>
             ) : (
             <div>
-                {authData.email && (<span>{authData.email}</span>)} <span>{state.successMessage}</span><br />
+                {authData.successMessage && <span>{state.successMessage}</span>} <br />
                 {authState && <Timer  
                     endSecond={180} 
                     startingPoint={180} 
