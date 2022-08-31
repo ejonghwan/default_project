@@ -15,7 +15,7 @@ import UserRequest from '../../reducers/UserRequest.js';
 import { UserContext } from '../../context/UserContext.js';
 
 // util
-import { stringLengthChecked  } from '../../utils/utils.js';
+import { stringLengthChecked, statusCode  } from '../../utils/utils.js';
 
 
 
@@ -42,11 +42,8 @@ const UserProfile = () => {
     const manRef = useRef(null) 
 
     const handleToggle = useCallback(e => {
-        console.log(e.target.name)
         const { name } = e.target;
-        if(name === "userInfo") {
-            setEditUserInfoState(!editUserInfoState);
-        };
+        if(name === "userInfo") return setEditUserInfoState(!editUserInfoState);
         if(name === "email") return setEditEmailState(!editEmailState);
         if(name === "emailAuth") { //인증 수정 취소
             setEditEmailAuthState(!editEmailAuthState);
@@ -57,6 +54,23 @@ const UserProfile = () => {
     }, [editUserInfoState, editEmailState, editEmailAuthState]);
 
 
+
+    // 이메일 수정 인증번호 요청 
+    const handleEmailAuth = e => {
+        e.preventDefault();
+        emailAuth();
+    };
+    const emailAuth = useMemo(() => _debounce(async e => {
+        try {
+            const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id });
+            if(statusCode(res.status, 2)) { setEditEmailAuthState(true); }
+        } catch(err) {
+            console.error(err);
+        };
+    }, 500), [userEmail, timerNumber]);
+    // 이메일 수정 인증번호 요청 
+
+
     // 이메일 수정 요청  
     const handleEmailEdit = e => {
         e.preventDefault();
@@ -65,73 +79,60 @@ const UserProfile = () => {
     const emailEdit = useMemo(() => _debounce(async () => {
         try {
             const res = await emailEditUser({ email: userEmail, _id: state.user._id, authNumber: authNumber })
-            // 실패시
-            if(res.status === 400) return dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: res.data.message })
-            dispatch({ type: "USER_MAIL_EDIT_SUCCESS", data: res.data })
-            setEditEmailState(!editEmailState)
-            setEditEmailAuthState(!editEmailAuthState)
+            if(statusCode(res.status, 2)) {
+                setEditEmailState(!editEmailState);
+                setEditEmailAuthState(!editEmailAuthState);
+            }
         } catch(err) {
-            console.log('catch res', err)
-            console.error(err)
+            console.error(err);
         }
-    },500), [userEmail, authNumber])
+    },500), [userEmail, authNumber]);
     // 이메일 수정 요청  
 
-
-    // 이메일 수정 인증번호 요청 
-    const handleEmailAuth = e => {
-        e.preventDefault();
-        emailAuth()
-    } 
-    const emailAuth = useMemo(() => _debounce(async e => {
-        try {
-            const res = await memberAuthNumberRequest({ email: userEmail, _id: state.user._id })
-            setEditEmailAuthState(true)
-        } catch(err) {
-            console.error(err)
-        }
-    }, 500), [userEmail, timerNumber])
-    // 이메일 수정 인증번호 요청 
-
     
-    // 이름 수정 요청
+    // 회원정보 수정 요청
     const handleUserInfoEdit = e => {
         e.preventDefault();
         userInfo();
-    }
+    };
     const userInfo = useMemo(() => _debounce(async() => {
         try {
-            const info = {
+            const userInfo = {
                 name: userName, 
                 gender: userGender,
                 birthday: userBirthday,
                 phoneNumber: userPhoneNumber,
                 _id: state.user._id
             }
-            const res = await userInfoEditUser(info)
-            dispatch({ type: "USER_USER_INFO_EDIT_SUCCESS", data: res.data })
-            setEditUserInfoState(!editUserInfoState)
+            const res = await userInfoEditUser(userInfo);
+            setEditUserInfoState(!editUserInfoState);
         } catch(err) {
-            dispatch({ type: "USER_USER_INFO_EDIT_FAILUE", data: err.err })
-            console.error(err)
-        }
-    }), [userName, userGender, userBirthday, userPhoneNumber])
-    // 이름 수정 요청
+            console.error(err);
+        };
+    }), [userName, userGender, userBirthday, userPhoneNumber]);
+    // 회원정보 수정 요청
+
 
     useEffect(() => {
         userPhoneNumber && stringLengthChecked(userPhoneNumber, 11) ? setPhoneNumberLengthChecked(false) : setPhoneNumberLengthChecked(true)
-    }, [userPhoneNumber]) 
+    }, [userPhoneNumber]);
 
     useEffect(() => {
         userBirthday && stringLengthChecked(userBirthday, 8) ? setBirthdayLengthChecked(false) : setBirthdayLengthChecked(true)
-    }, [userBirthday]) 
+    }, [userBirthday]);
 
     useEffect(() => {
-        state.user.gender === '남'? 
-        manRef.current && manRef.current.setAttribute('checked', true) : 
-        womanRef.current && womanRef.current.setAttribute('checked', true)
-    }, [editUserInfoState])
+        if(state.user.gender === '남') {
+            setUserGender(manRef.current && manRef.current.defaultValue); //radio value
+            manRef.current && manRef.current.setAttribute('checked', true);
+        } else {
+            setUserGender(womanRef.current && womanRef.current.defaultValue); //radio value
+            womanRef.current && womanRef.current.setAttribute('checked', true)
+        }
+    }, [editUserInfoState]);
 
+
+    
 
     return (
         <Fragment>
@@ -184,7 +185,7 @@ const UserProfile = () => {
                                     disabled={!timerNumber ? false : true}
                                 />
                                 <button disabled={!timerNumber ? false : true}>이메일 변경하기</button>
-                                {state.error && <p>{state.error}</p>}
+                               
                                 <br />
                                 <Timer  
                                     endSecond={180} 
@@ -202,6 +203,7 @@ const UserProfile = () => {
                             <button type="button" name="email" onClick={handleToggle}>이메일 수정</button>
                         </Fragment>
                     ) }
+                     {state.mailEditErrorMessage && <p style={{color: 'red'}}>{state.mailEditErrorMessage}</p>}
                 </li>
                 <li>아이디: {state.user.id}</li>
                 {editUserInfoState ? (
@@ -236,6 +238,7 @@ const UserProfile = () => {
                                         onChange={handleUserGender} 
                                         ref={manRef}
                                         // checked={state.user.gender === '남' ? true : false}
+                                        // 이거 수정할떄 체크안됨 
                                     />
                                 </span>
                                 <span>
@@ -289,6 +292,7 @@ const UserProfile = () => {
                                 )}
                             </li>
                             <button>개인정보 변경하기</button>
+                            {state.infoEditErrorMessage && <p style={{color: 'red'}}>{state.infoEditErrorMessage}</p>}
                             <button type="button" name="userInfo" onClick={handleToggle}>취소</button>
                         </form>
                     </Fragment>

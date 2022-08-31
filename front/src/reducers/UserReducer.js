@@ -23,7 +23,14 @@ const UserReducer = (state = UserIntialState, action) => {
             case "ERROR_LOADING_CLEAR" : return {
                 ...state,
                 loading: '',
-                error: '',
+                authErrorMessage: '',
+                loginErrorMessage: '',
+                signupErrorMessage: '',
+                findIdErrorMessage: '',
+                findPasswordErrorMessage: '',
+                infoEditErrorMessage: '',
+                mailEditErrorMessage: '',
+                passwordEditErrorMessage: '',
             }
 
             

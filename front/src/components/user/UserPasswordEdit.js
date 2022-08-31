@@ -60,7 +60,7 @@ const UserPasswordEdit = props => {
     // 기존 비번 바꾸기
     const prevPasswordEdit = useMemo(() => _debounce(async() => {
         try {   
-            if(!prevPassword && !newPassword && !state && !passwordIsChecked) return console.error('정보 확인해주세요');
+            if(!prevPassword || !newPassword || !state || !passwordIsChecked) throw new Error('정보 확인해주세요');
             dispatch({ type: "LOADING", loadingMessage: "비번 변경중.." })
             const user = await prevPasswordEditUser({
                 prevPassword, 
@@ -68,19 +68,12 @@ const UserPasswordEdit = props => {
                 newPasswordCheck,
                 _id: state.user._id
             });
-
             if(statusCode(user.status, 2)) { // 성공시
-                dispatch({ type: "USER_PASSWORD_EDIT_SUCCESS", data: user.data.message })
                 setPrevPassword('')
                 setNewPassword('')
                 setNewPasswordCheck('')
                 return;
             }
-            // 비밀번호 강화 로직 아직안함
-            //실패시 
-            console.log(user)
-            dispatch({ type: "USER_PASSWORD_EDIT_FAILUE", data: user.data.message })
-
         } catch(err) {
             console.error(err)
         }
@@ -198,7 +191,7 @@ const UserPasswordEdit = props => {
              
                 <button className={submitActive ? 'checked' : 'none'} disabled={submitActive ? false : true}>비번변경</button>
             </form>
-            <p>{state.error && state.error}</p>
+           {state.passwordEditErrorMessage &&  <p style={{color: 'red'}}>{state.passwordEditErrorMessage}</p>}
         </Fragment>
     )
 }

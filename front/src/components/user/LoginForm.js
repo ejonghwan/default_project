@@ -27,8 +27,6 @@ const LoginForm = () => {
     const { loginUser, logoutUser } = UserRequest();
     const {state, dispatch} = useContext(UserContext)
 
-
-   
     const handleSubmit = async e => {
         e.preventDefault();
         submit();
@@ -37,19 +35,14 @@ const LoginForm = () => {
 
     const submit = useMemo(() => _debounce(async () => {
         try {
-            await dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
+            dispatch({ type: "LOADING", loadingMessage: "로그인 중.." })
             const user = await loginUser({ id: userId, password: userPassword })
-            console.log('111??', user)
-            await dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data })
-
             if(statusCode(user.status, 2)) {
                 setUserId('')
                 setUserPassword('')
             }
-
         } catch(err) {
             console.error('catch?', err)
-            dispatch({ type: "USER_LOGIN_FAILUE", data: err.err  })
         }
     }, 500), [userId, userPassword])
 
@@ -108,6 +101,7 @@ const LoginForm = () => {
                      <button>view password</button>
                  </div>
                  <button type="submit">로그인</button>
+                 <p style={{color: "red"}}>{state.loginErrorMessage}</p>
              </form>
             ) : (<LoginUserInfo />)}
         </Fragment>

@@ -11,6 +11,8 @@ import Label from '../common/form/Label.js'
 import Timer from '../../components/common/utils/Timer.js';
 import UserPasswordEdit from './UserPasswordEdit.js'
 
+// util 
+import { statusCode } from '../../utils/utils.js'
 
 // context & request 
 // import { findUserId, nonLoginMemberAuthNumberRequest } from '../../reducers/UserRequest.js'
@@ -20,6 +22,7 @@ import { UserContext } from '../../context/UserContext.js'
 const FindPassword = () => {
 
         const { findUserId, nonLoginMemberAuthNumberRequest } = UserRequest()
+        const {state, dispatch} = useContext(UserContext)
 
         const [authNumber, handleAuthNumber, setAutnNumber] = useInput('');
         const [authToggle, setAuthToggle] = useState(false);
@@ -30,8 +33,7 @@ const FindPassword = () => {
         const [authcom, setAuthcom] = useState(false);
 
         
-    
-    
+
         /** 이메일인증 서브밋 */
         const handleAuthNumberSubmit = e => {
             e.preventDefault();
@@ -41,9 +43,7 @@ const FindPassword = () => {
             try {
                 const number = await nonLoginMemberAuthNumberRequest({ name, email }); 
                 setResMsg({ ...resMsg, ...number.data })
-                if(number.status === 400) return;
-    
-                setAuthToggle(true) //성공 시 
+                if(statusCode(number.status, 2)) return setAuthToggle(true); //성공 시 
             } catch(err) {
                 console.error(err)
             }
@@ -157,6 +157,7 @@ const FindPassword = () => {
                 <p>{resMsg.id}</p>
                 <p>{resMsg.message}</p>
             </div>)}
+            {state.mailEditErrorMessage && <p style={{color: 'red'}}>{state.mailEditErrorMessage}</p>}
         </Fragment>
     )
 }

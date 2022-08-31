@@ -18,27 +18,26 @@ router.get('/load', auth, async (req, res) => {
     try {
         delete req.user.token;
         if(req.reftoken) {
+            // auth 미들웨어에서 acc/ref 토큰 모두 만료되어 ref 다시 만들고 db에 저장 후 쿠키로 응답
             console.log('모두 만료돼서 디비 토큰 다시 저장하고 acc 다시 발급')
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(req.reftoken, salt,(err, hash) => {
                     // res
                     res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
-                    res.status(200).json(req.user)
-                })
-            })
+                    res.status(200).json(req.user);
+                });
+            });
         } else {
-            // 쿠키랑 로컬저장소에 정보남고 못불러오는 에러 있는데 어떤 경우인지 못찾음
-            console.log('디비 토큰 만료안돼서 이거넘김')
-            res.status(200).json(req.user)
-        }
-            
+            // 쿠키로 보낸 리프레시 토큰 만료안돼서 이거넘김
+            console.log('acc토큰 or 쿠키로 보낸 리프레시 토큰 만료안돼서 이거넘김');
+            res.status(200).json(req.user);
+        };
     } catch(err) {
-        console.error(err)
+        console.error(err);
         res.status(501).clearCookie('X-refresh-token').end();
         // res.status(500).json({ message: err.message })
-    }
-
-})
+    };
+});
 
 
 
@@ -73,9 +72,9 @@ router.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if(!match) return res.status(400).json({ message: "password is not matched" })
         if(match) {
+            // 2h acc토큰 발급
             jwt.sign({ id: id }, process.env.JWT_KEY, { expiresIn: "2h" }, (err, accToken) => {
                 if(err) throw new Error(err)
-
                 // token hash
                 bcrypt.genSalt(10, async (err, salt) => {
                     bcrypt.hash(user.token, salt, (err, hash) => {
@@ -113,14 +112,14 @@ router.get('/logout', (req, res) => {
 router.post('/signup', async (req, res) => {
     try {
         const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = req.body;
-        if(!id || typeof id !== 'string') throw Error( 'is not id' ) 
-        if(!password ) throw Error( 'is not password' ) 
-        if(!email || typeof email !== 'string') throw Error( 'is not email' ) 
-        if(!name || typeof name !== 'string') throw Error( 'is not name' ) 
-        if(!qeustion || typeof qeustion !== 'object') throw Error( 'is not qeustion' ) 
-        if(!phoneNumber || typeof phoneNumber !== 'string') throw Error( 'is not phoneNumber' ) 
-        if(!gender || typeof gender !== 'string') throw Error( 'is not gender' ) 
-        if(!birthday || typeof birthday !== 'string') throw Error( 'is not birthday' ) 
+        if(!id || typeof id !== 'string') return res.status(400).json({message: 'is not id'}) 
+        if(!password ) return res.status(400).json({message:'is not password'}) 
+        if(!email || typeof email !== 'string') return res.status(400).json({message:'is not email'}) 
+        if(!name || typeof name !== 'string') return res.status(400).json({message:'is not name'}) 
+        if(!qeustion || typeof qeustion !== 'object') return res.status(400).json({message:'is not qeustion'}) 
+        if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({message:'is not phoneNumber'}) 
+        if(!gender || typeof gender !== 'string') return res.status(400).json({message:'is not gender'}) 
+        if(!birthday || typeof birthday !== 'string') return res.status(400).json({message:'is not birthday'}) 
 
         const existingUser = await User.findOne({$or: [{id: id}, {phoneNumber: phoneNumber}] });
         if(existingUser) throw Error( '유저나 휴대폰번호가 이미 존재합니다' );

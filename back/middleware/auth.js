@@ -22,13 +22,15 @@ export const auth = async (req, res, next) => {
             } else {
 
                 // 인증토큰 만료되어 리프레시 토큰으로 인증할 경우
-                console.log('acc 토큰 만료돼서 refresh 토큰 으로 인증하고 다시 발급')
                 const getRefreshToken = req.cookies["X-refresh-token"]
+                if(!getRefreshToken) return; // client에서 cookie로 리프레시토큰없으면 return
+                console.log('acc 토큰 만료돼서 refresh 토큰 으로 인증하고 다시 발급')
+
                 const refreshTokenDecode = decodeURIComponent(getRefreshToken)
                 const user = await User.findOne({ id: match.id }).select({ password: 0, qeustion: 0 })
 
 
-                // db에 저장된 리프레시가 만료되었을 경우
+                // db에 저장된 리프레시가 만료되었을 경우 => db토큰 새로 교체하고 acc토큰 발급
                 const dbToken = await jwt.verify(user.token, process.env.JWT_KEY, {ignoreExpiration: true})
                 if(dbToken.exp < Date.now().valueOf() / 1000) {
                     user.token = jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "30 days" })
@@ -41,27 +43,24 @@ export const auth = async (req, res, next) => {
                 };
 
 
-                // 리프레시 토큰이 참이고 만료기간이 안 지난경우
+                // 넘어온 리프레시 토큰이 참이고 만료기간이 안 지난경우 => acc토큰 새로 발급
                 const refreshTokenMatch = await bcrypt.compare(user.token, refreshTokenDecode)
                 if(refreshTokenMatch && dbToken.exp > Date.now().valueOf() / 1000) {
+                    // 2시간짜리 토큰 재발급
                     const acctoken = await jwt.sign({ id: user.id }, process.env.JWT_KEY, { expiresIn: "2h" })
-                    // console.log('새로발급한 acc 토큰: ', acctoken)
-                    req.user = { accToken, ...user._doc }
-                    next() 
-                } 
-             
-            }
-
+                    req.user = { accToken: acctoken, ...user._doc };
+                    next();
+                };
+            };
         } else {
-            return res.status(400).json({ message: "acc 토큰 없음. 로그인 다시 해주세요" })
+            return res.status(400).json({ message: "토큰 만료. 로그인 다시 해주세요" });
         }
        
 
     } catch(err) {
-        console.log(err)
-        return res.status(400).json({ message: "인증에러" })
-    }
-       
-}
+        console.log(err);
+        return res.status(400).json({ message: "인증에러" });
+    };
+};
 
 

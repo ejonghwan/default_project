@@ -60,7 +60,6 @@ const Auth = () => {
 
 
     useEffect(() => {
-        
         return () => {
             authMail.cancel();
         }

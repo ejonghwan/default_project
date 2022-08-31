@@ -16,9 +16,8 @@ const Header = () => {
     
     const handleLogout = async () => {
       try {
-        await dispatch({ type: "LOADING", loadingMessage: "로그아웃 중.." })
+        dispatch({ type: "LOADING", loadingMessage: "로그아웃 중.." })
         const user = await logoutUser();
-        dispatch({ type: "USER_LOGOUT_SUCCESS" })
       } catch(err) {
         console.err(err)
       }

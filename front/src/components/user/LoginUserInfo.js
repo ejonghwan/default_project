@@ -12,8 +12,6 @@ const LoginUserInfo = () => {
     const {state, dispatch} = useContext(UserContext)
     const { id, name, email } = state.user;
 
-   console.log(state)
-
     return (
         <Fragment>
             로그인정보
