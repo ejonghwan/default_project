@@ -23,6 +23,7 @@ import { statusCode } from '../../utils/utils.js'
 
 const FindId = () => {
     const { findUserId, nonMemberAuthNumberRequest, nonLoginMemberAuthNumberRequest } = UserRequest();
+    const {state, dispatch} = useContext(UserContext);
 
     const [authNumber, handleAuthNumber, setAutnNumber] = useInput('');
     const [authToggle, setAuthToggle] = useState(false);
@@ -40,9 +41,7 @@ const FindId = () => {
     const authSubmit = useMemo(() => _debounce(async() => {
         try {
             const number = await nonLoginMemberAuthNumberRequest({ name, email }); 
-            console.log(number, '?????????')
-            if(statusCode(number.status, [4, 5])) return setResMsg({ ...resMsg, message: number.data.message })
-            setAuthToggle(true) //성공 시 
+            if(statusCode(number.status, 2)) return setAuthToggle(true) //성공 시 
         } catch(err) {
             console.error(err)
         }
@@ -60,7 +59,6 @@ const FindId = () => {
             const findId = await findUserId({ authNumber }); 
             // 여기선 쿠키 2개 보냄
             
-            if(statusCode(findId.status, [4, 5])) return setResMsg({...resMsg, message: findId.data.message});
             if(statusCode(findId.status, 2)) { 
                 setAuthToggle(false);
                 setName('');
@@ -116,7 +114,7 @@ const FindId = () => {
                         disabled={authToggle && true}
                     />
                 </div>
-                <p style={{color: "red"}}>{resMsg.message && resMsg.message}</p>
+                {state.mailAuthErrorMessage && <p style={{color: "red"}}> {state.mailAuthErrorMessage }</p>}
                 <button disabled={authToggle && true}>인증번호 보내기</button>
             </form>
             {/* 829 여기 하다가 감. 인증 만료 시 다시찾기 클릭버튼  */}
@@ -145,7 +143,7 @@ const FindId = () => {
                         callback={() => setAuthTimeout(true)}
                     />
                  </div>
-                 <p style={{color: "red"}}>{resMsg.message && resMsg.message}</p>
+                 {state.authNumberErrorMessage && <p style={{color: "red"}}> {state.authNumberErrorMessage }</p>}
                  <button disabled={authTimeout}>아이디 찾기</button>
              </form>
             )}

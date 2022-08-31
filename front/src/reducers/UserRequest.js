@@ -189,7 +189,7 @@ const UserRequest = () => {
         } catch(err) {
             console.error(err)
             dispatch({ type: "ERROR_LOADING_CLEAR"});
-            dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.response.data.message });
+            dispatch({ type: "USER_MAIL_AUTH_FAILUE", data: err.response.data.message });
             return err.response;
         }
     }
@@ -211,7 +211,7 @@ const UserRequest = () => {
         } catch(err) {
             console.error(err)
             dispatch({ type: "ERROR_LOADING_CLEAR"});
-            dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.response.data.message });
+            dispatch({ type: "USER_MAIL_AUTH_FAILUE", data: err.response.data.message });
             return err.response
         }
     }
@@ -235,7 +235,7 @@ const UserRequest = () => {
         } catch(err) {
             console.error('user request ', err);
             dispatch({ type: "ERROR_LOADING_CLEAR"});
-            dispatch({ type: "USER_MAIL_EDIT_FAILUE", data: err.response.data.message });
+            dispatch({ type: "USER_MAIL_AUTH_FAILUE", data: err.response.data.message });
             return err.response;
         }
     }
@@ -336,6 +336,7 @@ const UserRequest = () => {
 
         } catch(err) {
             console.error(err)
+            dispatch({ type: "AUTH_NUMBER_FAILUE", data: err.response.data.message })
             return err.response
         }
     }

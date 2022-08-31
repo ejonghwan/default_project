@@ -42,7 +42,6 @@ const FindPassword = () => {
         const authSubmit = useMemo(() => _debounce(async() => {
             try {
                 const number = await nonLoginMemberAuthNumberRequest({ name, email }); 
-                setResMsg({ ...resMsg, ...number.data })
                 if(statusCode(number.status, 2)) return setAuthToggle(true); //성공 시 
             } catch(err) {
                 console.error(err)
@@ -61,8 +60,8 @@ const FindPassword = () => {
                 const findId = await findUserId({ authNumber }); 
                 // 여기선 쿠키 2개 보냄
     
-                setResMsg({ ...resMsg, ...findId.data })
-                if(findId.status === 200) { 
+                
+                if(statusCode(findId.status, 2)) { 
                     setAuthToggle(false);
                     setName('');
                     setEmail(''); 
@@ -120,8 +119,10 @@ const FindPassword = () => {
                     />
                 </div>
                 <button disabled={authToggle && true}>인증번호 보내기</button>
+                {state.mailAuthErrorMessage && <p style={{color: 'red'}}>{state.mailAuthErrorMessage}</p>}
             </form>
 
+            {resMsg && <div>{resMsg.id}</div>}
             {authToggle && (
                 <form onSubmit={handleFindIdSubmit}>
                   <div>
@@ -147,17 +148,14 @@ const FindPassword = () => {
                     />
                  </div>
                  <button disabled={authTimeout}>메일 인증하기</button>
+                 {state.authNumberErrorMessage && <p style={{color: 'red'}}>{state.authNumberErrorMessage}</p>}
              </form>
             )}
 
             <br /><br />
             {authcom && <UserPasswordEdit prevPasswordCheck={false} userId={resMsg.id}/>}
-            {resMsg && (<div>
-                
-                <p>{resMsg.id}</p>
-                <p>{resMsg.message}</p>
-            </div>)}
-            {state.mailEditErrorMessage && <p style={{color: 'red'}}>{state.mailEditErrorMessage}</p>}
+            
+           
         </Fragment>
     )
 }

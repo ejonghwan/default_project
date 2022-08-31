@@ -9,6 +9,8 @@ export const UserIntialState = {
     infoEditErrorMessage: '',
     mailEditErrorMessage: '',
     passwordEditErrorMessage: '',
+    mailAuthErrorMessage: '',
+    authNumberErrorMessage: '',
     loading: '',
     user: {},
 }
@@ -31,6 +33,8 @@ const UserReducer = (state = UserIntialState, action) => {
                 infoEditErrorMessage: '',
                 mailEditErrorMessage: '',
                 passwordEditErrorMessage: '',
+                authNumberErrorMessage: '',
+                mailAuthErrorMessage: '',
             }
 
             
@@ -122,13 +126,26 @@ const UserReducer = (state = UserIntialState, action) => {
                 ...state,
                 authErrorMessage: '',
                 loading: '',
-                successMessage: action.data,
+                mailAuthErrorMessage: action.data,
             }
             case "USER_MAIL_AUTH_FAILUE" : return {
                 ...state,
                 loading: '',
-                authErrorMessage: action.data,
+                mailAuthErrorMessage: action.data,
             }
+
+
+            case "AUTH_NUMBER_SUCCESS": return {
+                ...state,
+                authNumberErrorMessage: '',
+                loading: '',
+            }
+            case "AUTH_NUMBER_FAILUE" : return {
+                ...state,
+                loading: '',
+                authNumberErrorMessage: action.data,
+            }
+            
           
           
 
