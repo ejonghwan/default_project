@@ -6,6 +6,7 @@ import UserPasswordEdit from '../components/user/UserPasswordEdit.js'
 import FindId from '../components/user/FindId.js'
 import FindPassword from '../components/user/FindPassword.js'
 import FindIdQuestion from '../components/user/FindIdQuestion.js'
+import Secession from '../components/user/Secession.js'
 
 
 const Profile = () => {
@@ -27,6 +28,10 @@ const Profile = () => {
             <br />
             FindPassword
             <FindPassword />
+            <br />
+            <br />
+            user delete
+            <Secession />
         </div>
     );
 };

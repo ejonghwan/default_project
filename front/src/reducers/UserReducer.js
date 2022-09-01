@@ -126,7 +126,6 @@ const UserReducer = (state = UserIntialState, action) => {
                 ...state,
                 authErrorMessage: '',
                 loading: '',
-                mailAuthErrorMessage: action.data,
             }
             case "USER_MAIL_AUTH_FAILUE" : return {
                 ...state,

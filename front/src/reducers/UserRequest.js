@@ -26,6 +26,7 @@ const UserRequest = () => {
             return res;
         } catch(err) {
             console.error(err)
+            dispatch({ type: "AUTH_NUMBER_FAILUE", data: err.response.data.message })
             return err.response
         }
     }
@@ -34,15 +35,16 @@ const UserRequest = () => {
     // 회원가입 유저
      const signupUser = async data => {
         try {
-            const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = data;
+            const { id, password, email, name, question, phoneNumber, gender, birthday } = data;
 
+            console.log('sagas:', data)
             if(!id || typeof id !== 'string') throw new Error('is not id');
             if(!password || typeof password !== 'string') throw new Error('is not password');
             if(!email || typeof email !== 'string') throw new Error('is not email');
             if(!name || typeof name !== 'string') throw new Error('is not name');
-            if(!qeustion || typeof qeustion !== 'object') throw new Error('is not qeustion');
+            if(!question || typeof question !== 'object') throw new Error('is not question');
             if(!phoneNumber || typeof phoneNumber !== 'string') throw new Error('is not phoneNumber');
-            if(!gender || typeof qeustion !== 'string') throw new Error('is not gender');
+            if(!gender || typeof gender !== 'string') throw new Error('is not gender');
             if(!birthday || typeof birthday !== 'string') throw new Error('is not birthday');
             
             const config = {
@@ -302,9 +304,9 @@ const UserRequest = () => {
      const findPasswordEditUser = async data => {
         try {
             const { newPassword, _id, newPasswordCheck } = data;
-            if(!newPassword && typeof newPassword !== 'string') return console.error('user request error. is not newPassword');
-            if(!newPasswordCheck && typeof newPasswordCheck !== 'string') return console.error('user request error. is not newPasswordCheck');
-            if(!_id && typeof _id !== 'string') return console.error('user request error. is not _id');
+            if(!newPassword && typeof newPassword !== 'string') throw new Error('user request error. is not newPassword');
+            if(!newPasswordCheck && typeof newPasswordCheck !== 'string') throw new Error('user request error. is not newPasswordCheck');
+            if(!_id && typeof _id !== 'string') throw new Error('user request error. is not _id');
 
             const config = {
                 headers: {"Content-Type": "application/json"},
@@ -312,7 +314,6 @@ const UserRequest = () => {
             }
             const user = await axios.post(`${host}/api/users/find/password`, data, config);
             return user;
-
         } catch(err) {
             console.error(err)
             return err.response
@@ -324,7 +325,7 @@ const UserRequest = () => {
      const findUserId = async data => {
         try {
             const { authNumber } = data;
-            if(!authNumber && typeof authNumber !== 'string') return console.error('user request error. is not authNumber');
+            if(!authNumber || typeof authNumber !== 'string') throw new Error('user request error. is not authNumber');
 
             const config = {
                 headers: { "Content-Type": "application/json", },
@@ -332,6 +333,7 @@ const UserRequest = () => {
             }
 
             const findId = await axios.post(`${host}/api/users/find/id`, data, config);
+            dispatch({ type: "ERROR_LOADING_CLEAR"});
             return findId;
 
         } catch(err) {
@@ -345,11 +347,11 @@ const UserRequest = () => {
     // 질답으로 아이디 찾기  
      const findUserIdQuestion = async data => {
         try {
-            const { name, email, qeustionType, result } = data;
-            if(!name && typeof name !== 'string') return console.error('user request error. is not name');
-            if(!email && typeof email !== 'string') return console.error('user request error. is not email');
-            if(!qeustionType && typeof qeustionType !== 'string') return console.error('user request error. is not qeustionType');
-            if(!result && typeof result !== 'string') return console.error('user request error. is not result');
+            const { name, email, questionType, result } = data;
+            if(!name || typeof name !== 'string') throw new Error('user request error. is not name');
+            if(!email || typeof email !== 'string') throw new Error('user request error. is not email');
+            if(!questionType || typeof questionType !== 'string') throw new Error('user request error. is not questionType');
+            if(!result || typeof result !== 'string') throw new Error('user request error. is not result');
 
             const config = {
                 headers: { "Content-Type": "application/json"},
@@ -357,12 +359,44 @@ const UserRequest = () => {
             }
 
             const findId = await axios.post(`${host}/api/users/find/id/question`, data, config);
+            dispatch({ type: "ERROR_LOADING_CLEAR"});
             return findId;
 
         } catch(err) {
             console.error(err)
+            dispatch({ type: "ERROR_LOADING_CLEAR"});
+            dispatch({ type: "AUTH_NUMBER_FAILUE", data: err.response.data.message })
             return err.response
         }
+    }
+
+
+    // 회원탈퇴
+     const secession = async data => {
+        try {
+            const accToken = localStorage.getItem('X-access-token')
+            if(!accToken) throw new Error('토큰 만료. 로그인해주세요');
+
+            const { id, password } = data;
+            if(!id || typeof id !== 'string') throw new Error('is not id');
+            if(!password || typeof password !== 'string') throw new Error('is not password');
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    'X-access-token': accToken,
+                },
+                withCredentials: true,
+            };
+            const user = await axios.post(`${host}/api/users/delete`, data, config);
+            localStorage.removeItem('X-access-token');
+            dispatch({ type: "USER_LOGOUT_SUCCESS" });
+            dispatch({ type: "ERROR_LOADING_CLEAR"});
+            return user;
+        } catch(err) {
+            console.error(err);
+            dispatch({ type: "AUTH_NUMBER_FAILUE", data: err.response.data.message })
+            return err.response;
+        };
     }
 
     return {
@@ -380,6 +414,7 @@ const UserRequest = () => {
         findPasswordEditUser,
         findUserId,
         findUserIdQuestion,
+        secession,
     }
 }
 
@@ -423,15 +458,15 @@ export default UserRequest;
 // // 회원가입 유저
 // export const signupUser = async data => {
 //     try {
-//         const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = data;
+//         const { id, password, email, name, question, phoneNumber, gender, birthday } = data;
 
 //         if(!id && typeof id !== 'string') return;
 //         if(!password && typeof password !== 'string') return;
 //         if(!email && typeof email !== 'string') return;
 //         if(!name && typeof name !== 'string') return;
-//         if(!qeustion && typeof qeustion !== 'object') return;
+//         if(!question && typeof question !== 'object') return;
 //         if(!phoneNumber && typeof phoneNumber !== 'string') return;
-//         if(!gender && typeof qeustion !== 'string') return;
+//         if(!gender && typeof question !== 'string') return;
 //         if(!birthday && typeof birthday !== 'string') return;
         
 //         const config = {
@@ -724,10 +759,10 @@ export default UserRequest;
 // // 질답으로 아이디 찾기  
 // export const findUserIdQuestion = async data => {
 //     try {
-//         const { name, email, qeustionType, result } = data;
+//         const { name, email, questionType, result } = data;
 //         if(!name && typeof name !== 'string') return console.error('user request error. is not name');
 //         if(!email && typeof email !== 'string') return console.error('user request error. is not email');
-//         if(!qeustionType && typeof qeustionType !== 'string') return console.error('user request error. is not qeustionType');
+//         if(!questionType && typeof questionType !== 'string') return console.error('user request error. is not questionType');
 //         if(!result && typeof result !== 'string') return console.error('user request error. is not result');
 
 //         const config = {

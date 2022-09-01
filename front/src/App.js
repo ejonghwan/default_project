@@ -69,7 +69,9 @@ const App = () => {
     userEmailLoad()
     dispatch({type: "ERROR_LOADING_CLEAR"})
     console.log(state.isLogged)
+    
   }, [])
+
 
   useEffect(() => {
     console.log(state)

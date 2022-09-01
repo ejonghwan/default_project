@@ -25,11 +25,7 @@ const Auth = () => {
     const {state, dispatch} = useContext(UserContext);
 
     const [email, handleEmail] = useInput('');
-    const [authData, setAuthData] = useState(null);
-
     const [authState, setAuthState] = useState(false);
-    const [message, setMessage] = useState('');
-    
 
     const handleAuthMailSubmit = e => {
         e.preventDefault();
@@ -39,18 +35,7 @@ const Auth = () => {
         try {
             dispatch({ type: "LOADING", loadingMessage: "인증메일 보내는 중.." })
             const res = await emailAuth({ email: email })
-            setAuthData(res.data)
-
-            console.log('홈어스 resdata:', res)
-            setMessage(res.data)
-
-            if(statusCode(res.status, 2)) {
-                dispatch({ type: "USER_MAIL_AUTH_SUCCESS", data: '인증메일이 발송되었습니다' })
-                setAuthState(true);
-            } else {
-                dispatch({ type: "USER_MAIL_AUTH_FAILUE", data: res.data.message })
-            }
-
+            if(statusCode(res.status, 2)) return setAuthState(true);
         } catch(err) {
             console.error(err)
         }
@@ -63,7 +48,7 @@ const Auth = () => {
         return () => {
             authMail.cancel();
         }
-    }, [authData])
+    }, [])
 
 
     return (
@@ -85,11 +70,10 @@ const Auth = () => {
                     />
                 </div>
                 <button>인증</button>
-                {state.authErrorMessage && <span>{state.authErrorMessage}</span>}<br />
             </form>
             ) : (
             <div>
-                {authData.successMessage && <span>{state.successMessage}</span>} <br />
+                메일이 발송되었습니다<br />
                 {authState && <Timer  
                     endSecond={180} 
                     startingPoint={180} 
@@ -99,6 +83,7 @@ const Auth = () => {
                 />}
             </div>
         )}
+         {state.authNumberErrorMessage && <span>{state.authNumberErrorMessage}</span>}<br />
         </Fragment>
     )
 }

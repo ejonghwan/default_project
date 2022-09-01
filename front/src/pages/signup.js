@@ -67,7 +67,7 @@ const Signup = () => {
     const [englishCheckedState, setEnglishCheckedState] = useState(false);
     // const [userEmail, handleUserEmail] = useInput('') 
     const [userName, handleUserName] = useInput('') 
-    const [qeustionType, setQeustionType] = useState(null)
+    const [questionType, setQuestionType] = useState(null)
     const [result, handleResult] = useInput('') 
     const [terms, setTerms] = useState(false) ;
     const [submitActive, setSubmitActive] = useState(false);
@@ -89,9 +89,9 @@ const Signup = () => {
     }, [setTerms])
 
 
-    const handleQeustion = useCallback(e => {
-        setQeustionType(e.target.value)
-    }, [qeustionType, setQeustionType])
+    const handleQuestion = useCallback(e => {
+        setQuestionType(e.target.value)
+    }, [questionType, setQuestionType])
 
     
     // 요청
@@ -101,7 +101,7 @@ const Signup = () => {
     }
     const signup = useMemo(() => _debounce(async() => {
         try {   
-            if(!userId && !userPassword && !userName && !passwordIsChecked && !terms && !qeustionType && !result && !phoneNumber && !gender && !birthday) return;
+            if(!userId && !userPassword && !userName && !passwordIsChecked && !terms && !questionType && !result && !phoneNumber && !gender && !birthday) return;
 
             dispatch({ type: "LOADING", loadingMessage: "회원가입 중.." })
             const user = await signupUser({
@@ -109,7 +109,7 @@ const Signup = () => {
                 password: userPassword, 
                 email: email, 
                 name: userName,
-                qeustion: { qeustionType, result },
+                question: { questionType, result },
                 phoneNumber, 
                 gender, 
                 birthday,
@@ -125,7 +125,7 @@ const Signup = () => {
         } catch(err) {
             console.error('view ', err)
         }
-    }, 500), [userId, userPassword, userName, passwordIsChecked, terms, qeustionType, result, phoneNumber, gender, birthday])
+    }, 500), [userId, userPassword, userName, passwordIsChecked, terms, questionType, result, phoneNumber, gender, birthday])
 
 
     useEffect(() => {
@@ -134,6 +134,7 @@ const Signup = () => {
             navigate(-1)
         }
         cookies.remove('signup')
+        console.log('ggggggggg', gender)
     }, [])
 
     useEffect(() => { //비번 강화 체크 
@@ -158,12 +159,12 @@ const Signup = () => {
 
 
     useEffect(() => {
-        if(userId && userPassword && userName && passwordIsChecked && terms && qeustionType && result && phoneNumber && gender && birthday && passwordProtected && !phoneNumberLengthChecked && !birthdayLengthChecked) {
+        if(userId && userPassword && userName && passwordIsChecked && terms && questionType && result && phoneNumber && gender && birthday && passwordProtected && !phoneNumberLengthChecked && !birthdayLengthChecked) {
             setSubmitActive(true)
         } else {
             setSubmitActive(false)
         };
-    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, qeustionType, result, phoneNumber, gender, birthday, passwordProtected, phoneNumberLengthChecked, birthdayLengthChecked])
+    }, [userId, userName, passwordIsChecked, terms, userPassword, userPasswordCheck, questionType, result, phoneNumber, gender, birthday, passwordProtected, phoneNumberLengthChecked, birthdayLengthChecked])
 
 
 
@@ -264,7 +265,7 @@ const Signup = () => {
                     <Label htmlFor="phoneNumber" content="전화번호" classN="label_t1"/>
                     <Input 
                         id="phoneNumber" 
-                        type="number" 
+                        type="tel" 
                         required={true} 
                         placeholder="phoneNumber" 
                         classN="input_text_t1" 
@@ -325,8 +326,8 @@ const Signup = () => {
                     )}
                 </div>
                 <div>
-                    <Label htmlFor="qeustion" content="질문" classN="label_t1"/>
-                    <select name="qeustion" onChange={handleQeustion}>
+                    <Label htmlFor="question" content="질문" classN="label_t1"/>
+                    <select name="question" onChange={handleQuestion}>
                         {   
                             questionData && questionData.map((data, idx) => {
                                 return <option key={idx} value={data.questionType}>{data.question}</option>

@@ -21,19 +21,20 @@ import { statusCode, questionData } from '../../utils/utils.js'
 
 const FindIdQuestion = () => {
     const { nmaeEditUser, emailEditUser, findUserIdQuestion } = UserRequest();
+    const {state, dispatch} = useContext(UserContext)
 
     const [authToggle, setAuthToggle] = useState(false);
     const [name, handleName, setName] = useInput('');
     const [email, handleEmail, setEmail] = useInput(''); 
-    const [qeustionType, setQeustionType] = useState(null)
+    const [questionType, setQuestionType] = useState(null)
     const [result, handleResult, setResult] = useInput('') 
 
     const selectRef = useRef(null)
     const [resMsg, setResMsg] = useState({});
 
-    const handleQeustion = useCallback(e => {
-        setQeustionType(e.target.value)
-    }, [qeustionType, setQeustionType, authToggle])
+    const handleQuestion = useCallback(e => {
+        setQuestionType(e.target.value)
+    }, [questionType, setQuestionType, authToggle])
 
    
     /** 아이디 찾기 서브밋 */
@@ -43,21 +44,19 @@ const FindIdQuestion = () => {
     }
     const findIdSubmit = useMemo(() => _debounce(async() => {
         try {
-            const findId = await findUserIdQuestion({ name, email, qeustionType, result }); 
-    
-            if(statusCode(findId.status, [4, 5])) return setResMsg({...resMsg, message: findId.data.message});
+            const findId = await findUserIdQuestion({ name, email, questionType, result }); 
             if(statusCode(findId.status, 2)) { //성공시
                 setAuthToggle(false);
                 setName('');
                 setEmail(''); 
                 setResult('');
-                setResMsg({id: findId.data.id, message: ''});
+                setResMsg({id: findId.data.id});
                 selectRef.current[0].selected = true
             }
         } catch(err) {
             console.error(err)
         }
-    }, 1000), [name, email, qeustionType, result])
+    }, 1000), [name, email, questionType, result])
      /** //아이디 찾기 서브밋 */
 
 
@@ -103,8 +102,8 @@ const FindIdQuestion = () => {
                     />
                 </div>
                 <div>
-                    <Label htmlFor="qeustion" content="질문" classN="label_t1"/>
-                    <select name="qeustion" onChange={handleQeustion} ref={selectRef}>
+                    <Label htmlFor="question" content="질문" classN="label_t1"/>
+                    <select name="question" onChange={handleQuestion} ref={selectRef}>
                         {questionData && questionData.map((data, idx) => {
                             return <option key={idx} value={data.questionType}>{data.question}</option>
                         })}
@@ -124,7 +123,7 @@ const FindIdQuestion = () => {
                     />
                 </div>
                 <button disabled={authToggle && true}>인증번호 보내기</button>
-                <p style={{color: "red"}}>{resMsg.message && resMsg.message}</p>
+                {state.authNumberErrorMessage && <p style={{color: "red"}}> {state.authNumberErrorMessage}</p>}
             </form>
 
             <br /><br />

@@ -78,11 +78,9 @@ router.post('/login', async (req, res) => {
                 // token hash
                 bcrypt.genSalt(10, async (err, salt) => {
                     bcrypt.hash(user.token, salt, (err, hash) => {
-
                         delete user._doc.password;
                         delete user._doc.token;
                         delete user._doc.question;
-
                         res.cookie('X-refresh-token', hash, { expires: new Date(Date.now() + 7200000), httpOnly: true });
                         res.status(200).json({ accToken, ...user._doc });
                     })
@@ -111,12 +109,12 @@ router.get('/logout', (req, res) => {
 //@ access  public
 router.post('/signup', async (req, res) => {
     try {
-        const { id, password, email, name, qeustion, phoneNumber, gender, birthday } = req.body;
+        const { id, password, email, name, question, phoneNumber, gender, birthday } = req.body;
         if(!id || typeof id !== 'string') return res.status(400).json({message: 'is not id'}) 
         if(!password ) return res.status(400).json({message:'is not password'}) 
         if(!email || typeof email !== 'string') return res.status(400).json({message:'is not email'}) 
         if(!name || typeof name !== 'string') return res.status(400).json({message:'is not name'}) 
-        if(!qeustion || typeof qeustion !== 'object') return res.status(400).json({message:'is not qeustion'}) 
+        if(!question || typeof question !== 'object') return res.status(400).json({message:'is not question'}) 
         if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({message:'is not phoneNumber'}) 
         if(!gender || typeof gender !== 'string') return res.status(400).json({message:'is not gender'}) 
         if(!birthday || typeof birthday !== 'string') return res.status(400).json({message:'is not birthday'}) 
@@ -160,13 +158,11 @@ router.patch('/edit/userInfo', auth, async(req, res) => {
         if(!phoneNumber || typeof phoneNumber !== 'string') return res.status(400).json({ message: '번호가 잘못되었습니다' }) 
         if(!mongoose.isValidObjectId(_id)) return res.status(400).json({ message: '_아이디가 잘못되었습니다' }) 
 
-
         // 한번 find하고 비교해서 바뀐거만 할지... 아니면 몇개안되니 find update 한번에 할지 ..고민
-        // const newUserInfo = {}
-
+      
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {name, gender, birthday, phoneNumber} }, { new: true })
-        res.status(201).json(user)
 
+        res.status(201).json(user)
     } catch(err) {
         console.error(err)
         res.status(500).json({ message: err.message })
@@ -193,13 +189,10 @@ router.patch('/edit/email', auth, async(req, res) => {
         // console.log('get cookie', getAuthCode, match)
         if(!match) return res.status(400).json({ message: '인증번호가 다릅니다'});
 
-
         const user = await User.findOneAndUpdate({ _id: _id }, { $set: {email: email} }, { new: true });
         if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
       
         res.status(200).json({ email: user.email });
-
-
     } catch(err) {
         console.error(err);
         res.status(500).json({ err: err.message });
@@ -219,29 +212,26 @@ router.post('/edit/password', auth, async (req, res) => {
         if(!newPassword && typeof newPassword !== 'string') return res.status(400).json({ message: 'is not checked password' }) 
         if(newPassword !== newPasswordCheck) return res.status(400).json({ message: 'not password matched' })
 
-        const user = await User.findById(_id)
-        const matched = await bcrypt.compare(prevPassword, user.password)
+        const user = await User.findById(_id);
+        const matched = await bcrypt.compare(prevPassword, user.password);
 
-        if(!user) return res.status(400).json({ message: 'is not user' })
-        if(!matched) return res.status(400).json({ message: '이전 비번 확인해주세요' })
+        if(!user) return res.status(400).json({ message: 'is not user' });
+        if(!matched) return res.status(400).json({ message: '이전 비번 확인해주세요' });
 
         if(matched) {
-            console.log('back 비번 매칭성공')
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(newPassword, salt, (err, hash) => {
-                    console.log('back hashed', hash)
                     user.password = hash;
                     user.save();
-                    // res.status(201).json({ message: '비번 변경 성공!' })
                     res.status(201).end()
-                })
-            })
-        }
+                });
+            });
+        };
     } catch(err) {
-        console.error(err)
-        res.status(500).json({ message: err.message })
-    }
-})
+        console.error(err);
+        res.status(500).json({ message: err.message });
+    };
+});
 
 
 
@@ -267,9 +257,8 @@ router.post('/find/password', async (req, res) => {
                 user.password = hash;
                 user.save();
                 res.status(201).end();
-            })
-        })
-
+            });
+        });
     } catch(err) {
         console.error(err)
         res.status(500).json({ message: err.message })
@@ -285,7 +274,6 @@ router.post('/find/password', async (req, res) => {
 3. c: 인증번호 입력 후 서버로 보낼 때 쿠키도 같이보냄 
 4. s: c에서 넘어온 쿠키 유효기간 체크하고..지났으면 에러를 안지났으면 bcript로 비교 후 
 */
-
 
 //@ path    POST /api/users/find/id
 //@ doc     아이디 찾기
@@ -310,8 +298,6 @@ router.post('/find/id', async (req, res) => {
         if(!user) return  res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
 
         res.status(200).json({id: user.id})
-
-
     } catch(err) {
         console.error(err)
         res.status(500).json({ message: err.message })
@@ -325,10 +311,10 @@ router.post('/find/id', async (req, res) => {
 //@ access  public
 router.post('/find/id/question', async (req, res) => {
     try {
-        const { name, email, qeustionType, result } = req.body;
+        const { name, email, questionType, result } = req.body;
         if(!name) return res.status(400).json({ message: 'is not name' });
         if(!email) return res.status(400).json({ message: 'is not email' });
-        if(!qeustionType) return res.status(400).json({ message: 'is not qeustionType' });
+        if(!questionType) return res.status(400).json({ message: 'is not questionType' });
         if(!result) return res.status(400).json({ message: 'is not result' });
 
         const user = await User.findOne({email: email});
@@ -336,15 +322,40 @@ router.post('/find/id/question', async (req, res) => {
         
         if(user.name !== name) return  res.status(500).json({ message: '이름이 등록된 정보와 다릅니다' });
         if(user.email !== email) return  res.status(500).json({ message: '이메일이 등록된 정보와 다릅니다' });
-        if(user.qeustion.qeustionType !== qeustionType) return  res.status(500).json({ message: '질문이 등록된 정보와 다릅니다' });
-        if(user.qeustion.result !== result) return  res.status(500).json({ message: '질문의 답이 등록된 정보와 다릅니다' });
+        if(user.question.questionType !== questionType) return  res.status(500).json({ message: '질문이 등록된 정보와 다릅니다' });
+        if(user.question.result !== result) return  res.status(500).json({ message: '질문의 답이 등록된 정보와 다릅니다' });
 
         res.status(200).json({id: user.id})
-
-
     } catch(err) {
         console.error(err)
         res.status(500).json({ message: err.message })
+    }
+})
+
+
+
+//@ path    DELETE /api/users/delete
+//@ doc     회원탈퇴
+//@ access  private
+router.post('/delete', auth, async (req, res) => {
+    try {
+        // 로그인 된 상태 + 아뒤/비번/이멜 입력
+        const { id, password } = req.body;
+        if(!id || typeof id !== 'string') return res.status(400).json({ message: 'is not id and type checked' });
+        if(!password || typeof password !== 'string') return res.status(400).json({ message: 'is not result and type checked' });
+
+        const user = await User.findOne({id: id});
+        if(!user) return res.status(500).json({ message: '유저가 없습니다. 회원가입해주세요' });
+        
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if(!passwordMatch) return res.status(400).json({ message: '비밀번호가 일치하지 않습니다' });
+        if(user && passwordMatch) {
+            await User.deleteOne({ id: id });
+            res.status(201).clearCookie('X-refresh-token').end();
+        }
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ message: err.message });
     }
 })
 
