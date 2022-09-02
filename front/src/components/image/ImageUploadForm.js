@@ -52,8 +52,7 @@ const ImageUploadForm = () => {
                 }
             })
 
-            await dispatch({ type: "TEST_REQUEST", data: 'hoho'})
-            await dispatch({ type: "IMAGE_UPLOAD_REQUEST", data: res.data })
+             dispatch({ type: "IMAGE_UPLOAD_REQUEST", data: res.data })
 
 
             toast.success('t')

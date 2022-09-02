@@ -63,7 +63,7 @@ router.post('/login', async (req, res) => {
     try {
         const { id, password } = req.body;
 
-        if(!id ) return res.status(400).json({ message: 'is not id' }) 
+        if(!id) return res.status(400).json({ message: 'is not id' }) 
         if(!password) return res.status(400).json({ message: 'is not password' }) 
 
         const user = await User.findOne({ id: id })
@@ -98,7 +98,7 @@ router.post('/login', async (req, res) => {
 //@ path    GET /api/users/logout
 //@ doc     로그아웃
 //@ access  public
-router.get('/logout', (req, res) => {
+router.get('/logout', auth, (req, res) => {
     res.status(200).clearCookie('X-refresh-token').end();
 })
 
