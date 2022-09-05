@@ -14,7 +14,7 @@ export const auth = async (req, res, next) => {
              
             if(match && match.exp > Date.now().valueOf() / 1000) { 
                 // console.log(match)
-                console.log('acc 토큰으로 인증함')
+                console.log('auth / acc 토큰으로 인증함')
                 const user = await User.findOne({ id: match.id }).select({ password: 0, qeustion: 0, token: 0 })
                 req.user = { accToken, ...user._doc }
                 next() 
@@ -24,7 +24,7 @@ export const auth = async (req, res, next) => {
                 // 인증토큰 만료되어 리프레시 토큰으로 인증할 경우
                 const getRefreshToken = req.cookies["X-refresh-token"]
                 if(!getRefreshToken) return; // client에서 cookie로 리프레시토큰없으면 return
-                console.log('acc 토큰 만료돼서 refresh 토큰 으로 인증하고 다시 발급')
+                console.log('auth /  acc 토큰 만료돼서 refresh 토큰 으로 인증하고 다시 발급')
 
                 const refreshTokenDecode = decodeURIComponent(getRefreshToken)
                 const user = await User.findOne({ id: match.id }).select({ password: 0, qeustion: 0 })

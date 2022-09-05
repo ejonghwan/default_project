@@ -2,6 +2,10 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom'
 import './Header.css'
 
+// componenets
+import LogoutForm from '../../components/user/LogoutForm.js'
+
+
 // import { logoutUser } from '../../reducers/UserRequest.js'
 import UserRequest from '../../reducers/UserRequest.js'
 
@@ -45,8 +49,7 @@ const Header = () => {
                     <li><Link to="/style">style</Link></li>
                 </ul>
             </nav>
-            <span>name: {state.user && state.user.name} </span>
-            <button onClick={handleLogout}>logout</button>
+            {state.isLogged && <LogoutForm />}
         </header>
     );
 };

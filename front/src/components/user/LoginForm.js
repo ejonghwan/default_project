@@ -6,7 +6,8 @@ import _debounce from 'lodash.debounce'
 import { useInput } from '../common/hooks/index.js'
 
 // util
-import { statusCode, useDebounce } from '../../utils/utils.js'
+import { statusCode } from '../../utils/utils.js'
+import './LoginForm.css';
 
 // components
 import Input from '../common/form/Input.js'
@@ -40,6 +41,11 @@ const LoginForm = () => {
             if(statusCode(user.status, 2)) {
                 setUserId('')
                 setUserPassword('')
+
+                // cookie 시간과 맞춰서 로그아웃
+                setTimeout(async () => {
+                    await logoutUser();
+                }, 5000)
             }
         } catch(err) {
             console.error('catch?', err)

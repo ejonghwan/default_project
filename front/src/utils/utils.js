@@ -108,11 +108,11 @@ export const initTime = () => {
 
 
  /**
-     * 상태 코드 첫 숫자 확인하는 함수
-     * @param {Number} statusCode - 성공한 상태코드
-     * @param {Number, [Number]} matched - 비교할 넘버. 상태코드 첫숫자
-     * @returns {Boolean} - 비교 후 불리언 값 반환
-     */
+ * 상태 코드 첫 숫자 확인하는 함수
+ * @param {Number} statusCode - 성공한 상태코드
+ * @param {Number, [Number]} matched - 비교할 넘버. 상태코드 첫숫자
+ * @returns {Boolean} - 비교 후 불리언 값 반환
+ */
 export const statusCode = (statusCode, matched) => {
     const code = (statusCode).toString();
     if(matched instanceof Array) {
@@ -244,7 +244,7 @@ export const englishChecked = str => {
 
 
 
-const test = () => {
+// const test = () => {
     // const sampleTimestamp = Date.now(); //현재시간 타임스탬프 13자리 예)1599891939914
     // const date = new Date(sampleTimestamp); //타임스탬프를 인자로 받아 Date 객체 생성
 
@@ -276,7 +276,7 @@ const test = () => {
         // console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`);
         // // expected output: seconds elapsed = 2
         // }, 7000);
-}
+// }
 
 
 
