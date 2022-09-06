@@ -73,8 +73,27 @@ const LoginForm = () => {
     // }
  
 
+    const [bbb, setbbbb] = useState(1)
+
+     const testClick = e => {
+        setbbbb(bbb+1)
+     }
+
+     useEffect(() => {
+        const hoho = setTimeout(() => {
+            console.log(bbb)
+        }, 3000)
+
+        
+
+        return () => {
+            clearTimeout(hoho)
+        }
+     }, [bbb])
+
     return (
         <Fragment>
+            <button onClick={testClick}>{bbb}</button>
             {!state.isLogged ? (
                  <form onSubmit={handleSubmit}>
                  <div>
