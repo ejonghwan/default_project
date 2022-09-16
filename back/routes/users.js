@@ -52,7 +52,6 @@ router.get('/', auth, async (req, res) => {
         console.error(err)
         res.status(500).json({ message: err.message })
     }
-
 })
 
 
@@ -360,5 +359,24 @@ router.post('/delete', auth, async (req, res) => {
 })
 
 
+
+// seo test
+
+router.get('/settest', (req, res) => {
+    // res.render(`${__dirname}/template/error.ejs`); res.end() // 응답 종료
+    res.write(`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <p>hgophohoho</p>
+    </body>
+    </html>`)
+    res.end();
+}) 
 
 export default router;

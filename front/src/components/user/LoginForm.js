@@ -61,39 +61,26 @@ const LoginForm = () => {
      }, [userId, userPassword])
   
 
+
+
     // 이거 꼭 기억하자;;
     // const dd = _debounce(() => {
     //     return console.log(1111)
     // })
 
     // const fn = (e) => {
+
+    
     //     e.preventDefault();
     //     console.log(e)
     //     dd();
     // }
  
 
-    const [bbb, setbbbb] = useState(1)
 
-     const testClick = e => {
-        setbbbb(bbb+1)
-     }
-
-     useEffect(() => {
-        const hoho = setTimeout(() => {
-            console.log(bbb)
-        }, 3000)
-
-        
-
-        return () => {
-            clearTimeout(hoho)
-        }
-     }, [bbb])
 
     return (
         <Fragment>
-            <button onClick={testClick}>{bbb}</button>
             {!state.isLogged ? (
                  <form onSubmit={handleSubmit}>
                  <div>
