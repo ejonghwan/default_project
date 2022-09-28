@@ -80,6 +80,7 @@ const UserRequest = () => {
                 },
                 withCredentials: true,
             };
+
             const user = await axios.get(`${host}/api/users/load`, config);
 
             // accToken 만료되었으면 다시 받아온걸로 저장소 셋팅
@@ -104,6 +105,18 @@ const UserRequest = () => {
                 headers: { "Content-Type": "application/json", },
                 withCredentials: true // 쿠키 cors 통신 설정
             }
+
+            // axios.interceptors.response.use(
+            //     function(res) {
+            //         console.log('inter', res)
+            //         return res;
+            //     }, 
+            //     function(err) {
+            //         return Promise.reject(err)
+            //     }
+            // )
+
+
             const user = await axios.post(`${host}/api/users/login`, data, config);
             localStorage.setItem('X-access-token', user.data.accToken);
             dispatch({ type: "USER_LOGIN_SUCCESS", data: user.data });

@@ -1,0 +1,8 @@
+.calendar * {box-sizing: border-box;}
+.days {display: flex; } 
+.row {display: flex;}
+.row > div:first-child {color: rgb(194, 66, 66);}
+.row > div:last-child {color: rgb(40, 89, 224);}
+.col {width: 14.285714285714286%; padding: 10px; text-align: center;}
+
+.col.disabled {opacity: .5;}

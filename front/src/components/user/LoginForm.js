@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, Fragment, useContext, useMemo } from 'react';
-import _debounce from 'lodash.debounce'
+import _debounce from 'lodash.debounce';
+// import jwt from 'jsonwebtoken';
 
 
 // module
@@ -42,10 +43,12 @@ const LoginForm = () => {
                 setUserId('')
                 setUserPassword('')
 
+
                 // cookie 시간과 맞춰서 로그아웃
                 setTimeout(async () => {
                     await logoutUser();
-                }, 5000)
+                }, 7200000)
+
             }
         } catch(err) {
             console.error('catch?', err)
@@ -81,7 +84,7 @@ const LoginForm = () => {
 
     return (
         <Fragment>
-            {!state.isLogged ? (
+            {state.isLogged ? (<LoginUserInfo />) : (
                  <form onSubmit={handleSubmit}>
                  <div>
                      <Label htmlFor="userId" content="아이디" classN="label_t1"/>
@@ -115,7 +118,7 @@ const LoginForm = () => {
                  <button type="submit">로그인</button>
                  <p style={{color: "red"}}>{state.loginErrorMessage}</p>
              </form>
-            ) : (<LoginUserInfo />)}
+            )}
         </Fragment>
     );
 };

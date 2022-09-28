@@ -24,5 +24,31 @@
         <li>axios test</li>
         <li>axios test</li>
     </ul>
+    <div class="seotest"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+
+        console.log(axios)
+
+
+        var ele = document.querySelector('.seotest')
+        const bbb = async() => {
+            const res = await axios.get('http://localhost:5000/api/users/settest');
+            const data = res.data;
+            ele.innerHTML = data;
+            console.log(data)
+            
+        }
+
+        bbb();
+
+        // 결론은 ajax 방식은 seo에 좋지않음 
+        // 백엔드에서 주는 페이지면 ok
+
+
+
+    </script>
+
 </body>
 </html>

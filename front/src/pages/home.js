@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import ImageUploadForm from '../components/image/ImageUploadForm.js'
 import Auth from '../components/user/Auth.js'
 import LoginForm from '../components/user/LoginForm.js'
+import { Calender } from '../components/calender/Calender.js'
+
 
 const Home = () => {
 
@@ -23,6 +25,7 @@ const Home = () => {
             <LoginForm />
             <br />
             <br />
+            <Calender />
         </div>
     );
 };

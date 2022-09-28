@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 
+// components
 // import { logoutUser } from '../../reducers/UserRequest.js'
 import UserRequest from '../../reducers/UserRequest.js'
 
 //context 
 import { UserContext } from '../../context/UserContext.js'
 import axios from 'axios';
-
 
 const LogoutForm = () => {
     const { logoutUser } = UserRequest();
@@ -20,6 +20,8 @@ const LogoutForm = () => {
         console.err(err)
       }
     }
+
+
 
     return (
         <div>

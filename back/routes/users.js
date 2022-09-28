@@ -361,7 +361,7 @@ router.post('/delete', auth, async (req, res) => {
 
 
 // seo test
-
+//@ path    DELETE /api/users/
 router.get('/settest', (req, res) => {
     // res.render(`${__dirname}/template/error.ejs`); res.end() // 응답 종료
     res.write(`<!DOCTYPE html>
