@@ -6,3 +6,4 @@
 .col {width: 14.285714285714286%; padding: 10px; text-align: center;}
 
 .col.disabled {opacity: .5;}
+.col.selected {background-color: rgb(233, 241, 255);}

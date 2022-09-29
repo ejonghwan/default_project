@@ -68,13 +68,13 @@ const App = () => {
     userLoad()
     userEmailLoad()
     dispatch({type: "ERROR_LOADING_CLEAR"})
-    console.log(state.isLogged)
+    // console.log(state.isLogged)
     
   }, [])
 
 
   useEffect(() => {
-    console.log(state)
+    // console.log(state)
   }, [state])
  
   return (
