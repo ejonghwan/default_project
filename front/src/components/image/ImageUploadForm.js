@@ -3,11 +3,11 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 
 
-import './ImageUploadForm.css'
-import ProgressBar from '../progress/ProgressBar.js'
+import './ImageUploadForm.css';
+import ProgressBar from '../progress/ProgressBar.js';
 
-import { ImageContext } from '../../context/ImageContext.js'
-
+import { ImageContext } from '../../context/ImageContext.js';
+import { UserContext } from '../../context/UserContext.js';
 
 
 const ImageUploadForm = () => {
@@ -16,10 +16,19 @@ const ImageUploadForm = () => {
     const [fileName, setFileName] = useState("이미지파일 업로드 해주세요")
     const [persent, setPersent] = useState(0) 
     const [imageUrl, setImageUrl] = useState(null);
-    
-    
-    const { state, dispatch } = useContext(ImageContext)
 
+    const [testFile, setTestFile] = useState([])
+    
+    
+    const { imageState, imageDispatch } = useContext(ImageContext)
+    const { state, dispatch } = useContext(UserContext)
+
+
+    useEffect(() => {
+        console.log('testFile', testFile)
+        setTestFile([...testFile, file])
+        
+    }, [file])
 
     const handleInputChange = e => {
         // console.log(e.target.files[0])
@@ -32,16 +41,20 @@ const ImageUploadForm = () => {
         fileReader.onload = e => setImageUrl(e.target.result)
     }
 
-
-
     const handleSubmit = async e => {
         e.preventDefault();
         const formData = new FormData();
         formData.append('image', file) //form data에 배열로 담김
+        formData.append('name', state.user.name) 
+        formData.append('_id', state.user._id) 
+        formData.append('public', true) 
+
+        console.log('front form: ', formData)
+
         if(!formData) return;
         try {
             const res = await axios.post('http://localhost:5000/api/images', formData, {
-                headers: {"Content-Type":"multipart/form-data"},
+                headers: { "Content-Type":"multipart/form-data" },
                 onUploadProgress: ProgressEvent => {
                     // console.log(ProgressEvent)
                     setPersent( Math.round(100 * ProgressEvent.loaded / ProgressEvent.total) )
@@ -75,6 +88,7 @@ const ImageUploadForm = () => {
 
     return (
         <div>
+            
             <form onSubmit={handleSubmit}>
                 <img src={imageUrl} style={{width: "200px"}}/>
                 {/* <label htmlFor='image' >{fileName}</label> */}

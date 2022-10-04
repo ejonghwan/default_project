@@ -6,9 +6,9 @@ export const ImageContext = createContext(null);
 
 
 export const ImageProvider = ({ children }) => {
-    const [ state, dispatch ] = useReducer(ImageReducer, ImageIntialState) 
+    const [ imageState, imageDispatch ] = useReducer(ImageReducer, ImageIntialState) 
     return (
-        <ImageContext.Provider value={{ state, dispatch }}>
+        <ImageContext.Provider value={{ imageState, imageDispatch }}>
             {children}
         </ImageContext.Provider>
     )

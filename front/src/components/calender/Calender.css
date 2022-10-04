@@ -5,5 +5,7 @@
 .row > div:last-child {color: rgb(40, 89, 224);}
 .col {width: 14.285714285714286%; padding: 10px; text-align: center;}
 
+.col.today > span {font-weight: bold; position: relative; width: 100%; display: inline-block;}
+.col.today > span::before {content:''; width: 5px; height: 5px; display: inline-block;; font-weight: bold; background-color: rgb(255, 97, 97); border-radius: 50%; position: absolute; top:0px; right: 8px;  margin: 0 auto; }
 .col.disabled {opacity: .5;}
-.col.selected {background-color: rgb(233, 241, 255);}
+.col.selected {background-color: #4481ff; color: #fff;}
