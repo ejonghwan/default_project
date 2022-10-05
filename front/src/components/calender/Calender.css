@@ -1,11 +1,27 @@
 .calendar * {box-sizing: border-box;}
-.days {display: flex; } 
-.row {display: flex;}
-.row > div:first-child {color: rgb(194, 66, 66);}
-.row > div:last-child {color: rgb(40, 89, 224);}
-.col {width: 14.285714285714286%; padding: 10px; text-align: center;}
+.header  {text-align: center; height: 40px;}
+
+
+.days,
+.body .row {display: flex;}
+.days .row > div:first-child,
+.body .row > div:first-child {color: rgb(194, 66, 66);}
+.days .row > div:last-child,
+.body .row > div:last-child {color: rgb(40, 89, 224);}
+
+.days .col,
+.body .col {width: 14.285714285714286%; padding: 10px; text-align: center;}
 
 .col.today > span {font-weight: bold; position: relative; width: 100%; display: inline-block;}
 .col.today > span::before {content:''; width: 5px; height: 5px; display: inline-block;; font-weight: bold; background-color: rgb(255, 97, 97); border-radius: 50%; position: absolute; top:0px; right: 8px;  margin: 0 auto; }
 .col.disabled {opacity: .5;}
-.col.selected {background-color: #4481ff; color: #fff;}
+.col.selected {background-color: #4481ff; color: #fff !important;}
+
+
+/* .swiper {overflow: visible !important;} */
+.swiper .swiper-button-prev {top:3px; font-size: 25px;}
+.swiper .swiper-button-next {top:3px; font-size: 25px;}
+.swiper-button-next:after, 
+.swiper-rtl .swiper-button-prev:after,
+.swiper-button-next:after, 
+.swiper-button-prev:after {font-size: 25px !important;;}

@@ -1,16 +1,13 @@
-import React, { useContext, useState } from 'react'
+import { useContext } from 'react'
 import axios from 'axios'
-import _debounce from 'lodash.debounce'
 import { UserContext } from '../context/UserContext.js'
 
-// ddebounceFn
-import { debounce } from '../utils/utils.js'
 
 
 
 const host = 'http://localhost:5000'
 const UserRequest = () => {
-    const { state, dispatch } = useContext(UserContext); 
+    const { dispatch } = useContext(UserContext); 
 
    // 회원가입 유저
      const emailAuth = async data => {

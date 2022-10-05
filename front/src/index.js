@@ -11,6 +11,10 @@ import { UserProvider, UserContext } from './context/UserContext.js'
 import RoutesPage from './pages/index.js'
 
 
+import 'swiper/css';
+import 'swiper/css/virtual';
+import "swiper/css/navigation";
+
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

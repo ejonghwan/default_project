@@ -77,6 +77,21 @@ router.delete('/', async (req, res) => {
 })
 
  
+// 파퓰 테스트
+// @ GET /api/images/pp
+// @ public
+// @ desc 이미지 삭제
+router.get('/pp', async (req, res) => {
+    try {
+        const img = await ImageModel.findById('633d46a6d9ab95b3a0f74c9a')
+        console.log(img)
+        res.json(img)
+    } catch(err) {
+        console.error(err)
+    }
+})
+
+ 
 
 
 

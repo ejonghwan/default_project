@@ -1,9 +1,3 @@
-import React from 'react';
-import axios from 'axios';
-import _debounce from 'lodash.debounce';
-
-
-
 
 
 export const questionData = [
@@ -119,10 +113,10 @@ export const statusCode = (statusCode, matched) => {
     const code = (statusCode).toString();
     if(matched instanceof Array) {
         for(let i = 0; i < matched.length; i++) {
-            if(code[0] == matched[i]) return true;
+            if(code[0] === matched[i]) return true;
         }
     }
-    if(typeof matched === 'number') { return code[0] == matched ? true : false; }
+    if(typeof matched === 'number') { return code[0] === matched ? true : false; }
     return false;
 }
 
@@ -161,8 +155,8 @@ export const englishChecked = str => {
  * @returns {Boolean} - 체크 후 불리언값 리턴
  */
  export const stringLengthChecked = (arg, len) => {
-    if(!arg && typeof arg !== 'string' || 
-       !arg && typeof arg !== 'number' ) return console.error('타입 확인')
+    if(!arg && typeof arg !== 'string') return console.error('타입 확인')
+    if(!arg && typeof arg !== 'number') return console.error('타입 확인')
     return arg.length === len ? true : false;
 }
 

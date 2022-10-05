@@ -6,6 +6,8 @@ import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { isSameMonth, isSameDay, addDays, parse } from 'date-fns';
 
 
+
+
 const CalenderCells = ({ currentMonth, selectedDate, onDateClick }) => {
     const monthStart = startOfMonth(currentMonth); //이달의 시작 9/1
     const monthEnd = endOfMonth(monthStart); //이달의 끝 9/30
@@ -64,9 +66,10 @@ const CalenderCells = ({ currentMonth, selectedDate, onDateClick }) => {
         days = [];
     }
 
-    return <div className="body">{rows}</div>;
+    return (<div className="body">{rows}</div>);
 };
 
 
 
 export default CalenderCells;
+
