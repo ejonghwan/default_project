@@ -19,6 +19,13 @@ import { statusCode } from '../../utils/utils.js'
 import UserRequest from '../../reducers/UserRequest.js'
 import { UserContext } from '../../context/UserContext.js'
 
+
+/*
+    1. nonLoginMemberAuthNumberRequest 이름 메일번호 받아서 인증번호 날림 
+    2. 인증번호 입력후 서브밋하면 findUserId으로 아뒤 받아옴 
+    3. UserPasswordEdit으로 id 넘겨주고 비번변경함 
+*/
+
 const FindPassword = () => {
 
         const { findUserId, nonLoginMemberAuthNumberRequest } = UserRequest()
@@ -28,7 +35,7 @@ const FindPassword = () => {
         const [authToggle, setAuthToggle] = useState(false);
         const [name, handleName, setName] = useInput('');
         const [email, handleEmail, setEmail] = useInput(''); 
-        const [resMsg, setResMsg] = useState({});
+        const [resMsg, setResMsg] = useState('');
         const [authTimeout, setAuthTimeout] = useState(false);
         const [authcom, setAuthcom] = useState(false);
 
@@ -65,7 +72,8 @@ const FindPassword = () => {
                     setName('');
                     setEmail(''); 
                     setAutnNumber('');
-                    setAuthcom(true)
+                    setAuthcom(true);
+                    setResMsg(findId.data.id) //이거 제대로 넘겨줘야...
                 }
             } catch(err) {
                 console.error(err)
@@ -121,7 +129,7 @@ const FindPassword = () => {
                 {state.mailAuthErrorMessage && <p style={{color: 'red'}}>{state.mailAuthErrorMessage}</p>}
             </form>
 
-            {resMsg && <div>{resMsg.id}</div>}
+            {resMsg && <div>{resMsg}</div>}
             {authToggle && (
                 <form onSubmit={handleFindIdSubmit}>
                   <div>
@@ -152,7 +160,7 @@ const FindPassword = () => {
             )}
 
             <br /><br />
-            {authcom && <UserPasswordEdit prevPasswordCheck={false} userId={resMsg.id}/>}
+            {authcom && <UserPasswordEdit prevPasswordCheck={false} userId={resMsg}/>}
             
            
         </Fragment>
