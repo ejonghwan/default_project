@@ -23,9 +23,8 @@ const ImageReducer = (state = ImageIntialState, action) => {
         case "IMAGE_UPLOAD_REQUEST": 
             return {
                 ...state,
-           
                 images: [...state.images].concat(action.data),
-                // testa: [...state.testa].concat(action.data)
+                testa: [...state.testa].concat(action.data)
             }
 
         default: 

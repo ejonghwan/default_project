@@ -61,7 +61,7 @@ const UserRequest = () => {
 
 
     // 유저 불러오기
-     const getUser = async query => {
+     const getUser = async query => { // 쿠키없으면 로컬에서 acc토큰없애기 
         try {
             let accToken = null;
             if(query) { accToken = query }; //이미 가입된 이메일로 들어오는 유저들은 로그인 로직탐. query로 acc토큰 받음 

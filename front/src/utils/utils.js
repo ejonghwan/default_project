@@ -116,7 +116,7 @@ export const statusCode = (statusCode, matched) => {
             if(code[0] === matched[i]) return true;
         }
     }
-    if(typeof matched === 'number') { return code[0] === matched ? true : false; }
+    if(typeof matched === 'number') { return Number(code[0]) === matched ? true : false; }
     return false;
 }
 

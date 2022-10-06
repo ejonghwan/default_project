@@ -11,7 +11,6 @@ export const auth = async (req, res, next) => {
         if(accToken) {
             const match = jwt.verify(accToken, process.env.JWT_KEY, {ignoreExpiration: true},) 
              // decode가 있으면 acc로 인증 
-             
             if(match && match.exp > Date.now().valueOf() / 1000) { 
                 // console.log(match)
                 console.log('auth / acc 토큰으로 인증함')

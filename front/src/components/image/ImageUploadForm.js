@@ -54,7 +54,11 @@ const ImageUploadForm = () => {
         if(!formData) return;
         try {
             const res = await axios.post('http://localhost:5000/api/images', formData, {
-                headers: { "Content-Type":"multipart/form-data" },
+                headers: { 
+                    "Content-Type": "multipart/form-data",
+                    'X-access-token': localStorage.getItem('X-access-token'),
+                },
+                withCredentials: true,
                 onUploadProgress: ProgressEvent => {
                     // console.log(ProgressEvent)
                     setPersent( Math.round(100 * ProgressEvent.loaded / ProgressEvent.total) )
@@ -65,7 +69,7 @@ const ImageUploadForm = () => {
                 }
             })
 
-             dispatch({ type: "IMAGE_UPLOAD_REQUEST", data: res.data })
+            imageDispatch({ type: "IMAGE_UPLOAD_REQUEST", data: res.data })
 
 
             toast.success('t')
@@ -78,7 +82,7 @@ const ImageUploadForm = () => {
 
     const testClick = e => {
         console.log(111)
-        dispatch({ type: "IMAGE_UPLOAD_REQUEST", data: 'hoho'})
+        imageDispatch({ type: "IMAGE_UPLOAD_REQUEST", data: 'hoho'})
     }
 
     // useEffect(() => {
